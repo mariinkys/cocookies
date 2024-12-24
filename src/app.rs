@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use leptos_meta::{provide_meta_context, Stylesheet, Title};
+use leptos_meta::{provide_meta_context, Link, Stylesheet, Title};
 use leptos_router::{
     components::{Route, Router, Routes},
     StaticSegment, WildcardSegment,
@@ -21,6 +21,11 @@ pub fn App() -> impl IntoView {
 
         // sets the document title
         <Title text="Cocookies"/>
+
+        <Link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
+        <Link rel="icon" type_="image/png" sizes="32x32" href="/assets/favicon-32x32.png" />
+        <Link rel="icon" type_="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
+        <Link rel="manifest" href="/assets/site.webmanifest" />
 
         <ToastComponent/>
         <NavbarComponent/>
