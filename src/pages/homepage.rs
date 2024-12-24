@@ -13,7 +13,24 @@ pub fn HomePage() -> impl IntoView {
                 <p class="text-xl text-center text-red-500">"An error occurred: " {format!("{:?}", error)}</p>
             }>
                 <Show  when=move || {recipes.get().is_some_and(|res| res.is_ok_and(|recipes| !recipes.is_empty()))}
-                fallback=move || view! { <p class="text-xl text-center">"No recipes..."</p>}>
+                fallback=move || view! {
+                    <div class="flex flex-col items-center justify-center h-[90vh] text-center gap-5">
+                        <img src="/assets/utils/NoRecipes.png" />
+                        <p class="text-2xl">"No recipes..."</p>
+                        <a href="/recipes/new">
+                            <button type="button" class="btn btn-primary">"Add a new one!"</button>
+                        </a>
+                    </div>
+
+                }>
+                    <div class="fixed bottom-4 right-4 z-10">
+                        <a href="/recipes/new" class="bg-primary text-white px-4 py-2 rounded-full shadow-lg hover:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-400 flex items-center justify-center">
+                        <svg class="w-20 h-20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 12H20M12 4V20" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        </a>
+                    </div>
+
                     <div class="p-8 flex gap-5 flex-wrap justify-start sm:justify-center items-center">
                         <For
                             each=move || {recipes.get_untracked().and_then(|res| res.ok()).unwrap_or_default()}
