@@ -46,6 +46,11 @@ ssr = [
   "dep:dotenvy",
 ]
 
+# Added by me for file uploading
+[dependencies.web-sys]
+version = "0.3.72"
+features = ["File"]
+
 # Defines a size-optimized profile for the WASM bundle in release mode
 [profile.wasm-release]
 inherits = "release"
