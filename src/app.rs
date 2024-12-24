@@ -5,6 +5,8 @@ use leptos_router::{
     StaticSegment, WildcardSegment,
 };
 
+use crate::components::navbar::NavbarComponent;
+use crate::components::toast::ToastComponent;
 use crate::pages::homepage::HomePage;
 
 #[component]
@@ -19,6 +21,9 @@ pub fn App() -> impl IntoView {
 
         // sets the document title
         <Title text="Cocookies"/>
+
+        <ToastComponent/>
+        <NavbarComponent/>
 
         // content for this welcome page
         <Router>

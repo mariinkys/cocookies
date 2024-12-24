@@ -24,6 +24,7 @@ sqlx = { version = "0.8.2", features = [
   "chrono",
   "uuid",
 ], optional = true }
+serde = { version = "1.0.216" }
 chrono = { version = "0.4.31", features = ["serde"] }
 futures = { version = "0.3", optional = true }
 dotenvy = { version = "0.15.7", optional = true }
