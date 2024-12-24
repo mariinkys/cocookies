@@ -33,6 +33,7 @@ pub async fn get_recipe(id: i32) -> Result<Recipe, ServerFnError> {
                 description: row.get("description"),
                 prep_time_minutes: row.get("prep_time_minutes"),
                 servings: row.get("servings"),
+                main_photo: row.get("main_photo"),
                 created_at: row.get("created_at"),
                 updated_at: row.get("updated_at"),
             };
@@ -56,6 +57,7 @@ pub async fn upsert_recipe(recipe: Recipe) -> Result<i32, ServerFnError> {
                     description = ?,
                     prep_time_minutes = ?,
                     servings = ?,
+                    main_photo = ?,
                 WHERE
                     recipe_id = ?
             ",
@@ -64,6 +66,7 @@ pub async fn upsert_recipe(recipe: Recipe) -> Result<i32, ServerFnError> {
         .bind(recipe.description)
         .bind(recipe.prep_time_minutes)
         .bind(recipe.servings)
+        .bind(recipe.main_photo)
         .bind(recipe.recipe_id.unwrap())
         .execute(&*pool)
         .await
@@ -73,15 +76,17 @@ pub async fn upsert_recipe(recipe: Recipe) -> Result<i32, ServerFnError> {
                 name,
                 description,
                 prep_time_minutes,
-                servings
+                servings,
+                main_photo
             )
-            VALUES (?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?)
         ",
         )
         .bind(recipe.name)
         .bind(recipe.description)
         .bind(recipe.prep_time_minutes)
         .bind(recipe.servings)
+        .bind(recipe.main_photo)
         .execute(&*pool)
         .await
     };
@@ -107,6 +112,7 @@ pub async fn get_all_recipes() -> Result<Vec<Recipe>, ServerFnError> {
         let description: Option<String> = row.try_get("description").unwrap_or(None);
         let prep_time_minutes: Option<i32> = row.try_get("prep_time_minutes").unwrap_or(None);
         let servings: Option<i32> = row.try_get("servings").unwrap_or(None);
+        let main_photo: Option<String> = row.try_get("main_photo").unwrap_or(None);
         let created_at: Option<NaiveDateTime> = row.try_get("created_at").unwrap_or(None);
         let updated_at: Option<NaiveDateTime> = row.try_get("updated_at").unwrap_or(None);
 
@@ -116,6 +122,7 @@ pub async fn get_all_recipes() -> Result<Vec<Recipe>, ServerFnError> {
             description,
             prep_time_minutes,
             servings,
+            main_photo,
             created_at,
             updated_at,
         };

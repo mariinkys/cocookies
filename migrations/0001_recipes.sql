@@ -4,6 +4,7 @@ CREATE TABLE recipes (
     description TEXT,
     prep_time_minutes INTEGER,
     servings INTEGER,
+    main_photo TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

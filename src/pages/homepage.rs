@@ -1,5 +1,6 @@
 use leptos::prelude::*;
 
+use crate::components::page_loading::PageLoadingComponent;
 use crate::{api::recipe::get_all_recipes, models::recipe::Recipe};
 
 /// Renders the home page of your application.
@@ -8,7 +9,7 @@ pub fn HomePage() -> impl IntoView {
     let recipes = OnceResource::new(get_all_recipes());
 
     view! {
-        <Suspense fallback=move || view! { <p>"Loading..."</p> }>
+        <Suspense fallback=move || view! { <PageLoadingComponent/> }>
             <ErrorBoundary fallback=|error| view! {
                 <p class="text-xl text-center text-red-500">"An error occurred: " {format!("{:?}", error)}</p>
             }>

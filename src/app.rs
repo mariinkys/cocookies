@@ -2,12 +2,13 @@ use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, Link, Stylesheet, Title};
 use leptos_router::{
     components::{Route, Router, Routes},
-    StaticSegment, WildcardSegment,
+    path, StaticSegment, WildcardSegment,
 };
 
 use crate::components::navbar::NavbarComponent;
 use crate::components::toast::ToastComponent;
 use crate::pages::homepage::HomePage;
+use crate::pages::new_recipe::NewRecipe;
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -35,6 +36,7 @@ pub fn App() -> impl IntoView {
             <main>
                 <Routes fallback=move || "Not found.">
                     <Route path=StaticSegment("") view=HomePage/>
+                    <Route path=path!("/recipes/new") view=NewRecipe/>
                     <Route path=WildcardSegment("any") view=NotFound/>
                 </Routes>
             </main>
