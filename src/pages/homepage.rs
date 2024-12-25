@@ -51,6 +51,20 @@ pub fn HomePage() -> impl IntoView {
                                                     None => String::from("No description"),
                                                 }}
                                                 </p>
+                                                <div class="flex gap-3 flex-wrap">
+                                                    <Show
+                                                        when=move || { recipe.servings.is_some() }
+                                                        fallback=|| view! { "" }
+                                                    >
+                                                        <div class="badge badge-primary font-bold">{recipe.servings.unwrap_or_default()}" servings"</div>
+                                                    </Show>
+                                                    <Show
+                                                        when=move || { recipe.prep_time_minutes.is_some() }
+                                                        fallback=|| view! { "" }
+                                                    >
+                                                        <div class="badge badge-secondary font-bold">{recipe.prep_time_minutes.unwrap_or_default()}"min"</div>
+                                                    </Show>
+                                                </div>
                                             </div>
                                         </a>
                                     </div>
