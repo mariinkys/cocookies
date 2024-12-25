@@ -9,6 +9,7 @@ use crate::components::navbar::NavbarComponent;
 use crate::components::toast::ToastComponent;
 use crate::pages::homepage::HomePage;
 use crate::pages::new_recipe::NewRecipe;
+use crate::pages::view_edit_recipe::ViewEditRecipe;
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -37,6 +38,7 @@ pub fn App() -> impl IntoView {
                 <Routes fallback=move || "Not found.">
                     <Route path=StaticSegment("") view=HomePage/>
                     <Route path=path!("/recipes/new") view=NewRecipe/>
+                    <Route path=path!("/recipes/:id") view=ViewEditRecipe/>
                     <Route path=WildcardSegment("any") view=NotFound/>
                 </Routes>
             </main>
