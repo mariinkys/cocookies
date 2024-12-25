@@ -32,13 +32,13 @@ pub fn HomePage() -> impl IntoView {
                         </a>
                     </div>
 
-                    <div class="p-8 flex gap-5 flex-wrap justify-start sm:justify-center items-center">
+                    <div class="p-8 flex gap-5 flex-wrap justify-start sm:justify-center">
                         <For
                             each=move || {recipes.get_untracked().and_then(|res| res.ok()).unwrap_or_default()}
                             key=|recipe| recipe.recipe_id
                             children=move |recipe: Recipe| {
                                 view! {
-                                    <div class="card bg-base-100 w-96 shadow-xl">
+                                    <div class="card bg-base-100 w-96 shadow-xl h-max">
                                         <a class="w-full h-full" href=format!("recipes/{}", recipe.recipe_id.unwrap_or_default())>
                                             <figure>
                                                 <img
@@ -51,7 +51,7 @@ pub fn HomePage() -> impl IntoView {
                                                     None => String::from("No description"),
                                                 }}
                                                 </p>
-                                                <div class="flex gap-3 flex-wrap">
+                                                <div class="flex gap-3 flex-wrap justify-end">
                                                     <Show
                                                         when=move || { recipe.servings.is_some() }
                                                         fallback=|| view! { "" }
