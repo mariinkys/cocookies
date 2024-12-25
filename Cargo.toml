@@ -28,6 +28,9 @@ serde = { version = "1.0.216" }
 chrono = { version = "0.4.31", features = ["serde"] }
 futures = { version = "0.3", optional = true }
 dotenvy = { version = "0.15.7", optional = true }
+wasm-bindgen-futures = "0.4.49"
+async-std = "1.13.0"
+uuid = { version = "1", features = ["v4", "js"] }
 
 [features]
 csr = ["leptos/csr"]
@@ -49,7 +52,7 @@ ssr = [
 # Added by me for file uploading
 [dependencies.web-sys]
 version = "0.3.72"
-features = ["File"]
+features = ["File", "FileList"]
 
 # Defines a size-optimized profile for the WASM bundle in release mode
 [profile.wasm-release]

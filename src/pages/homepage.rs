@@ -42,7 +42,7 @@ pub fn HomePage() -> impl IntoView {
                                         <a class="w-full h-full" href=format!("recipes/{}", recipe.recipe_id.unwrap_or_default())>
                                             <figure>
                                                 <img
-                                                src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"/>
+                                                src=recipe.main_photo.unwrap_or_default()/>
                                             </figure>
                                             <div class="card-body">
                                                 <h2 class="card-title">{recipe.name}</h2>

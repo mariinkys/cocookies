@@ -3,6 +3,7 @@ pub mod app;
 pub mod components;
 pub mod models;
 pub mod pages;
+pub mod utils;
 
 #[cfg(feature = "ssr")]
 #[actix_web::main]
