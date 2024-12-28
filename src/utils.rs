@@ -34,6 +34,36 @@ pub async fn upload_file(file_data: Vec<u8>, file_path: String) -> Result<String
     }
 }
 
+#[server(DeleteFile, "/api/uploadfile")]
+pub async fn delete_file(file_path: String) -> Result<String, ServerFnError> {
+    use async_std::fs;
+    use async_std::path::Path;
+
+    // Convert the file path into an async-compatible Path
+    let file_path = Path::new(&file_path);
+
+    // Check if the file exists asynchronously
+    if !file_path.exists().await {
+        return Err(ServerFnError::ServerError(format!(
+            "File not found: {}",
+            file_path.display()
+        )));
+    }
+
+    // Attempt to delete the file asynchronously
+    match fs::remove_file(file_path).await {
+        Ok(_) => Ok(format!(
+            "File deleted successfully: {}",
+            file_path.display()
+        )),
+        Err(e) => Err(ServerFnError::ServerError(format!(
+            "Failed to delete file: {}. Error: {}",
+            file_path.display(),
+            e
+        ))),
+    }
+}
+
 pub fn get_file_extension(file: &web_sys::File) -> Option<&'static str> {
     match file.type_().as_str() {
         "image/png" => Some("png"),

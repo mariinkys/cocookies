@@ -27,8 +27,8 @@ pub fn NewRecipe() -> impl IntoView {
         // TODO: Fix Hydration issues while adding (so that loading set true also works and instead of disabling maybe show spinner?)
         spawn_local(async move {
             // File upload handling
-            let image_bytes = move || main_photo_image.get();
-            if let Some(img) = image_bytes() {
+            let image_bytes = main_photo_image.get();
+            if let Some(img) = image_bytes {
                 if let Err(err) = upload_file(img, image_path.get()).await {
                     set_toast.set(ToastMessage {
                         message: format!("Err {}", err),

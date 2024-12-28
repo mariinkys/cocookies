@@ -152,24 +152,64 @@ pub async fn get_all_recipes() -> Result<Vec<Recipe>, ServerFnError> {
 }
 
 #[server(DeleteRecipe, "/api/recipe/delete")]
-pub async fn delete_recipe(id: i32) -> Result<(), ServerFnError> {
+pub async fn delete_recipe(recipe_id: i32) -> Result<(), ServerFnError> {
     let ext: Data<Pool<Sqlite>> = extract().await?;
     let pool: Arc<Pool<Sqlite>> = ext.into_inner();
 
-    if id != 0 {
-        let row_result = sqlx::query("DELETE FROM recipes WHERE id = ?")
-            .bind(id)
-            .execute(&*pool)
-            .await;
+    if recipe_id == 0 {
+        return Err(ServerFnError::ServerError(String::from(
+            "Invalid recipe_id",
+        )));
+    }
 
-        match row_result {
-            Ok(_) => Ok(()),
-            Err(sqlx::Error::RowNotFound) => {
-                Err(ServerFnError::new(String::from("Recipe not found")))
-            }
-            Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+    let row_result = sqlx::query("SELECT * FROM recipes WHERE recipe_id = ?")
+        .bind(recipe_id)
+        .fetch_one(&*pool)
+        .await;
+
+    let recipe = match row_result {
+        Ok(row) => Recipe {
+            recipe_id: row.get("recipe_id"),
+            name: row.get("name"),
+            description: row.get("description"),
+            prep_time_minutes: row.get("prep_time_minutes"),
+            servings: row.get("servings"),
+            main_photo: row.get("main_photo"),
+            created_at: row.get("created_at"),
+            updated_at: row.get("updated_at"),
+        },
+        Err(Error::RowNotFound) => {
+            return Err(ServerFnError::ServerError(String::from("Recipe not found")));
         }
-    } else {
-        Err(ServerFnError::new(String::from("Query Error")))
+        Err(err) => {
+            return Err(ServerFnError::ServerError(format!("Server Error: {}", err)));
+        }
+    };
+
+    // Attempt to delete the main photo, if it exists
+    if recipe.main_photo.is_some() {
+        if let Err(err) = crate::utils::delete_file(recipe.main_photo.unwrap()).await {
+            return Err(ServerFnError::ServerError(format!(
+                "Failed to delete main photo: {}",
+                err
+            )));
+        }
+    }
+
+    // Delete the recipe from the database
+    let delete_row_result = sqlx::query("DELETE FROM recipes WHERE recipe_id = ?")
+        .bind(recipe_id)
+        .execute(&*pool)
+        .await;
+
+    match delete_row_result {
+        Ok(_) => Ok(()),
+        Err(Error::RowNotFound) => {
+            Err(ServerFnError::ServerError(String::from("Recipe not found")))
+        }
+        Err(err) => Err(ServerFnError::ServerError(format!(
+            "Failed to delete recipe: {}",
+            err
+        ))),
     }
 }

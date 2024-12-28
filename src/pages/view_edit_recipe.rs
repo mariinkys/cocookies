@@ -2,6 +2,7 @@ use crate::api::recipe::get_recipe;
 use crate::components::page_loading::PageLoadingComponent;
 use crate::components::recipe::add_edit_ingredients::ViewEditIngredientsComponent;
 use crate::components::recipe::add_edit_steps::ViewEditStepsComponent;
+use crate::components::recipe::delete_recipe_button::DeleteRecipeButton;
 use crate::components::recipe::edit_recipe::ViewEditRecipeComponent;
 use crate::components::toast::{ToastMessage, ToastType};
 use crate::models::recipe::Recipe;
@@ -45,9 +46,12 @@ pub fn ViewEditRecipe() -> impl IntoView {
                 <ErrorBoundary fallback=|error| view! {
                     <p class="text-3xl text-center text-red-500">"An error occurred: " {format!("{:?}", error)}</p>
                 }>
+                    // TODO Maybe we can use either and check the recipe id? Also maybe keep an edit/view state in this page and switch the view?
                     { move || {
                         recipe_resource.get().map(move |x| {
                             x.map(move |recipe_result| {
+                                let recipe_id = recipe_result.recipe_id.unwrap_or_default();
+
                                 view! {
                                     // EDIT RECIPE
                                     <ViewEditRecipeComponent recipe=recipe_result/>
@@ -56,6 +60,9 @@ pub fn ViewEditRecipe() -> impl IntoView {
                                     <ViewEditIngredientsComponent/>
                                     // EDIT/ADD STEPS COMPONENT
                                     <ViewEditStepsComponent/>
+
+                                    // DELETE RECIPE BUTTON
+                                    <DeleteRecipeButton recipe_id=recipe_id/>
                                 }
                             })
                         })
