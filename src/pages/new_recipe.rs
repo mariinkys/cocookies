@@ -1,4 +1,4 @@
-use crate::api::recipe::upsert_recipe;
+use crate::api::recipe::add_recipe;
 use crate::components::page_loading::PageLoadingComponent;
 use crate::components::toast::{ToastMessage, ToastType};
 use crate::models::recipe::Recipe;
@@ -24,11 +24,11 @@ pub fn NewRecipe() -> impl IntoView {
         loading.set(true);
 
         // TODO: Data validator
-
+        // TODO: Fix Hydration issues while adding (so that loading set true also works and instead of disabling maybe show spinner?)
         spawn_local(async move {
             // File upload handling
-            let image_bytes = main_photo_image.get();
-            if let Some(img) = image_bytes {
+            let image_bytes = move || main_photo_image.get();
+            if let Some(img) = image_bytes() {
                 if let Err(err) = upload_file(img, image_path.get()).await {
                     set_toast.set(ToastMessage {
                         message: format!("Err {}", err),
@@ -43,7 +43,7 @@ pub fn NewRecipe() -> impl IntoView {
             }
 
             // Recipe creation handling
-            match upsert_recipe(model.get_untracked()).await {
+            match add_recipe(model.get_untracked()).await {
                 Ok(_succ) => {
                     set_toast.set(ToastMessage {
                         message: String::from("Success"),
@@ -125,7 +125,7 @@ pub fn NewRecipe() -> impl IntoView {
                                 </div>
                                 <input type="number"
                                     class="input input-bordered w-full"
-                                    name="prep_time"
+                                    name="prep_time_minutes"
                                     autocomplete="off"
                                     disabled=loading
                                     prop:value={move || model.get().prep_time_minutes }

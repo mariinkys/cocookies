@@ -44,35 +44,13 @@ pub async fn get_recipe(id: i32) -> Result<Recipe, ServerFnError> {
     }
 }
 
-#[server(UpsertRecipe, "/api/recipe/create")]
-pub async fn upsert_recipe(recipe: Recipe) -> Result<i32, ServerFnError> {
+#[server(AddRecipe, "/api/recipe/add")]
+pub async fn add_recipe(recipe: Recipe) -> Result<i32, ServerFnError> {
     let ext: Data<Pool<Sqlite>> = extract().await?;
     let pool: Arc<Pool<Sqlite>> = ext.into_inner();
 
-    let command_res = if recipe.recipe_id.is_some() {
-        sqlx::query(
-            "UPDATE recipes
-                SET
-                    name = ?,
-                    description = ?,
-                    prep_time_minutes = ?,
-                    servings = ?,
-                    main_photo = ?,
-                WHERE
-                    recipe_id = ?
-            ",
-        )
-        .bind(recipe.name)
-        .bind(recipe.description)
-        .bind(recipe.prep_time_minutes)
-        .bind(recipe.servings)
-        .bind(recipe.main_photo)
-        .bind(recipe.recipe_id.unwrap())
-        .execute(&*pool)
-        .await
-    } else {
-        sqlx::query(
-            "INSERT INTO recipes (
+    let command_res = sqlx::query(
+        "INSERT INTO recipes (
                 name,
                 description,
                 prep_time_minutes,
@@ -81,15 +59,50 @@ pub async fn upsert_recipe(recipe: Recipe) -> Result<i32, ServerFnError> {
             )
             VALUES (?, ?, ?, ?, ?)
         ",
-        )
-        .bind(recipe.name)
-        .bind(recipe.description)
-        .bind(recipe.prep_time_minutes)
-        .bind(recipe.servings)
-        .bind(recipe.main_photo)
-        .execute(&*pool)
-        .await
-    };
+    )
+    .bind(recipe.name)
+    .bind(recipe.description)
+    .bind(recipe.prep_time_minutes)
+    .bind(recipe.servings)
+    .bind(recipe.main_photo)
+    .execute(&*pool)
+    .await;
+
+    match command_res {
+        Ok(result) => Ok(result.last_insert_rowid().try_into().unwrap()),
+        Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+    }
+}
+
+#[server(UpdateRecipe, "/api/recipe/update")]
+pub async fn update_recipe(
+    recipe_id: Option<i32>,
+    name: String,
+    description: Option<String>,
+    prep_time_minutes: Option<i32>,
+    servings: Option<i32>,
+) -> Result<i32, ServerFnError> {
+    let ext: Data<Pool<Sqlite>> = extract().await?;
+    let pool: Arc<Pool<Sqlite>> = ext.into_inner();
+
+    let command_res = sqlx::query(
+        "UPDATE recipes
+            SET
+                name = ?,
+                description = ?,
+                prep_time_minutes = ?,
+                servings = ?
+            WHERE
+                recipe_id = ?
+        ",
+    )
+    .bind(name)
+    .bind(description)
+    .bind(prep_time_minutes)
+    .bind(servings)
+    .bind(recipe_id)
+    .execute(&*pool)
+    .await;
 
     match command_res {
         Ok(result) => Ok(result.last_insert_rowid().try_into().unwrap()),
