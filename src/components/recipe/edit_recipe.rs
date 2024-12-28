@@ -1,13 +1,39 @@
 use leptos::prelude::*;
 
-use crate::{api::recipe::UpdateRecipe, models::recipe::Recipe};
+use crate::{
+    api::recipe::UpdateRecipe,
+    components::toast::{ToastMessage, ToastType},
+    models::recipe::Recipe,
+};
 
 #[component]
 pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
+    let set_toast: WriteSignal<ToastMessage> = expect_context();
     let model = RwSignal::new(recipe);
     let update_recipe = ServerAction::<UpdateRecipe>::new();
 
-    // TODO: Error Handling && User Feedback when Changes Saved
+    // 'value' holds the latest *returned* value from the server
+    let value = update_recipe.value();
+    Effect::new(move |_| {
+        if let Some(val) = value() {
+            match val {
+                Ok(_) => {
+                    set_toast.set(ToastMessage {
+                        message: String::from("Changed Saved"),
+                        toast_type: ToastType::Success,
+                        visible: true,
+                    });
+                }
+                Err(err) => {
+                    set_toast.set(ToastMessage {
+                        message: format!("Error Saving {}", err),
+                        toast_type: ToastType::Error,
+                        visible: true,
+                    });
+                }
+            }
+        }
+    });
 
     view! {
         <div class="w-full card shadow-xl">
