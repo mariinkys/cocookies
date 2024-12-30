@@ -22,9 +22,10 @@ pub async fn get_all_recipe_ingredients(
     let ext: Data<Pool<Sqlite>> = extract().await?;
     let pool: Arc<Pool<Sqlite>> = ext.into_inner();
 
-    let mut rows = sqlx::query("SELECT * FROM recipes WHERE recipe_id = ? ORDER BY recipe_id ASC")
-        .bind(recipe_id)
-        .fetch(&*pool);
+    let mut rows =
+        sqlx::query("SELECT * FROM recipe_ingredients WHERE recipe_id = ? ORDER BY recipe_id ASC")
+            .bind(recipe_id)
+            .fetch(&*pool);
 
     let mut result = Vec::<RecipeIngredient>::new();
 
@@ -90,35 +91,35 @@ pub async fn add_recipe_ingredients(
 
 #[server(UpdateRecipeIngredients, "/api/recipeingredients/update")]
 pub async fn update_recipe_ingredients(
-    recipe_ingredients: Vec<RecipeIngredient>,
-) -> Result<(), ServerFnError> {
+    recipe_ingredient_id: i32,
+    ingredient_name: String,
+    quantity: f64,
+    unit: Option<String>,
+) -> Result<i32, ServerFnError> {
     let ext: Data<Pool<Sqlite>> = extract().await?;
     let pool: Arc<Pool<Sqlite>> = ext.into_inner();
 
-    for recipe_ingredient in recipe_ingredients {
-        let command_res = sqlx::query(
-            "UPDATE recipe_ingredients
-                SET
-                    ingredient_name = ?,
-                    quantity = ?,
-                    unit = ?
-                WHERE
-                    recipe_ingredient_id = ?
-            ",
-        )
-        .bind(recipe_ingredient.ingredient_name)
-        .bind(recipe_ingredient.quantity)
-        .bind(recipe_ingredient.unit)
-        .bind(recipe_ingredient.recipe_ingredient_id)
-        .execute(&*pool)
-        .await;
+    let command_res = sqlx::query(
+        "UPDATE recipe_ingredients
+            SET
+                ingredient_name = ?,
+                quantity = ?,
+                unit = ?
+            WHERE
+                recipe_ingredient_id = ?
+        ",
+    )
+    .bind(ingredient_name)
+    .bind(quantity)
+    .bind(unit)
+    .bind(recipe_ingredient_id)
+    .execute(&*pool)
+    .await;
 
-        if let Err(err) = command_res {
-            return Err(ServerFnError::new(format!("Server Error: {}", err)));
-        }
+    match command_res {
+        Ok(result) => Ok(result.last_insert_rowid().try_into().unwrap()),
+        Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
     }
-
-    Ok(())
 }
 
 #[server(DeleteRecipeIngredient, "/api/recipeingredients/delete")]
