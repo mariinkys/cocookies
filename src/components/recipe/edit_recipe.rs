@@ -101,7 +101,6 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
                                         curr.prep_time_minutes = None;
                                     });
                                 }
-
                             }
                         />
                     </div>
