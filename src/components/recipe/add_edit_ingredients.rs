@@ -2,7 +2,8 @@ use leptos::prelude::*;
 
 use crate::{
     api::recipe_ingredients::{
-        get_all_recipe_ingredients, AddRecipeIngredients, UpdateRecipeIngredients,
+        get_all_recipe_ingredients, AddRecipeIngredients, DeleteRecipeIngredient,
+        UpdateRecipeIngredients,
     },
     components::{
         page_loading::PageLoadingComponent,
@@ -43,6 +44,30 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
     });
 
     let add_recipe_ingredient = ServerAction::<AddRecipeIngredients>::new();
+
+    let delete_recipe_ingredient = ServerAction::<DeleteRecipeIngredient>::new();
+    let delete_value = delete_recipe_ingredient.value();
+    Effect::new(move |_| {
+        if let Some(val) = delete_value() {
+            match val {
+                Ok(_) => {
+                    recipe_ingredients_resource.refetch();
+                    set_toast.set(ToastMessage {
+                        message: String::from("Changed Saved"),
+                        toast_type: ToastType::Success,
+                        visible: true,
+                    });
+                }
+                Err(err) => {
+                    set_toast.set(ToastMessage {
+                        message: format!("Error Saving {}", err),
+                        toast_type: ToastType::Error,
+                        visible: true,
+                    });
+                }
+            }
+        }
+    });
 
     view! {
         <div class="w-full card shadow-xl">
@@ -136,7 +161,15 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                                                 />
                                                             </div>
 
-                                                            //TODO: Add Delete Button
+                                                            <div class="sm:w-min w-full">
+                                                                <ActionForm action=delete_recipe_ingredient>
+                                                                    // We need the id for the update but we don't want to show it.
+                                                                    <input type="hidden" name="recipe_ingredient_id" autocomplete="off" prop:value={move || model.get().recipe_ingredient_id.unwrap_or_default()}/>
+
+                                                                    <button type="submit" class="btn btn-warning mt-[20px] sm:w-min w-full">"Delete"</button>
+                                                                </ActionForm>
+                                                            </div>
+
                                                             <button type="submit" class="btn btn-primary mt-[20px] sm:w-min w-full">"Update"</button>
                                                         </div>
                                                     </ActionForm>
