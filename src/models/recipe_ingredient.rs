@@ -11,3 +11,17 @@ pub struct RecipeIngredient {
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
+
+impl RecipeIngredient {
+    pub fn init(recipe_id: i32) -> Self {
+        RecipeIngredient {
+            recipe_ingredient_id: None,
+            recipe_id,
+            ingredient_name: String::new(),
+            quantity: 0.0,
+            unit: None,
+            created_at: None,
+            updated_at: None,
+        }
+    }
+}
