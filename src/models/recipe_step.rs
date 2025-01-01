@@ -10,3 +10,16 @@ pub struct RecipeStep {
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
+
+impl RecipeStep {
+    pub fn init(recipe_id: i32) -> Self {
+        RecipeStep {
+            step_id: None,
+            recipe_id,
+            step_number: 0,
+            instructions: String::new(),
+            created_at: None,
+            updated_at: None,
+        }
+    }
+}

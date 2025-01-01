@@ -59,7 +59,7 @@ pub fn ViewEditRecipe() -> impl IntoView {
                                     // EDIT/ADD INGREDIENTS COMPONENT
                                     <ViewEditIngredientsComponent recipe_id=recipe_id/>
                                     // EDIT/ADD STEPS COMPONENT
-                                    <ViewEditStepsComponent/>
+                                    <ViewEditStepsComponent recipe_id=recipe_id/>
 
                                     // DELETE RECIPE BUTTON
                                     <DeleteRecipeButton recipe_id=recipe_id/>
