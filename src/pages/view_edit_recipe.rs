@@ -19,6 +19,7 @@ struct RecipeParams {
 pub fn ViewEditRecipe() -> impl IntoView {
     let set_toast: WriteSignal<ToastMessage> = expect_context();
     let params = use_params::<RecipeParams>();
+    let page_edit_mode = RwSignal::new(false);
 
     let recipe_resource = Resource::new(
         move || params.read().as_ref().ok().and_then(|params| params.id),
@@ -46,23 +47,39 @@ pub fn ViewEditRecipe() -> impl IntoView {
                 <ErrorBoundary fallback=|error| view! {
                     <p class="text-3xl text-center text-red-500">"An error occurred: " {format!("{:?}", error)}</p>
                 }>
-                    // TODO Maybe we can use either and check the recipe id? Also maybe keep an edit/view state in this page and switch the view?
+
+                    <div class="flex flex-row-reverse">
+                        <button class="btn btn-primary" on:click=move |_| page_edit_mode.set(!page_edit_mode.get())>
+                            {move || if page_edit_mode.get() {
+                                "View"
+                            } else {
+                                "Edit"
+                            }}
+                        </button>
+                    </div>
+
                     { move || {
                         recipe_resource.get().map(move |x| {
                             x.map(move |recipe_result| {
                                 let recipe_id = recipe_result.recipe_id.unwrap_or_default();
 
                                 view! {
-                                    // EDIT RECIPE
-                                    <ViewEditRecipeComponent recipe=recipe_result/>
+                                    <Show
+                                        when= move || { page_edit_mode.get() }
+                                        fallback=|| view! { <p>"Page View Mode"</p> }
+                                    >
+                                        // EDIT RECIPE (TODO: AVOID THIS CLONE?)
+                                        <ViewEditRecipeComponent recipe=recipe_result.clone()/>
 
-                                    // EDIT/ADD INGREDIENTS COMPONENT
-                                    <ViewEditIngredientsComponent recipe_id=recipe_id/>
-                                    // EDIT/ADD STEPS COMPONENT
-                                    <ViewEditStepsComponent recipe_id=recipe_id/>
+                                        // EDIT/ADD INGREDIENTS COMPONENT
+                                        <ViewEditIngredientsComponent recipe_id=recipe_id/>
 
-                                    // DELETE RECIPE BUTTON
-                                    <DeleteRecipeButton recipe_id=recipe_id/>
+                                        // EDIT/ADD STEPS COMPONENT
+                                        <ViewEditStepsComponent recipe_id=recipe_id/>
+
+                                        // DELETE RECIPE BUTTON
+                                        <DeleteRecipeButton recipe_id=recipe_id/>
+                                    </Show>
                                 }
                             })
                         })
