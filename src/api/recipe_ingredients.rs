@@ -15,7 +15,7 @@ use std::sync::Arc;
 
 use crate::models::recipe_ingredient::RecipeIngredient;
 
-#[server(GetAllRecipeIngredients, "/api/recipes")]
+#[server(GetAllRecipeIngredients, "/api/recipe_ingredients")]
 pub async fn get_all_recipe_ingredients(
     recipe_id: i32,
 ) -> Result<Vec<RecipeIngredient>, ServerFnError> {
@@ -145,7 +145,7 @@ pub async fn delete_recipeingredients(recipe_ingredient_id: i32) -> Result<(), S
             "Recipe ingredient not found",
         ))),
         Err(err) => Err(ServerFnError::ServerError(format!(
-            "Failed to delete recipe: {}",
+            "Failed to delete recipe ingredient: {}",
             err
         ))),
     }
