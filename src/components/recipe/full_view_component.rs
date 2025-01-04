@@ -18,6 +18,10 @@ pub fn ViewFullRecipeComponent(recipe_id: i32) -> impl IntoView {
             { move || {
                 recipe_resource.get().map(move |x| {
                     x.map(move |recipe_result| {
+                        // TODO: Only need read signal?
+                        let recipe_ingredients = RwSignal::new(recipe_result.ingredients);
+                        let recipe_steps = RwSignal::new(recipe_result.steps);
+
                         view! {
                             // MAIN RECIPE VIEW
                             <div class="w-full card shadow-xl">
@@ -48,9 +52,39 @@ pub fn ViewFullRecipeComponent(recipe_id: i32) -> impl IntoView {
                                 </div>
                             </div>
 
-                            // INGREDIENTS VIEW
+                            // INGREDIENTS & STEPS VIEW
+                            <div class="w-full card shadow-xl">
+                                <div class="card-body">
+                                    // INGREDIENTS
+                                    <h1 class="text-4xl font-bold">"Ingredients"</h1>
+                                    <Show
+                                        when=move || !recipe_ingredients.get().is_empty()
+                                        fallback=|| view! { "No Ingredients..." }
+                                    >
+                                        <For each=move || recipe_ingredients.get() key=|ingredient| ingredient.recipe_ingredient_id children=move |ingredient| {
+                                            view! {
+                                                <p>{ingredient.quantity}" "{ingredient.unit}" - "{ingredient.ingredient_name}</p>
+                                            }
+                                        }/>
+                                    </Show>
 
-                            // STEPS VIEW
+                                    // STEPS
+                                    <h1 class="text-4xl font-bold">"Steps"</h1>
+                                    <Show
+                                        when=move || !recipe_steps.get().is_empty()
+                                        fallback=|| view! { "No Steps..." }
+                                    >
+                                        <For each=move || recipe_steps.get() key=|step| step.step_id children=move |step| {
+                                            view! {
+                                                <div class="flex flex-col gap-3">
+                                                    <p>{step.instructions}</p>
+                                                </div>
+                                            }
+                                        }/>
+                                    </Show>
+                                </div>
+                            </div>
+
                         }
                     })
                 })
