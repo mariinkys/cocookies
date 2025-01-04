@@ -13,7 +13,7 @@ use sqlx::{Error, Pool, Row, Sqlite};
 #[cfg(feature = "ssr")]
 use std::sync::Arc;
 
-use crate::models::recipe::Recipe;
+use crate::models::recipe::{FullRecipe, Recipe};
 
 #[server(GetRecipe, "/api/recipe")]
 pub async fn get_recipe(id: i32) -> Result<Recipe, ServerFnError> {
@@ -211,5 +211,93 @@ pub async fn delete_recipe(recipe_id: i32) -> Result<(), ServerFnError> {
             "Failed to delete recipe: {}",
             err
         ))),
+    }
+}
+
+#[server(GetFullRecipe, "/api/recipe/full")]
+pub async fn get_full_recipe(id: i32) -> Result<FullRecipe, ServerFnError> {
+    use sqlx::{Error, Row};
+
+    let ext: Data<Pool<Sqlite>> = extract().await?;
+    let pool: Arc<Pool<Sqlite>> = ext.into_inner();
+
+    let query = r#"
+        SELECT
+            r.recipe_id, r.name, r.description, r.prep_time_minutes, r.servings,
+            r.main_photo, r.created_at, r.updated_at,
+            ri.recipe_ingredient_id, ri.ingredient_name, ri.quantity, ri.unit,
+            rs.step_id, rs.step_number, rs.instructions
+        FROM
+            recipes r
+        LEFT JOIN
+            recipe_ingredients ri ON r.recipe_id = ri.recipe_id
+        LEFT JOIN
+            recipe_steps rs ON r.recipe_id = rs.recipe_id
+        WHERE
+            r.recipe_id = ?
+        ORDER BY
+            rs.step_number ASC
+    "#;
+
+    let rows = sqlx::query(query).bind(id).fetch_all(&*pool).await;
+
+    match rows {
+        Ok(results) => {
+            if results.is_empty() {
+                return Err(ServerFnError::new("Recipe not found"));
+            }
+
+            let mut ingredients: Vec<crate::models::recipe_ingredient::RecipeIngredient> =
+                Vec::new();
+            let mut steps: Vec<crate::models::recipe_step::RecipeStep> = Vec::new();
+
+            // Extract recipe data from the first row
+            let first_row = &results[0];
+            let full_recipe = FullRecipe {
+                recipe_id: first_row.try_get("recipe_id").ok(),
+                name: first_row.try_get("name").unwrap_or_default(),
+                description: first_row.try_get("description").ok(),
+                prep_time_minutes: first_row.try_get("prep_time_minutes").ok(),
+                servings: first_row.try_get("servings").ok(),
+                main_photo: first_row.try_get("main_photo").ok(),
+                created_at: first_row.try_get("created_at").ok(),
+                updated_at: first_row.try_get("updated_at").ok(),
+                ingredients: Vec::new(),
+                steps: Vec::new(),
+            };
+
+            for row in results {
+                if let Ok(ingredient_id) = row.try_get::<i32, _>("recipe_ingredient_id") {
+                    ingredients.push(crate::models::recipe_ingredient::RecipeIngredient {
+                        recipe_ingredient_id: Some(ingredient_id),
+                        recipe_id: row.try_get("recipe_id").unwrap_or_default(),
+                        ingredient_name: row.try_get("ingredient_name").unwrap_or_default(),
+                        quantity: row.try_get("quantity").unwrap_or_default(),
+                        unit: row.try_get("unit").ok(),
+                        created_at: row.try_get("created_at").ok(),
+                        updated_at: row.try_get("updated_at").ok(),
+                    });
+                }
+
+                if let Ok(step_id) = row.try_get::<i32, _>("step_id") {
+                    steps.push(crate::models::recipe_step::RecipeStep {
+                        step_id: Some(step_id),
+                        recipe_id: row.try_get("recipe_id").unwrap_or_default(),
+                        step_number: row.try_get("step_number").unwrap_or_default(),
+                        instructions: row.try_get("instructions").unwrap_or_default(),
+                        created_at: row.try_get("created_at").ok(),
+                        updated_at: row.try_get("updated_at").ok(),
+                    });
+                }
+            }
+
+            Ok(FullRecipe {
+                ingredients,
+                steps,
+                ..full_recipe
+            })
+        }
+        Err(Error::RowNotFound) => Err(ServerFnError::new("Recipe not found")),
+        Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
     }
 }

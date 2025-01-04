@@ -4,6 +4,7 @@ use crate::components::recipe::add_edit_ingredients::ViewEditIngredientsComponen
 use crate::components::recipe::add_edit_steps::ViewEditStepsComponent;
 use crate::components::recipe::delete_recipe_button::DeleteRecipeButton;
 use crate::components::recipe::edit_recipe::ViewEditRecipeComponent;
+use crate::components::recipe::full_view_component::ViewFullRecipeComponent;
 use crate::components::toast::{ToastMessage, ToastType};
 use crate::models::recipe::Recipe;
 use leptos::prelude::*;
@@ -66,7 +67,7 @@ pub fn ViewEditRecipe() -> impl IntoView {
                                 view! {
                                     <Show
                                         when= move || { page_edit_mode.get() }
-                                        fallback=|| view! { <p>"Page View Mode"</p> }
+                                        fallback=move || view! { <ViewFullRecipeComponent recipe_id=recipe_id/> }
                                     >
                                         // EDIT RECIPE (TODO: AVOID THIS CLONE?)
                                         <ViewEditRecipeComponent recipe=recipe_result.clone()/>
