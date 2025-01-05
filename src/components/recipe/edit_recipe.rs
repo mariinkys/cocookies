@@ -46,9 +46,9 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
 
                 <div class="flex flex-wrap md:flex-nowrap gap-3">
                     <img class="w-48 h-48 object-cover shadow-inner rounded-full" src=format!("../{}", model.read_only().get().main_photo.unwrap_or_default())/>
-                    <div class="flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-center">
+                    <div class="flex flex-col justify-between w-full">
+                        <div class="w-full">
+                            <div class="flex justify-between items-center w-full">
                                 <h1 class="text-4xl font-bold">{move || model.read_only().get().name}</h1>
                                 <button
                                     class="btn btn-sm btn-ghost"
