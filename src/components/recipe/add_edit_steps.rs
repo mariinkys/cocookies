@@ -188,17 +188,16 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
                                                                     />
                                                                 </div>
 
-                                                                // TODO: Fix width view
-                                                                <div class="sm:w-min w-full">
+                                                                <div class="w-full">
                                                                     <ActionForm action=delete_recipe_step>
                                                                         // We need the id for the update but we don't want to show it.
                                                                         <input type="hidden" name="step_id" autocomplete="off" prop:value={move || model.get().step_id.unwrap_or_default()}/>
 
-                                                                        <button type="submit" class="btn btn-warning mt-[20px] sm:w-min w-full">"Delete"</button>
+                                                                        <button type="submit" class="btn btn-warning mt-[20px] w-full">"Delete"</button>
                                                                     </ActionForm>
                                                                 </div>
 
-                                                                <button type="submit" class="btn btn-primary mt-[20px] sm:w-min w-full">"Update"</button>
+                                                                <button type="submit" class="btn btn-primary mt-[10px] w-full">"Update"</button>
                                                             </div>
                                                         </ActionForm>
                                                     }

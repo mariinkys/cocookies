@@ -45,11 +45,11 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
         <div class="w-full card shadow-xl">
             <div class="card-body">
                 // TODO: Fix mobile view
-                <div class="flex gap-3">
+                <div class="flex flex-wrap md:flex-nowrap gap-3">
                     <img class="w-48 h-48 object-cover shadow-inner rounded-full" src=format!("../{}", model.read_only().get().main_photo.unwrap_or_default())/>
                     <div class="flex flex-col justify-between">
                         <div>
-                            <div class="flex justify-between">
+                            <div class="flex justify-between items-center">
                                 <h1 class="text-4xl font-bold">{move || model.read_only().get().name}</h1>
                                 <button
                                     class="btn btn-sm btn-ghost"
@@ -62,7 +62,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
                             </div>
                             <p>{move || model.read_only().get().description}</p>
                         </div>
-                        <div class="flex gap-3">
+                        <div class="flex gap-3 mt-3 md:mt-0">
                             <Show
                                 when=move || { model.read_only().get().servings.is_some() }
                                 fallback=|| view! { "" }
