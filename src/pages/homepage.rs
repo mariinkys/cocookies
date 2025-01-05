@@ -24,6 +24,7 @@ pub fn HomePage() -> impl IntoView {
                     </div>
 
                 }>
+                    // TODO: Maybe new recipe could also be a dialog and not a single almost empty page
                     <div class="fixed bottom-4 right-4 z-10">
                         <a href="/recipes/new" class="bg-primary text-white px-4 py-2 rounded-full shadow-lg hover:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-400 flex items-center justify-center">
                         <svg class="w-20 h-20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
