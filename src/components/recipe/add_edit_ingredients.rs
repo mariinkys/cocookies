@@ -6,6 +6,7 @@ use crate::{
         UpdateRecipeIngredients,
     },
     components::{
+        dialog::DialogComponent,
         page_loading::PageLoadingComponent,
         toast::{ToastMessage, ToastType},
     },
@@ -45,6 +46,7 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
         }
     });
 
+    let add_dialog_ref_node: NodeRef<leptos::html::Dialog> = NodeRef::new();
     let add_recipe_ingredient = ServerAction::<AddRecipeIngredients>::new();
     let add_value = add_recipe_ingredient.value();
     Effect::new(move |_| {
@@ -97,6 +99,17 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
     view! {
         <div class="w-full card shadow-xl">
             <div class="card-body">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-4xl font-bold">"Ingredients"</h1>
+                    <button
+                        class="btn btn-sm btn-primary"
+                        on:click=move |_| {
+                            let _ = add_dialog_ref_node.get().unwrap().show_modal();
+                        }
+                    >
+                        "Add New"
+                    </button>
+                </div>
                 <Suspense fallback= move || view! { <PageLoadingComponent/> }>
                     <ErrorBoundary fallback=|error| view! {
                         <p class="text-3xl text-center text-red-500">"An error occurred: " {format!("{:?}", error)}</p>
@@ -108,10 +121,22 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                     view! {
                                         <For each=move || recipe_ingredients.get() key=|ingredient| ingredient.recipe_ingredient_id children=move |recipe_ingredient| {
                                             let model = RwSignal::new(recipe_ingredient);
+                                            let update_dialog_ref: NodeRef<leptos::html::Dialog> = NodeRef::new();
 
                                             view! {
-                                            <div class="w-full card shadow-xl">
-                                                <div class="card-body">
+                                                <div class="flex justify-between items-center gap-3">
+                                                    <button
+                                                        class="btn btn-sm btn-ghost"
+                                                        on:click=move |_| {
+                                                            let _ = update_dialog_ref.get().unwrap().show_modal();
+                                                        }
+                                                    >
+                                                        "Edit"
+                                                    </button>
+                                                    <p>{move || model.read_only().get().quantity}" "{move || model.read_only().get().unit}" - "{move || model.read_only().get().ingredient_name}</p>
+                                                </div>
+
+                                                <DialogComponent dialog_title="Edit Ingredient" dialog_node_ref=update_dialog_ref dialog_content=move || view! {
                                                     <ActionForm action=update_recipe_ingredient>
                                                         <div class="flex flex-wrap gap-2 items-center">
                                                             // We need the id for the update but we don't want to show it.
@@ -198,8 +223,7 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                                             <button type="submit" class="btn btn-primary mt-[20px] sm:w-min w-full">"Update"</button>
                                                         </div>
                                                     </ActionForm>
-                                                </div>
-                                            </div>
+                                                }/>
                                             }
                                         }/>
 
@@ -210,8 +234,9 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                         }}
                     </ErrorBoundary>
                 </Suspense>
-                <div class="w-full card shadow-xl">
-                    <div class="card-body">
+
+                <DialogComponent dialog_title="Add Ingredient" dialog_node_ref=add_dialog_ref_node dialog_content=move || {
+                    view! {
                         <ActionForm action=add_recipe_ingredient>
                             <div class="flex flex-wrap gap-2 items-center">
                                 // We need the id for the update but we don't want to show it.
@@ -289,9 +314,10 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                 <button type="submit" class="btn btn-primary mt-[20px] sm:w-min w-full">"Add"</button>
                             </div>
                         </ActionForm>
-                    </div>
-                </div>
+                    }
+                }/>
+
             </div>
         </div>
-    }
+    }.into_any()
 }

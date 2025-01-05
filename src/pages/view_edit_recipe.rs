@@ -4,7 +4,6 @@ use crate::components::recipe::add_edit_ingredients::ViewEditIngredientsComponen
 use crate::components::recipe::add_edit_steps::ViewEditStepsComponent;
 use crate::components::recipe::delete_recipe_button::DeleteRecipeButton;
 use crate::components::recipe::edit_recipe::ViewEditRecipeComponent;
-use crate::components::recipe::full_view_component::ViewFullRecipeComponent;
 use crate::components::toast::{ToastMessage, ToastType};
 use crate::models::recipe::Recipe;
 use leptos::prelude::*;
@@ -20,7 +19,6 @@ struct RecipeParams {
 pub fn ViewEditRecipe() -> impl IntoView {
     let set_toast: WriteSignal<ToastMessage> = expect_context();
     let params = use_params::<RecipeParams>();
-    let page_edit_mode = RwSignal::new(false);
 
     let recipe_resource = Resource::new(
         move || params.read().as_ref().ok().and_then(|params| params.id),
@@ -49,42 +47,28 @@ pub fn ViewEditRecipe() -> impl IntoView {
                     <p class="text-3xl text-center text-red-500">"An error occurred: " {format!("{:?}", error)}</p>
                 }>
 
-                    <div class="flex flex-row-reverse">
-                        <button class="btn btn-primary" on:click=move |_| page_edit_mode.set(!page_edit_mode.get())>
-                            {move || if page_edit_mode.get() {
-                                "View"
-                            } else {
-                                "Edit"
-                            }}
-                        </button>
-                    </div>
-
                     { move || {
                         recipe_resource.get().map(move |x| {
                             x.map(move |recipe_result| {
                                 let recipe_id = recipe_result.recipe_id.unwrap_or_default();
 
                                 view! {
-                                    <Show
-                                        when= move || { page_edit_mode.get() }
-                                        fallback=move || view! { <ViewFullRecipeComponent recipe_id=recipe_id/> }
-                                    >
-                                        // EDIT RECIPE (TODO: AVOID THIS CLONE?)
-                                        <ViewEditRecipeComponent recipe=recipe_result.clone()/>
+                                    // EDIT RECIPE
+                                    <ViewEditRecipeComponent recipe=recipe_result/>
 
-                                        // EDIT/ADD INGREDIENTS COMPONENT
-                                        <ViewEditIngredientsComponent recipe_id=recipe_id/>
+                                    // EDIT/ADD INGREDIENTS COMPONENT
+                                    <ViewEditIngredientsComponent recipe_id=recipe_id/>
 
-                                        // EDIT/ADD STEPS COMPONENT
-                                        <ViewEditStepsComponent recipe_id=recipe_id/>
+                                    // EDIT/ADD STEPS COMPONENT
+                                    <ViewEditStepsComponent recipe_id=recipe_id/>
 
-                                        // DELETE RECIPE BUTTON
-                                        <DeleteRecipeButton recipe_id=recipe_id/>
-                                    </Show>
+                                    // DELETE RECIPE BUTTON
+                                    <DeleteRecipeButton recipe_id=recipe_id/>
                                 }
                             })
                         })
                     }}
+
                 </ErrorBoundary>
             </Suspense>
         </div>
