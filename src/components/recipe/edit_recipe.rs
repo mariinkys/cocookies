@@ -2,7 +2,10 @@ use leptos::prelude::*;
 
 use crate::{
     api::recipe::UpdateRecipe,
-    components::toast::{ToastMessage, ToastType},
+    components::{
+        dialog::DialogComponent,
+        toast::{ToastMessage, ToastType},
+    },
     models::recipe::Recipe,
 };
 
@@ -18,6 +21,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
         if let Some(val) = value() {
             match val {
                 Ok(_) => {
+                    // TODO: Close dialog and fix values not updating
                     set_toast.set(ToastMessage {
                         message: String::from("Changed Saved"),
                         toast_type: ToastType::Success,
@@ -35,104 +39,144 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
         }
     });
 
+    let edit_dialog_ref: NodeRef<leptos::html::Dialog> = NodeRef::new();
+
     view! {
         <div class="w-full card shadow-xl">
             <div class="card-body">
-                <ActionForm action=update_recipe>
-                    // We need the id for the update but we don't want to show it.
-                    <input type="hidden" name="recipe_id" autocomplete="off" prop:value={move || model.get().recipe_id.unwrap_or_default()}/>
-
-                    // Recipe: name
-                    <div class="label p-0">
-                        <span class="label-text">"Recipe Name"</span>
-                    </div>
-                    <input type="text"
-                        class="input input-bordered w-full"
-                        name="name"
-                        required
-                        autocomplete="off"
-                        prop:value={move || model.get().name}
-                        on:input=move |ev| {
-                            model.update(|curr| {
-                                curr.name = event_target_value(&ev);
-                            });
-                        }
-                    />
-
-                    // Recipe: description
-                    <div class="label p-0">
-                        <span class="label-text">"Description"</span>
-                    </div>
-                    <input type="text"
-                        class="input input-bordered w-full"
-                        name="description"
-                        autocomplete="off"
-                        prop:value=move || model.get().description.unwrap_or_default()
-                        on:input=move |ev| {
-                            if !event_target_value(&ev).is_empty() {
-                                model.update(|curr| {
-                                    curr.description = Some(event_target_value(&ev));
-                                });
-                            } else {
-                                model.update(|curr| {
-                                    curr.description = None;
-                                });
-                            }
-                        }
-                    />
-
-                    // Recipe: prep_time
-                    <div>
-                        <div class="label p-0">
-                            <span class="label-text">"Preparation Time (minutes)"</span>
+                <div class="flex gap-3">
+                    <img class="w-48 h-48 object-cover shadow-inner rounded-full" src=format!("../{}", model.read_only().get().main_photo.unwrap_or_default())/>
+                    <div class="flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between">
+                                <h1 class="text-4xl font-bold">{model.read_only().get().name}</h1>
+                                <button
+                                    class="btn btn-sm btn-ghost"
+                                    on:click=move |_| {
+                                        let _ = edit_dialog_ref.get().unwrap().show_modal();
+                                    }
+                                >
+                                    "Edit"
+                                </button>
+                            </div>
+                            <p>{model.read_only().get().description}</p>
                         </div>
-                        <input type="number"
-                            class="input input-bordered w-full"
-                            name="prep_time_minutes"
-                            autocomplete="off"
-                            prop:value={move || model.get().prep_time_minutes }
-                            on:input=move |ev| {
-                                if let Ok(value) = event_target_value(&ev).parse::<i32>() {
+                        <div class="flex gap-3">
+                            <Show
+                                when=move || { model.read_only().get().servings.is_some() }
+                                fallback=|| view! { "" }
+                            >
+                                <div class="badge badge-primary font-bold">{model.read_only().get().servings.unwrap_or_default()}" servings"</div>
+                            </Show>
+                            <Show
+                                when=move || { model.read_only().get().prep_time_minutes.is_some() }
+                                fallback=|| view! { "" }
+                            >
+                                <div class="badge badge-secondary font-bold">{model.read_only().get().prep_time_minutes.unwrap_or_default()}"min"</div>
+                            </Show>
+                        </div>
+                    </div>
+                </div>
+
+                <DialogComponent dialog_node_ref=edit_dialog_ref dialog_content=move || {
+                    view! {
+                        <ActionForm action=update_recipe>
+                            // We need the id for the update but we don't want to show it.
+                            <input type="hidden" name="recipe_id" autocomplete="off" prop:value={move || model.get().recipe_id.unwrap_or_default()}/>
+
+                            // Recipe: name
+                            <div class="label p-0">
+                                <span class="label-text">"Recipe Name"</span>
+                            </div>
+                            <input type="text"
+                                class="input input-bordered w-full"
+                                name="name"
+                                required
+                                autocomplete="off"
+                                prop:value={move || model.get().name}
+                                on:input=move |ev| {
                                     model.update(|curr| {
-                                        curr.prep_time_minutes = Some(value);
-                                    });
-                                } else {
-                                    model.update(|curr| {
-                                        curr.prep_time_minutes = None;
+                                        curr.name = event_target_value(&ev);
                                     });
                                 }
-                            }
-                        />
-                    </div>
+                            />
 
-                    // Recipe: servings
-                    <div>
-                        <div class="label p-0">
-                            <span class="label-text">"Servings"</span>
-                        </div>
-                        <input type="number"
-                            class="input input-bordered w-full"
-                            name="servings"
-                            autocomplete="off"
-                            prop:value={move || model.get().servings }
-                            on:input=move |ev| {
-                                if let Ok(value) = event_target_value(&ev).parse::<i32>() {
-                                    model.update(|curr| {
-                                        curr.servings = Some(value);
-                                    });
-                                } else {
-                                    model.update(|curr| {
-                                        curr.servings = None;
-                                    });
+                            // Recipe: description
+                            <div class="label p-0">
+                                <span class="label-text">"Description"</span>
+                            </div>
+                            <input type="text"
+                                class="input input-bordered w-full"
+                                name="description"
+                                autocomplete="off"
+                                prop:value=move || model.get().description.unwrap_or_default()
+                                on:input=move |ev| {
+                                    if !event_target_value(&ev).is_empty() {
+                                        model.update(|curr| {
+                                            curr.description = Some(event_target_value(&ev));
+                                        });
+                                    } else {
+                                        model.update(|curr| {
+                                            curr.description = None;
+                                        });
+                                    }
                                 }
+                            />
 
-                            }
-                        />
-                    </div>
+                            // Recipe: prep_time
+                            <div>
+                                <div class="label p-0">
+                                    <span class="label-text">"Preparation Time (minutes)"</span>
+                                </div>
+                                <input type="number"
+                                    class="input input-bordered w-full"
+                                    name="prep_time_minutes"
+                                    autocomplete="off"
+                                    prop:value={move || model.get().prep_time_minutes }
+                                    on:input=move |ev| {
+                                        if let Ok(value) = event_target_value(&ev).parse::<i32>() {
+                                            model.update(|curr| {
+                                                curr.prep_time_minutes = Some(value);
+                                            });
+                                        } else {
+                                            model.update(|curr| {
+                                                curr.prep_time_minutes = None;
+                                            });
+                                        }
+                                    }
+                                />
+                            </div>
 
-                    <button type="submit" class="btn btn-primary w-full mt-2">"Save"</button>
-                </ActionForm>
+                            // Recipe: servings
+                            <div>
+                                <div class="label p-0">
+                                    <span class="label-text">"Servings"</span>
+                                </div>
+                                <input type="number"
+                                    class="input input-bordered w-full"
+                                    name="servings"
+                                    autocomplete="off"
+                                    prop:value={move || model.get().servings }
+                                    on:input=move |ev| {
+                                        if let Ok(value) = event_target_value(&ev).parse::<i32>() {
+                                            model.update(|curr| {
+                                                curr.servings = Some(value);
+                                            });
+                                        } else {
+                                            model.update(|curr| {
+                                                curr.servings = None;
+                                            });
+                                        }
+
+                                    }
+                                />
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-full mt-2">"Save"</button>
+                        </ActionForm>
+                    }
+                }/>
             </div>
         </div>
-    }
+    }.into_any()
 }
