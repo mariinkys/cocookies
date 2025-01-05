@@ -44,6 +44,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
     view! {
         <div class="w-full card shadow-xl">
             <div class="card-body">
+                // TODO: Fix mobile view
                 <div class="flex gap-3">
                     <img class="w-48 h-48 object-cover shadow-inner rounded-full" src=format!("../{}", model.read_only().get().main_photo.unwrap_or_default())/>
                     <div class="flex flex-col justify-between">
@@ -78,7 +79,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
                     </div>
                 </div>
 
-                <DialogComponent dialog_node_ref=edit_dialog_ref dialog_content=move || {
+                <DialogComponent dialog_title="Edit Recipe" dialog_node_ref=edit_dialog_ref dialog_content=move || {
                     view! {
                         <ActionForm action=update_recipe>
                             // We need the id for the update but we don't want to show it.
