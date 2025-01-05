@@ -272,5 +272,5 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
                 }/>
             </div>
         </div>
-    }
+    }.into_any()
 }
