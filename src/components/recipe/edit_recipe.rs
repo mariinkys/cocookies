@@ -50,7 +50,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
                     <div class="flex flex-col justify-between">
                         <div>
                             <div class="flex justify-between">
-                                <h1 class="text-4xl font-bold">{model.read_only().get().name}</h1>
+                                <h1 class="text-4xl font-bold">{move || model.read_only().get().name}</h1>
                                 <button
                                     class="btn btn-sm btn-ghost"
                                     on:click=move |_| {
@@ -60,20 +60,20 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
                                     "Edit"
                                 </button>
                             </div>
-                            <p>{model.read_only().get().description}</p>
+                            <p>{move || model.read_only().get().description}</p>
                         </div>
                         <div class="flex gap-3">
                             <Show
                                 when=move || { model.read_only().get().servings.is_some() }
                                 fallback=|| view! { "" }
                             >
-                                <div class="badge badge-primary font-bold">{model.read_only().get().servings.unwrap_or_default()}" servings"</div>
+                                <div class="badge badge-primary font-bold">{move || model.read_only().get().servings.unwrap_or_default()}" servings"</div>
                             </Show>
                             <Show
                                 when=move || { model.read_only().get().prep_time_minutes.is_some() }
                                 fallback=|| view! { "" }
                             >
-                                <div class="badge badge-secondary font-bold">{model.read_only().get().prep_time_minutes.unwrap_or_default()}"min"</div>
+                                <div class="badge badge-secondary font-bold">{move || model.read_only().get().prep_time_minutes.unwrap_or_default()}"min"</div>
                             </Show>
                         </div>
                     </div>

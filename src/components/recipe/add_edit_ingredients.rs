@@ -134,7 +134,7 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                                     >
                                                         "Edit"
                                                     </button>
-                                                    <p>{model.read_only().get().quantity}" "{model.read_only().get().unit}" - "{model.read_only().get().ingredient_name}</p>
+                                                    <p>{move || model.read_only().get().quantity}" "{move || model.read_only().get().unit}" - "{move || model.read_only().get().ingredient_name}</p>
                                                 </div>
 
                                                 <DialogComponent dialog_title="Edit Ingredient" dialog_node_ref=update_dialog_ref dialog_content=move || view! {

@@ -133,7 +133,7 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
                                                     >
                                                         "Edit"
                                                     </button>
-                                                    <p>{model.read_only().get().instructions}</p>
+                                                    <p>{move || model.read_only().get().instructions}</p>
                                                 </div>
 
                                                 <DialogComponent dialog_title="Edit Step" dialog_node_ref=update_dialog_ref dialog_content=move || {
