@@ -27,7 +27,6 @@ sqlx = { version = "0.8.3", features = [
 serde = { version = "1.0.217" }
 chrono = { version = "0.4.31", features = ["serde"] }
 futures = { version = "0.3", optional = true }
-dotenvy = { version = "0.15.7", optional = true }
 wasm-bindgen-futures = "0.4.49"
 async-std = "1.13.0"
 uuid = { version = "1", features = ["v4", "js"] }
@@ -46,7 +45,6 @@ ssr = [
   #Added by me
   "dep:sqlx",
   "dep:futures",
-  "dep:dotenvy",
 ]
 
 # Added by me for file uploading

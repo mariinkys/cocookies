@@ -15,16 +15,12 @@ async fn main() -> std::io::Result<()> {
     use leptos::prelude::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
     use leptos_meta::MetaTags;
-    // Added by me
-    use dotenvy::dotenv;
 
     let conf = get_configuration(None).unwrap();
     let addr = conf.leptos_options.site_addr;
 
-    // Load .env
-    dotenv().ok();
-
     // Database
+    // Ej: export DATABASE_URL="sqlite:cocookies.db"
     let database_url = std::env::var("DATABASE_URL").expect("database URL must be set");
     if let Some(filename) = &database_url.strip_prefix("sqlite:") {
         if !std::path::Path::new(filename).exists() {
