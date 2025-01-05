@@ -29,7 +29,6 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
         if let Some(val) = update_value() {
             match val {
                 Ok(_) => {
-                    // TODO: Close modal, maybe refetch to update? Why it doesn't update if it's a signal...
                     set_toast.set(ToastMessage {
                         message: String::from("Changed Saved"),
                         toast_type: ToastType::Success,

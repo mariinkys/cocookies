@@ -21,7 +21,6 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
         if let Some(val) = value() {
             match val {
                 Ok(_) => {
-                    // TODO: Close dialog and fix values not updating
                     set_toast.set(ToastMessage {
                         message: String::from("Changed Saved"),
                         toast_type: ToastType::Success,
@@ -44,7 +43,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
     view! {
         <div class="w-full card shadow-xl">
             <div class="card-body">
-                // TODO: Fix mobile view
+
                 <div class="flex flex-wrap md:flex-nowrap gap-3">
                     <img class="w-48 h-48 object-cover shadow-inner rounded-full" src=format!("../{}", model.read_only().get().main_photo.unwrap_or_default())/>
                     <div class="flex flex-col justify-between">

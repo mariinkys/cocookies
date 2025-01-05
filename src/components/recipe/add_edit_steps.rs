@@ -28,7 +28,6 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
         if let Some(val) = update_value() {
             match val {
                 Ok(_) => {
-                    // TODO: Close modal, maybe refetch to update? Why it doesn't update if it's a signal...
                     set_toast.set(ToastMessage {
                         message: String::from("Changed Saved"),
                         toast_type: ToastType::Success,
@@ -264,7 +263,7 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
                                     />
                                 </div>
 
-                                <button type="submit" class="btn btn-primary mt-[20px] sm:w-min w-full">"Add"</button>
+                                <button type="submit" class="btn btn-primary mt-[20px] w-full">"Add"</button>
                             </div>
                         </ActionForm>
                     }
