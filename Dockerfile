@@ -35,4 +35,5 @@ EXPOSE 8080
 
 CMD ["/app/cocookies"]
 
-
+# TODO: Fix image uploading not working on docker
+# TODO: Mount DB to persistent volumne on docker
