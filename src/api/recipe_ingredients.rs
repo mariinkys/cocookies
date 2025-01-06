@@ -46,6 +46,7 @@ pub async fn get_all_recipe_ingredients(
             unit,
             created_at,
             updated_at,
+            quantity_raw: quantity.to_string(),
         };
 
         if let Some(_id) = recipe_ingredient.recipe_ingredient_id {

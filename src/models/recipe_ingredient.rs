@@ -10,6 +10,9 @@ pub struct RecipeIngredient {
     pub unit: Option<String>,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
+
+    // Helpers, not on the DB
+    pub quantity_raw: String,
 }
 
 impl RecipeIngredient {
@@ -22,6 +25,7 @@ impl RecipeIngredient {
             unit: None,
             created_at: None,
             updated_at: None,
+            quantity_raw: String::new(),
         }
     }
 }

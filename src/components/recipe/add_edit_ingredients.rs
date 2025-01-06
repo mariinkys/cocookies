@@ -29,6 +29,8 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
         if let Some(val) = update_value() {
             match val {
                 Ok(_) => {
+                    // Refetch is needed due to quantity_raw not being what is shown (quantity is shown)
+                    recipe_ingredients_resource.refetch();
                     set_toast.set(ToastMessage {
                         message: String::from("Changed Saved"),
                         toast_type: ToastType::Success,
@@ -162,27 +164,20 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                                             </div>
 
                                                             // Recipe Ingredient: quantity
-                                                            // TODO: Can't input a decimal number on this input
                                                             <div class="flex-1 min-w-[200px]">
                                                                 <div class="label p-0">
                                                                     <span class="label-text">"Quantity"</span>
                                                                 </div>
-                                                                <input type="text"
+                                                                <input type="text" 
                                                                     class="input input-bordered w-full"
                                                                     name="quantity"
                                                                     required
                                                                     autocomplete="off"
-                                                                    prop:value={move || model.get().quantity}
+                                                                    prop:value={move || model.get().quantity_raw} 
                                                                     on:input=move |ev| {
-                                                                        if let Ok(value) = event_target_value(&ev).parse::<f64>() {
-                                                                            model.update(|curr| {
-                                                                                curr.quantity = value;
-                                                                            });
-                                                                        } else {
-                                                                            model.update(|curr| {
-                                                                                curr.quantity = 0.0;
-                                                                            });
-                                                                        }
+                                                                        model.update(|curr| {
+                                                                            curr.quantity_raw = event_target_value(&ev); 
+                                                                        });
                                                                     }
                                                                 />
                                                             </div>
@@ -262,27 +257,20 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                 </div>
 
                                 // Recipe Ingredient: quantity
-                                // TODO: Can't input a decimal number on this input
                                 <div class="flex-1 min-w-[200px]">
                                     <div class="label p-0">
                                         <span class="label-text">"Quantity"</span>
                                     </div>
-                                    <input type="text"
+                                    <input type="text" 
                                         class="input input-bordered w-full"
                                         name="quantity"
                                         required
                                         autocomplete="off"
-                                        prop:value={move || new_ingredient_model.get().quantity}
+                                        prop:value={move || new_ingredient_model.get().quantity_raw} 
                                         on:input=move |ev| {
-                                            if let Ok(value) = event_target_value(&ev).parse::<f64>() {
-                                                new_ingredient_model.update(|curr| {
-                                                    curr.quantity = value;
-                                                });
-                                            } else {
-                                                new_ingredient_model.update(|curr| {
-                                                    curr.quantity = 0.0;
-                                                });
-                                            }
+                                            new_ingredient_model.update(|curr| {
+                                                curr.quantity_raw = event_target_value(&ev);
+                                            });
                                         }
                                     />
                                 </div>
