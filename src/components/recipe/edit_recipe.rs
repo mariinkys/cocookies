@@ -45,7 +45,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
             <div class="card-body">
 
                 <div class="flex flex-wrap md:flex-nowrap gap-3">
-                    <img class="w-48 h-48 object-cover shadow-inner rounded-full" src=format!("../{}", model.read_only().get().main_photo.unwrap_or_default())/>
+                    <img class="w-48 h-48 object-cover shadow-inner rounded-full" src=format!("../{}", model.read_only().get().main_photo.unwrap_or(String::from("assets/utils/image-not-found.png")))/>
                     <div class="flex flex-col justify-between w-full">
                         <div class="w-full">
                             <div class="flex justify-between items-center w-full">
