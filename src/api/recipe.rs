@@ -213,3 +213,49 @@ pub async fn delete_recipe(recipe_id: i32) -> Result<(), ServerFnError> {
         ))),
     }
 }
+
+#[server(UpdateRecipeMainPhoto, "/api/recipe/update/mainphoto")]
+pub async fn update_recipe_main_photo(id: i32, photo_path: String) -> Result<(), ServerFnError> {
+    let ext: Data<Pool<Sqlite>> = extract().await?;
+    let pool: Arc<Pool<Sqlite>> = ext.into_inner();
+
+    let row_result = sqlx::query("SELECT main_photo FROM recipes WHERE recipe_id = ?")
+        .bind(id)
+        .fetch_one(&*pool)
+        .await;
+
+    let og_main_photo: Result<String, ServerFnError> = match row_result {
+        Ok(row) => Ok(row.get("main_photo")),
+        Err(Error::RowNotFound) => Err(ServerFnError::new(String::from("Recipe not found"))),
+        Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+    };
+
+    if let Ok(og_main_photo) = og_main_photo {
+        let command_res = sqlx::query(
+            "UPDATE recipes
+                SET
+                    main_photo = ?
+                WHERE
+                    recipe_id = ?
+            ",
+        )
+        .bind(photo_path)
+        .bind(id)
+        .execute(&*pool)
+        .await;
+
+        match command_res {
+            Ok(_) => {
+                if !og_main_photo.is_empty() {
+                    let _del_res = crate::utils::delete_file(og_main_photo).await;
+                }
+                Ok(())
+            }
+            Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+        }
+    } else {
+        Err(og_main_photo.unwrap_err())
+    }
+
+    // Use delete_file(file_path) to delete old photo if anything before fails delete the new photo_path instead
+}

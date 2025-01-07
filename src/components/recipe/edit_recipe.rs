@@ -4,6 +4,7 @@ use crate::{
     api::recipe::UpdateRecipe,
     components::{
         dialog::DialogComponent,
+        recipe::edit_main_photo::EditMainPhotoComponent,
         toast::{ToastMessage, ToastType},
     },
     models::recipe::Recipe,
@@ -40,12 +41,30 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
 
     let edit_dialog_ref: NodeRef<leptos::html::Dialog> = NodeRef::new();
 
+    let change_main_photo_dialog_ref: NodeRef<leptos::html::Dialog> = NodeRef::new();
+
     view! {
         <div class="w-full card shadow-xl">
             <div class="card-body">
-
                 <div class="flex flex-wrap md:flex-nowrap gap-3">
-                    <img class="w-48 h-48 object-cover shadow-inner rounded-full" src=format!("../{}", model.read_only().get().main_photo.unwrap_or(String::from("assets/utils/image-not-found.png")))/>
+                    <div class="flex-none relative w-48 h-48">
+                        <img class="w-full h-full object-cover shadow-inner rounded-full" src=format!("../{}", model.read_only().get().main_photo.unwrap_or(String::from("assets/utils/image-not-found.png")))/>
+                        <button
+                            class="absolute inset-0 w-full h-full bg-transparent rounded-full"
+                            on:click=move |_| {
+                                let _ = change_main_photo_dialog_ref.get().unwrap().show_modal();
+                            }
+                        >
+                            <span class="sr-only">"Click to open change image dialog"</span>
+                        </button>
+                        <DialogComponent dialog_title="Edit Main Photo" dialog_node_ref=change_main_photo_dialog_ref dialog_content=move || {
+                            let recipe_id = model.get_untracked().recipe_id.unwrap_or_default();
+                            
+                            view! {
+                                <EditMainPhotoComponent recipe_id=recipe_id/>
+                            }
+                        }/>
+                    </div>
                     <div class="flex flex-col justify-between w-full">
                         <div class="w-full">
                             <div class="flex justify-between items-center w-full">
