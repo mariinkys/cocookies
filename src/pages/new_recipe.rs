@@ -25,8 +25,7 @@ pub fn NewRecipe() -> impl IntoView {
             let navigate = use_navigate();
             loading.set(true);
 
-            // TODO: Data validator
-            // TODO: Fix Hydration issues while adding (so that loading set true also works and instead of disabling maybe show spinner?)
+            // TODO: How to make loading appear on submit click (why does it wait for a while? file uploading?)
             spawn_local(async move {
                 // File upload handling
                 let image_bytes = main_photo_image.get_untracked();
@@ -75,9 +74,7 @@ pub fn NewRecipe() -> impl IntoView {
             <ErrorBoundary fallback=|error| view! {
                 <p class="text-xl text-center text-red-500">"An error occurred: " {format!("{:?}", error)}</p>
             }>
-                <Show when=move || !loading.get() fallback=move || view! {
-                    <p class="text-3xl text-center">"Todo Spinner..."</p>}>
-
+                <Show when=move || !loading.get() fallback=move || view! { <PageLoadingComponent/> }>
                     <div class="mx-auto max-w-lg card shadow-xl">
                         <div class="card-body">
                             <h1 class="text-3xl font-bold text-center">"New Recipe"</h1>
