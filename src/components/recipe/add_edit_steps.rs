@@ -138,12 +138,12 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
                                                 <DialogComponent dialog_title="Edit Step" dialog_node_ref=update_dialog_ref dialog_content=move || {
                                                     view! {
                                                         <ActionForm action=update_recipe_step>
-                                                            <div class="flex flex-wrap gap-2 items-center">
+                                                            <div class="flex flex-col gap-2 w-full">
                                                                 // We need the id for the update but we don't want to show it.
                                                                 <input type="hidden" name="step_id" autocomplete="off" prop:value={move || model.get().step_id.unwrap_or_default()}/>
 
                                                                 // Recipe Step: step_number
-                                                                <div class="flex-1 min-w-[200px]">
+                                                                <div class="w-full">
                                                                     <div class="label p-0">
                                                                         <span class="label-text">"Step Number"</span>
                                                                     </div>
@@ -167,17 +167,15 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
                                                                     />
                                                                 </div>
 
-                                                                // TODO: This should be a textarea
                                                                 // Recipe Step: instructions
-                                                                <div class="flex-1 min-w-[200px]">
+                                                                <div class="w-full">
                                                                     <div class="label p-0">
                                                                         <span class="label-text">"Instructions"</span>
                                                                     </div>
-                                                                    <input type="text"
-                                                                        class="input input-bordered w-full"
+                                                                    <textarea
+                                                                        class="textarea textarea-bordered w-full min-h-80"
                                                                         name="instructions"
                                                                         required
-                                                                        autocomplete="off"
                                                                         prop:value={move || model.get().instructions}
                                                                         on:input=move |ev| {
                                                                             model.update(|curr| {
@@ -192,11 +190,11 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
                                                                         // We need the id for the update but we don't want to show it.
                                                                         <input type="hidden" name="step_id" autocomplete="off" prop:value={move || model.get().step_id.unwrap_or_default()}/>
 
-                                                                        <button type="submit" class="btn btn-warning mt-[20px] w-full">"Delete"</button>
+                                                                        <button type="submit" class="btn btn-warning w-full">"Delete"</button>
                                                                     </ActionForm>
                                                                 </div>
 
-                                                                <button type="submit" class="btn btn-primary mt-[10px] w-full">"Update"</button>
+                                                                <button type="submit" class="btn btn-primary w-full">"Update"</button>
                                                             </div>
                                                         </ActionForm>
                                                     }
@@ -215,12 +213,12 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
                 <DialogComponent dialog_title="Add Step" dialog_node_ref=add_dialog_ref_node dialog_content=move || {
                     view! {
                         <ActionForm action=add_recipe_step>
-                            <div class="flex flex-wrap gap-2 items-center">
+                            <div class="flex flex-col gap-2 w-full">
                                 // We need the id for the update but we don't want to show it.
                                 <input type="hidden" name="recipe_id" autocomplete="off" prop:value={move || new_step_model.get().recipe_id}/>
 
                                 // Recipe Step: step_number
-                                <div class="flex-1 min-w-[200px]">
+                                <div class="w-full">
                                     <div class="label p-0">
                                         <span class="label-text">"Step Number"</span>
                                     </div>
@@ -245,15 +243,14 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
                                 </div>
 
                                 // Recipe Step: instructions
-                                <div class="flex-1 min-w-[200px]">
+                                <div class="w-full">
                                     <div class="label p-0">
                                         <span class="label-text">"Instructions"</span>
                                     </div>
-                                    <input type="text"
-                                        class="input input-bordered w-full"
+                                    <textarea
+                                        class="textarea textarea-bordered w-full min-h-80"
                                         name="instructions"
                                         required
-                                        autocomplete="off"
                                         prop:value={move || new_step_model.get().instructions}
                                         on:input=move |ev| {
                                             new_step_model.update(|curr| {
@@ -263,7 +260,7 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
                                     />
                                 </div>
 
-                                <button type="submit" class="btn btn-primary mt-[20px] w-full">"Add"</button>
+                                <button type="submit" class="btn btn-primary w-full">"Add"</button>
                             </div>
                         </ActionForm>
                     }
