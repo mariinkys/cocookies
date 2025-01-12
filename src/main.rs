@@ -15,6 +15,7 @@ async fn main() -> std::io::Result<()> {
     use leptos::prelude::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
     use leptos_meta::MetaTags;
+    use utils::EnvOptions;
 
     let conf = get_configuration(None).unwrap();
     let addr = conf.leptos_options.site_addr;
@@ -45,6 +46,9 @@ async fn main() -> std::io::Result<()> {
         }
     };
 
+    let shared_env_options = SharedValue::new(EnvOptions::init);
+    let env_options = shared_env_options.into_inner();
+
     println!("listening on http://{}", &addr);
 
     HttpServer::new(move || {
@@ -53,7 +57,7 @@ async fn main() -> std::io::Result<()> {
         let leptos_options = &conf.leptos_options;
         let site_root = leptos_options.site_root.clone().to_string();
 
-        App::new()
+        let mut app = App::new()
             // database
             .app_data(web::Data::new(pool.clone()))
             // serve JS/WASM/CSS from `pkg`
@@ -82,8 +86,17 @@ async fn main() -> std::io::Result<()> {
                     }
                 }
             })
-            .app_data(web::Data::new(leptos_options.to_owned()))
+            .app_data(web::Data::new(leptos_options.to_owned()));
         //.wrap(middleware::Compress::default())
+
+        if std::env::var("UPLOAD_DIR").is_ok() {
+            leptos::logging::log!("UPLOAD_DIR = {}", env_options.upload_dir);
+            app = app.service(
+                Files::new("/app/uploads", env_options.upload_dir.to_string()),
+            );
+        };
+
+        app
     })
     .bind(&addr)?
     .run()

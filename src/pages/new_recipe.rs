@@ -2,7 +2,7 @@ use crate::api::recipe::add_recipe;
 use crate::components::page_loading::PageLoadingComponent;
 use crate::components::toast::{ToastMessage, ToastType};
 use crate::models::recipe::Recipe;
-use crate::utils::upload_file;
+use crate::utils::{upload_file, EnvOptions};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos_router::hooks::use_navigate;
@@ -11,6 +11,7 @@ use leptos_router::NavigateOptions;
 #[component]
 pub fn NewRecipe() -> impl IntoView {
     let set_toast: WriteSignal<ToastMessage> = expect_context();
+    let env_options: ReadSignal<EnvOptions> = expect_context();
     let loading = RwSignal::new(false);
 
     let file_input = NodeRef::<leptos::html::Input>::new();
@@ -196,7 +197,7 @@ pub fn NewRecipe() -> impl IntoView {
                                                             let bytes = web_sys::js_sys::Uint8Array::new(&js_value).to_vec();
                                                             main_photo_image.set(Some(bytes));
 
-                                                            image_path.set(format!("assets/recipes/{}.{}", uuid::Uuid::new_v4(),file_type.unwrap()))
+                                                            image_path.set(format!("{}/{}.{}", env_options.get_untracked().upload_dir, uuid::Uuid::new_v4(),file_type.unwrap()))
                                                         } else {
                                                             main_photo_image.set(None);
                                                             image_path.set(String::new());

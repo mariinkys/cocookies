@@ -30,10 +30,20 @@ COPY --from=builder /work/Cargo.toml /app/
 ENV RUST_LOG="info"
 ENV LEPTOS_SITE_ADDR="0.0.0.0:8080"
 ENV LEPTOS_SITE_ROOT=./site
-ENV DATABASE_URL="sqlite:cocookies.db"
+ENV DATABASE_URL="sqlite:/app/db/cocookies.db"
+ENV UPLOAD_DIR="/app/uploads"
 EXPOSE 8080
 
-CMD ["/app/cocookies"]
+# Create a directory for the database
+RUN mkdir -p /app/db
 
-# TODO: Fix image uploading not working on docker
-# TODO: Mount DB to persistent volumne on docker
+# Create a directory for uploaded images
+RUN mkdir -p $UPLOAD_DIR
+
+# Use VOLUME to mark the database directory as a mount point
+VOLUME /app/db
+
+# Use VOLUME to mark the uploads directory as a mount point
+VOLUME $UPLOAD_DIR
+
+CMD ["/app/cocookies"]
