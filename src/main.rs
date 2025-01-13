@@ -15,6 +15,7 @@ async fn main() -> std::io::Result<()> {
     use leptos::prelude::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
     use leptos_meta::MetaTags;
+    use utils::EnvOptions;
 
     let conf = get_configuration(None).unwrap();
     let addr = conf.leptos_options.site_addr;
@@ -45,6 +46,8 @@ async fn main() -> std::io::Result<()> {
         }
     };
 
+    let _shared_env_options = SharedValue::new(EnvOptions::init);
+
     println!("listening on http://{}", &addr);
 
     HttpServer::new(move || {
@@ -60,6 +63,8 @@ async fn main() -> std::io::Result<()> {
             .service(Files::new("/pkg", format!("{site_root}/pkg")))
             // serve other assets from the `assets` directory
             .service(Files::new("/assets", &site_root))
+            // serve the app uploads
+            .service(serve_image_uploads)
             // serve the favicon from /favicon.ico
             .service(favicon)
             .leptos_routes(routes, {
@@ -120,4 +125,17 @@ pub fn main() {
     console_error_panic_hook::set_once();
 
     leptos::mount_to_body(App);
+}
+
+#[actix_web::get("/app/uploads/{filename}")]
+async fn serve_image_uploads(filename: actix_web::web::Path<String>) -> actix_web::HttpResponse {
+    use actix_web::HttpResponse;
+
+    let env_options = utils::EnvOptions::init();
+    let filepath = format!("{}/{}", env_options.upload_dir, filename.into_inner());
+
+    match std::fs::read(filepath) {
+        Ok(data) => HttpResponse::Ok().content_type("image/*").body(data),
+        Err(_) => HttpResponse::NotFound().finish(),
+    }
 }

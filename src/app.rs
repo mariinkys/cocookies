@@ -5,16 +5,20 @@ use leptos_router::{
     path, StaticSegment, WildcardSegment,
 };
 
-use crate::components::navbar::NavbarComponent;
 use crate::components::toast::ToastComponent;
 use crate::pages::homepage::HomePage;
 use crate::pages::new_recipe::NewRecipe;
 use crate::pages::view_edit_recipe::ViewEditRecipe;
+use crate::{components::navbar::NavbarComponent, utils::EnvOptions};
 
 #[component]
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
+
+    // Provides context for things that change between docker and local envs
+    let (read, _write) = signal::<EnvOptions>(SharedValue::new(EnvOptions::init).into_inner());
+    provide_context::<ReadSignal<EnvOptions>>(read);
 
     view! {
         // injects a stylesheet into the document <head>
