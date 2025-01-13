@@ -7,7 +7,8 @@ pub async fn upload_file(file_data: Vec<u8>, file_path: String) -> Result<String
     use async_std::io::prelude::*;
     use std::path::Path;
 
-    let fpath = if file_path.starts_with('/') {
+    // TODO: This is awful
+    let fpath = if file_path.starts_with('/') && file_path.starts_with("/assets/") {
         file_path.strip_prefix("/").unwrap_or_default()
     } else {
         &file_path
@@ -46,7 +47,8 @@ pub async fn delete_file(file_path: String) -> Result<String, ServerFnError> {
     use async_std::fs;
     use async_std::path::Path;
 
-    let fpath = if file_path.starts_with('/') {
+    // TODO: This is awful
+    let fpath = if file_path.starts_with('/') && file_path.starts_with("/assets/") {
         file_path.strip_prefix("/").unwrap_or_default()
     } else {
         &file_path
