@@ -7,12 +7,13 @@ use crate::{
         recipe::edit_main_photo::EditMainPhotoComponent,
         toast::{ToastMessage, ToastType},
     },
-    models::recipe::Recipe,
+    models::recipe::Recipe, utils::EnvOptions,
 };
 
 #[component]
 pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
     let set_toast: WriteSignal<ToastMessage> = expect_context();
+    let env_options: ReadSignal<EnvOptions> = expect_context();
     let model = RwSignal::new(recipe);
     let update_recipe = ServerAction::<UpdateRecipe>::new();
 
@@ -48,7 +49,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
             <div class="card-body">
                 <div class="flex flex-wrap md:flex-nowrap gap-3">
                     <div class="flex-none relative w-48 h-48">
-                        <img class="w-full h-full object-cover shadow-inner rounded-full" src=format!("../{}", model.read_only().get().main_photo.unwrap_or(String::from("assets/utils/image-not-found.png")))/>
+                        <img class="w-full h-full object-cover shadow-inner rounded-full" src=format!("..{}/{}", env_options.get().upload_dir, model.read_only().get().main_photo.unwrap_or(String::from("assets/utils/image-not-found.png")))/>
                         <button
                             class="absolute inset-0 w-full h-full bg-transparent rounded-full"
                             on:click=move |_| {

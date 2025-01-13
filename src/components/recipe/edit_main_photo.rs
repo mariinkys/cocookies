@@ -14,14 +14,14 @@ pub fn EditMainPhotoComponent(recipe_id: i32) -> impl IntoView {
 
     let file_input = NodeRef::<leptos::html::Input>::new();
     let main_photo_image = RwSignal::new(None);
-    let image_path = RwSignal::new(String::new());
+    let image_name = RwSignal::new(String::new());
     let on_image_submit = move |ev: leptos::ev::SubmitEvent| {
         // stop the page from reloading!
         ev.prevent_default();
 
         if !loading.get()
             && main_photo_image.get_untracked().is_some()
-            && !image_path.get_untracked().is_empty()
+            && !image_name.get_untracked().is_empty()
         {
             loading.set(true);
 
@@ -30,7 +30,13 @@ pub fn EditMainPhotoComponent(recipe_id: i32) -> impl IntoView {
                 // File upload handling
                 let image_bytes = main_photo_image.get_untracked();
                 if let Some(img) = image_bytes {
-                    if let Err(err) = upload_file(img, image_path.get_untracked()).await {
+                    let image_path = format!(
+                        "{}/{}",
+                        env_options.get_untracked().upload_dir,
+                        image_name.get_untracked()
+                    );
+
+                    if let Err(err) = upload_file(img, image_path).await {
                         set_toast.set(ToastMessage {
                             message: format!("Err {}", err),
                             toast_type: ToastType::Error,
@@ -42,7 +48,7 @@ pub fn EditMainPhotoComponent(recipe_id: i32) -> impl IntoView {
                 }
 
                 // Recipe main photo update handling
-                match update_recipe_main_photo(recipe_id, image_path.get_untracked()).await {
+                match update_recipe_main_photo(recipe_id, image_name.get_untracked()).await {
                     Ok(_succ) => {
                         set_toast.set(ToastMessage {
                             message: String::from("Success"),
@@ -87,7 +93,7 @@ pub fn EditMainPhotoComponent(recipe_id: i32) -> impl IntoView {
                                         visible: true,
                                     });
                                     main_photo_image.set(None);
-                                    image_path.set(String::new());
+                                    image_name.set(String::new());
                                 } else {
                                     spawn_local(async move {
                                         let promise = file.array_buffer();
@@ -95,10 +101,10 @@ pub fn EditMainPhotoComponent(recipe_id: i32) -> impl IntoView {
                                             let bytes = web_sys::js_sys::Uint8Array::new(&js_value).to_vec();
                                             main_photo_image.set(Some(bytes));
 
-                                            image_path.set(format!("{}/{}.{}", env_options.get_untracked().upload_dir, uuid::Uuid::new_v4(),file_type.unwrap()))
+                                            image_name.set(format!("{}.{}", uuid::Uuid::new_v4(), file_type.unwrap()))
                                         } else {
                                             main_photo_image.set(None);
-                                            image_path.set(String::new());
+                                            image_name.set(String::new());
                                         }
                                     });
                                 }

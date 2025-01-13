@@ -31,7 +31,7 @@ ENV RUST_LOG="info"
 ENV LEPTOS_SITE_ADDR="0.0.0.0:8080"
 ENV LEPTOS_SITE_ROOT=./site
 ENV DATABASE_URL="sqlite:/app/db/cocookies.db"
-ENV UPLOAD_DIR="app/uploads"
+ENV UPLOAD_DIR="/app/uploads"
 EXPOSE 8080
 
 # Create a directory for the database

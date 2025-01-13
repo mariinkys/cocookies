@@ -46,7 +46,7 @@ async fn main() -> std::io::Result<()> {
         }
     };
 
-    let _shared_env_options = SharedValue::new(EnvOptions::init);
+    let _shared_env_options = SharedValue::new(EnvOptions::get);
 
     println!("listening on http://{}", &addr);
 
@@ -131,7 +131,7 @@ pub fn main() {
 async fn serve_image_uploads(filename: actix_web::web::Path<String>) -> actix_web::HttpResponse {
     use actix_web::HttpResponse;
 
-    let env_options = utils::EnvOptions::init();
+    let env_options = utils::EnvOptions::get();
     let filepath = format!("{}/{}", env_options.upload_dir, filename.into_inner());
 
     match std::fs::read(filepath) {

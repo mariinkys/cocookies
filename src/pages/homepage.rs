@@ -1,11 +1,13 @@
 use leptos::prelude::*;
 
 use crate::components::page_loading::PageLoadingComponent;
+use crate::utils::EnvOptions;
 use crate::{api::recipe::get_all_recipes, models::recipe::Recipe};
 
 /// Renders the home page of your application.
 #[component]
 pub fn HomePage() -> impl IntoView {
+    let env_options: ReadSignal<EnvOptions> = expect_context();
     let recipes = OnceResource::new(get_all_recipes());
 
     view! {
@@ -43,7 +45,7 @@ pub fn HomePage() -> impl IntoView {
                                         <a class="w-full h-full" href=format!("recipes/{}", recipe.recipe_id.unwrap_or_default())>
                                             <figure>
                                                 <img
-                                                src=recipe.main_photo.unwrap_or_default()/>
+                                                src=format!("{}/{}", env_options.get().upload_dir, recipe.main_photo.unwrap_or_default())/>
                                             </figure>
                                             <div class="card-body">
                                                 <h2 class="card-title">{recipe.name}</h2>

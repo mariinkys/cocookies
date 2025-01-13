@@ -188,7 +188,13 @@ pub async fn delete_recipe(recipe_id: i32) -> Result<(), ServerFnError> {
 
     // Attempt to delete the main photo, if it exists
     if recipe.main_photo.is_some() {
-        if let Err(err) = crate::utils::delete_file(recipe.main_photo.unwrap()).await {
+        let photo_path = format!(
+            "{}/{}",
+            crate::utils::EnvOptions::get().upload_dir,
+            recipe.main_photo.unwrap()
+        );
+
+        if let Err(err) = crate::utils::delete_file(photo_path).await {
             return Err(ServerFnError::ServerError(format!(
                 "Failed to delete main photo: {}",
                 err
@@ -247,7 +253,14 @@ pub async fn update_recipe_main_photo(id: i32, photo_path: String) -> Result<(),
         match command_res {
             Ok(_) => {
                 if !og_main_photo.is_empty() {
-                    let _del_res = crate::utils::delete_file(og_main_photo).await;
+                    let photo_path = format!(
+                        "{}/{}",
+                        crate::utils::EnvOptions::get().upload_dir,
+                        og_main_photo
+                    );
+                    leptos::logging::log!("{photo_path}");
+                    let del_res = crate::utils::delete_file(photo_path).await;
+                    leptos::logging::log!("{:?}", del_res);
                 }
                 Ok(())
             }
