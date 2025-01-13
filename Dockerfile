@@ -38,7 +38,7 @@ EXPOSE 8080
 RUN mkdir -p /app/db
 
 # Create a directory for uploaded images
-RUN mkdir -p /$UPLOAD_DIR
+RUN mkdir -p $UPLOAD_DIR
 
 # Use VOLUME to mark the database directory as a mount point
 VOLUME /app/db
