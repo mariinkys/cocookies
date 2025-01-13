@@ -1,0 +1,43 @@
+name: cocookies
+services:
+  cocookies:
+    image: mariinkys/cocookies:latest
+    container_name: cocookies
+    cpu_shares: 128  
+    deploy:
+      resources:
+        limits:
+          memory: 1024M 
+    environment:
+      - UPLOAD_DIR=app/uploads
+      - DATABASE_URL=sqlite:/app/db/cocookies.db
+    labels:
+      icon: https://raw.githubusercontent.com/mariinkys/cocookies/refs/heads/main/resources/Cocookies.png 
+    ports:
+      - target: 8080
+        published: "8080"
+        protocol: tcp
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /DATA/AppData/cocookies/db
+        target: /app/db
+      - type: bind
+        source: /DATA/AppData/cocookies/uploads
+        target: /app/uploads
+    devices: []  # No devices passed to the container
+    cap_add: []  # No additional capabilities required
+    network_mode: bridge  # Use default Docker bridge network
+    privileged: false  # Do not run in privileged mode
+
+x-casaos:
+  author: self
+  category: self
+  hostname: ""
+  icon: https://raw.githubusercontent.com/mariinkys/cocookies/refs/heads/main/resources/Cocookies.png 
+  index: /
+  port_map: "8080"
+  scheme: http
+  store_app_id: cocookies
+  title:
+    custom: Cocookies
