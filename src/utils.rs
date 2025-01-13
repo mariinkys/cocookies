@@ -7,7 +7,14 @@ pub async fn upload_file(file_data: Vec<u8>, file_path: String) -> Result<String
     use async_std::io::prelude::*;
     use std::path::Path;
 
-    let path = Path::new(&file_path);
+    // TODO: This is awful
+    let fpath = if file_path.starts_with('/') && file_path.starts_with("/assets/") {
+        file_path.strip_prefix("/").unwrap_or_default()
+    } else {
+        &file_path
+    };
+
+    let path = Path::new(&fpath);
 
     // Check if the file path has a parent directory
     let parent_dir = path.parent();
@@ -40,8 +47,14 @@ pub async fn delete_file(file_path: String) -> Result<String, ServerFnError> {
     use async_std::fs;
     use async_std::path::Path;
 
-    // Convert the file path into an async-compatible Path
-    let file_path = Path::new(&file_path);
+    // TODO: This is awful
+    let fpath = if file_path.starts_with('/') && file_path.starts_with("/assets/") {
+        file_path.strip_prefix("/").unwrap_or_default()
+    } else {
+        &file_path
+    };
+
+    let file_path = Path::new(&fpath);
 
     // Check if the file exists asynchronously
     if !file_path.exists().await {
@@ -83,10 +96,10 @@ pub struct EnvOptions {
 }
 
 impl EnvOptions {
-    pub fn init() -> Self {
+    pub fn get() -> Self {
         // If we are on a docker enviorment the UPLOAD_DIR env will be set, it will default to assets/recipes on non-docker enviorments.
         let upload_dir =
-            std::env::var("UPLOAD_DIR").unwrap_or_else(|_| "assets/recipes".to_string());
+            std::env::var("UPLOAD_DIR").unwrap_or_else(|_| "/assets/recipes".to_string());
 
         EnvOptions { upload_dir }
     }

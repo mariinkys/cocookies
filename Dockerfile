@@ -7,7 +7,7 @@ RUN apk update && \
 RUN npm install -g sass
 
 #RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/leptos-rs/cargo-leptos/releases/latest/download/cargo-leptos-installer.sh | sh
-RUN cargo install --locked cargo-leptos
+RUN cargo install --locked cargo-leptos@0.2.24
 
 # Add the WASM target
 RUN rustup target add wasm32-unknown-unknown
@@ -31,7 +31,7 @@ ENV RUST_LOG="info"
 ENV LEPTOS_SITE_ADDR="0.0.0.0:8080"
 ENV LEPTOS_SITE_ROOT=./site
 ENV DATABASE_URL="sqlite:/app/db/cocookies.db"
-ENV UPLOAD_DIR="app/uploads"
+ENV UPLOAD_DIR="/app/uploads"
 EXPOSE 8080
 
 # Create a directory for the database

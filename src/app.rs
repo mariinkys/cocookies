@@ -17,7 +17,7 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     // Provides context for things that change between docker and local envs
-    let (read, _write) = signal::<EnvOptions>(SharedValue::new(EnvOptions::init).into_inner());
+    let (read, _write) = signal::<EnvOptions>(SharedValue::new(EnvOptions::get).into_inner());
     provide_context::<ReadSignal<EnvOptions>>(read);
 
     view! {
