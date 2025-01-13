@@ -46,8 +46,7 @@ async fn main() -> std::io::Result<()> {
         }
     };
 
-    let shared_env_options = SharedValue::new(EnvOptions::init);
-    let env_options = shared_env_options.into_inner();
+    let _shared_env_options = SharedValue::new(EnvOptions::init);
 
     println!("listening on http://{}", &addr);
 
@@ -57,13 +56,15 @@ async fn main() -> std::io::Result<()> {
         let leptos_options = &conf.leptos_options;
         let site_root = leptos_options.site_root.clone().to_string();
 
-        let mut app = App::new()
+        App::new()
             // database
             .app_data(web::Data::new(pool.clone()))
             // serve JS/WASM/CSS from `pkg`
             .service(Files::new("/pkg", format!("{site_root}/pkg")))
             // serve other assets from the `assets` directory
             .service(Files::new("/assets", &site_root))
+            // serve the app uploads
+            .service(serve_image_uploads)
             // serve the favicon from /favicon.ico
             .service(favicon)
             .leptos_routes(routes, {
@@ -86,17 +87,8 @@ async fn main() -> std::io::Result<()> {
                     }
                 }
             })
-            .app_data(web::Data::new(leptos_options.to_owned()));
+            .app_data(web::Data::new(leptos_options.to_owned()))
         //.wrap(middleware::Compress::default())
-
-        if std::env::var("UPLOAD_DIR").is_ok() {
-            leptos::logging::log!("UPLOAD_DIR = {}", env_options.upload_dir);
-            app = app.service(
-                Files::new("/app/uploads", env_options.upload_dir.to_string()),
-            );
-        };
-
-        app
     })
     .bind(&addr)?
     .run()
@@ -133,4 +125,17 @@ pub fn main() {
     console_error_panic_hook::set_once();
 
     leptos::mount_to_body(App);
+}
+
+#[actix_web::get("/app/uploads/{filename}")]
+async fn serve_image_uploads(filename: actix_web::web::Path<String>) -> actix_web::HttpResponse {
+    use actix_web::HttpResponse;
+
+    let env_options = utils::EnvOptions::init();
+    let filepath = format!("{}/{}", env_options.upload_dir, filename.into_inner());
+
+    match std::fs::read(filepath) {
+        Ok(data) => HttpResponse::Ok().content_type("image/*").body(data),
+        Err(_) => HttpResponse::NotFound().finish(),
+    }
 }
