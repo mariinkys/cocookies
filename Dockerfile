@@ -31,14 +31,14 @@ ENV RUST_LOG="info"
 ENV LEPTOS_SITE_ADDR="0.0.0.0:8080"
 ENV LEPTOS_SITE_ROOT=./site
 ENV DATABASE_URL="sqlite:/app/db/cocookies.db"
-ENV UPLOAD_DIR="/app/uploads"
+ENV UPLOAD_DIR="app/uploads"
 EXPOSE 8080
 
 # Create a directory for the database
 RUN mkdir -p /app/db
 
 # Create a directory for uploaded images
-RUN mkdir -p $UPLOAD_DIR
+RUN mkdir -p /$UPLOAD_DIR
 
 # Use VOLUME to mark the database directory as a mount point
 VOLUME /app/db
