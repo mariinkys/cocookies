@@ -9,7 +9,7 @@ services:
         limits:
           memory: 1024M 
     environment:
-      - UPLOAD_DIR=app/uploads
+      - UPLOAD_DIR=/app/uploads
       - DATABASE_URL=sqlite:/app/db/cocookies.db
     labels:
       icon: https://raw.githubusercontent.com/mariinkys/cocookies/refs/heads/main/resources/Cocookies.png 
