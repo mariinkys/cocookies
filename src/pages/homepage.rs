@@ -40,12 +40,18 @@ pub fn HomePage() -> impl IntoView {
                             each=move || {recipes.get_untracked().and_then(|res| res.ok()).unwrap_or_default()}
                             key=|recipe| recipe.recipe_id
                             children=move |recipe: Recipe| {
+                                let photo_path = if recipe.main_photo.is_some() {
+                                    format!("{}/{}", env_options.get().upload_dir, recipe.main_photo.unwrap_or_default())
+                                } else {
+                                    String::new()
+                                };
+
                                 view! {
                                     <div class="card bg-base-100 w-96 shadow-xl h-max">
                                         <a class="w-full h-full" href=format!("recipes/{}", recipe.recipe_id.unwrap_or_default())>
                                             <figure>
                                                 <img
-                                                src=format!("{}/{}", env_options.get().upload_dir, recipe.main_photo.unwrap_or_default())/>
+                                                src=photo_path/>
                                             </figure>
                                             <div class="card-body">
                                                 <h2 class="card-title">{recipe.name}</h2>

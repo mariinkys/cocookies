@@ -43,13 +43,18 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
     let edit_dialog_ref: NodeRef<leptos::html::Dialog> = NodeRef::new();
 
     let change_main_photo_dialog_ref: NodeRef<leptos::html::Dialog> = NodeRef::new();
+    let photo_path = if model.get().main_photo.is_some() {
+        format!("..{}/{}", env_options.get().upload_dir, model.read_only().get().main_photo.unwrap_or_default())
+    } else {
+        String::from("/assets/utils/image-not-found.png")
+    };
 
     view! {
         <div class="w-full card shadow-xl">
             <div class="card-body">
                 <div class="flex flex-wrap md:flex-nowrap gap-3">
                     <div class="flex-none relative w-48 h-48">
-                        <img class="w-full h-full object-cover shadow-inner rounded-full" src=format!("..{}/{}", env_options.get().upload_dir, model.read_only().get().main_photo.unwrap_or(String::from("assets/utils/image-not-found.png")))/>
+                        <img class="w-full h-full object-cover shadow-inner rounded-full" src=photo_path/>
                         <button
                             class="absolute inset-0 w-full h-full bg-transparent rounded-full"
                             on:click=move |_| {
