@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 
 use crate::components::page_loading::PageLoadingComponent;
-use crate::utils::EnvOptions;
+use crate::utils::{truncate_str_with_ellipsis, EnvOptions};
 use crate::{api::recipe::get_all_recipes, models::recipe::Recipe};
 
 /// Renders the home page of your application.
@@ -56,7 +56,7 @@ pub fn HomePage() -> impl IntoView {
                                             <div class="card-body">
                                                 <h2 class="card-title">{recipe.name}</h2>
                                                 <p>{match recipe.description {
-                                                    Some(desc) => desc,
+                                                    Some(desc) => truncate_str_with_ellipsis(&desc, 75),
                                                     None => String::from("No description"),
                                                 }}
                                                 </p>

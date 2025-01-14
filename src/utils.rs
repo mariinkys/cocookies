@@ -90,6 +90,18 @@ pub fn get_file_extension(file: &web_sys::File) -> Option<&'static str> {
     }
 }
 
+pub fn truncate_str_with_ellipsis(input: &str, limit: usize) -> String {
+    if input.len() <= limit {
+        input.to_string()
+    } else {
+        let mut end = limit;
+        while !input.is_char_boundary(end) {
+            end -= 1;
+        }
+        format!("{}...", &input[..end])
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct EnvOptions {
     pub upload_dir: String,
