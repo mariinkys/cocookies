@@ -258,7 +258,6 @@ pub async fn update_recipe_main_photo(id: i32, photo_path: String) -> Result<(),
                         crate::utils::EnvOptions::get().upload_dir,
                         og_main_photo
                     );
-                    leptos::logging::log!("{photo_path}");
                     let del_res = crate::utils::delete_file(photo_path).await;
                     leptos::logging::log!("{:?}", del_res);
                 }
