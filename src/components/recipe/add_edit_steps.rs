@@ -16,10 +16,17 @@ use crate::{
 pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
     let set_toast: WriteSignal<ToastMessage> = expect_context();
 
-    let new_step_model = RwSignal::new(RecipeStep::init(recipe_id));
+    let new_step_model = RwSignal::new(RecipeStep::init(recipe_id, None));
     let recipe_steps_resource = Resource::new(
         move || recipe_id,
-        move |recipe_id| async move { get_all_recipe_steps(recipe_id).await },
+        move |recipe_id| async move {
+            let recipes = get_all_recipe_steps(recipe_id).await;
+
+            let step = recipes.as_ref().map(|x| x.len() as i32).unwrap_or_default();
+            new_step_model.set(RecipeStep::init(recipe_id, Some(step)));
+
+            recipes
+        },
     );
 
     let update_recipe_step = ServerAction::<UpdateRecipeSteps>::new();
@@ -52,7 +59,6 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
         if let Some(val) = add_value() {
             match val {
                 Ok(_) => {
-                    new_step_model.set(RecipeStep::init(recipe_id));
                     recipe_steps_resource.refetch();
                     set_toast.set(ToastMessage {
                         message: String::from("Changed Saved"),

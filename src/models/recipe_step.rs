@@ -12,11 +12,11 @@ pub struct RecipeStep {
 }
 
 impl RecipeStep {
-    pub fn init(recipe_id: i32) -> Self {
+    pub fn init(recipe_id: i32, step_number: Option<i32>) -> Self {
         RecipeStep {
             step_id: None,
             recipe_id,
-            step_number: 0,
+            step_number: step_number.unwrap_or(0),
             instructions: String::new(),
             created_at: None,
             updated_at: None,
