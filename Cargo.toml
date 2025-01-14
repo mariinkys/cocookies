@@ -15,7 +15,7 @@ leptos = { version = "0.7.3", features = ["nightly"] }
 leptos_meta = { version = "0.7.3" }
 leptos_actix = { version = "0.7.3", optional = true }
 leptos_router = { version = "0.7.3", features = ["nightly"] }
-wasm-bindgen = "=0.2.99"
+wasm-bindgen = "=0.2.100"
 
 # Added by me
 sqlx = { version = "0.8.3", features = [
@@ -27,9 +27,9 @@ sqlx = { version = "0.8.3", features = [
 serde = { version = "1.0.217" }
 chrono = { version = "0.4.31", features = ["serde"] }
 futures = { version = "0.3", optional = true }
-wasm-bindgen-futures = "0.4.49"
+wasm-bindgen-futures = "0.4.50"
 async-std = "1.13.0"
-uuid = { version = "1", features = ["v4", "js"] }
+uuid = { version = "1.11.1", features = ["v4", "js"] }
 
 [features]
 csr = ["leptos/csr"]
@@ -49,7 +49,7 @@ ssr = [
 
 # Added by me for file uploading
 [dependencies.web-sys]
-version = "0.3.72"
+version = "0.3.77"
 features = ["File", "FileList"]
 
 # Defines a size-optimized profile for the WASM bundle in release mode
