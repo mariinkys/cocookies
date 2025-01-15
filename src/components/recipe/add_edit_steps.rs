@@ -22,6 +22,8 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
         move |recipe_id| async move {
             let recipes = get_all_recipe_steps(recipe_id).await;
 
+            // TODO: Instead of len maybe we could check the highest step_number this way works better when
+            // you've deleted some step before.
             let step = recipes.as_ref().map(|x| x.len() as i32).unwrap_or_default();
             new_step_model.set(RecipeStep::init(recipe_id, Some(step)));
 
