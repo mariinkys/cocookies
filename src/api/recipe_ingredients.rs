@@ -33,7 +33,7 @@ pub async fn get_all_recipe_ingredients(
         let recipe_ingredient_id: Option<i32> = row.try_get("recipe_ingredient_id").unwrap_or(None);
         let recipe_id: i32 = row.try_get("recipe_id").unwrap_or_default();
         let ingredient_name = row.try_get("ingredient_name").unwrap_or("Error");
-        let quantity: f64 = row.try_get("quantity").unwrap_or_default();
+        let quantity = row.try_get("quantity").unwrap_or(None);
         let unit = row.try_get("unit").unwrap_or(None);
         let created_at: Option<NaiveDateTime> = row.try_get("created_at").unwrap_or(None);
         let updated_at: Option<NaiveDateTime> = row.try_get("updated_at").unwrap_or(None);
@@ -46,7 +46,6 @@ pub async fn get_all_recipe_ingredients(
             unit,
             created_at,
             updated_at,
-            quantity_raw: quantity.to_string(),
         };
 
         if let Some(_id) = recipe_ingredient.recipe_ingredient_id {
@@ -61,7 +60,7 @@ pub async fn get_all_recipe_ingredients(
 pub async fn add_recipe_ingredients(
     recipe_id: i32,
     ingredient_name: String,
-    quantity: f64,
+    quantity: Option<String>,
     unit: Option<String>,
 ) -> Result<i32, ServerFnError> {
     let ext: Data<Pool<Sqlite>> = extract().await?;
@@ -94,7 +93,7 @@ pub async fn add_recipe_ingredients(
 pub async fn update_recipe_ingredients(
     recipe_ingredient_id: i32,
     ingredient_name: String,
-    quantity: f64,
+    quantity: Option<String>,
     unit: Option<String>,
 ) -> Result<i32, ServerFnError> {
     let ext: Data<Pool<Sqlite>> = extract().await?;

@@ -29,8 +29,6 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
         if let Some(val) = update_value() {
             match val {
                 Ok(_) => {
-                    // Refetch is needed due to quantity_raw not being what is shown (quantity is shown)
-                    recipe_ingredients_resource.refetch();
                     set_toast.set(ToastMessage {
                         message: String::from("Changed Saved"),
                         toast_type: ToastType::Success,
@@ -135,17 +133,21 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                                     >
                                                         "Edit"
                                                     </button>
-                                                    <p>{move || model.read_only().get().quantity}" "{move || model.read_only().get().unit}" - "{move || model.read_only().get().ingredient_name}</p>
+                                                    <Show when=move || model.read_only().get().quantity.is_some() || model.read_only().get().unit.is_some()
+                                                        fallback=move ||  { view! { <p>{move || model.read_only().get().ingredient_name}</p> } }
+                                                    >
+                                                        <p>{move || model.read_only().get().quantity}" "{move || model.read_only().get().unit}" - "{move || model.read_only().get().ingredient_name}</p>
+                                                    </Show>
                                                 </div>
 
                                                 <DialogComponent dialog_title="Edit Ingredient" dialog_node_ref=update_dialog_ref dialog_content=move || view! {
                                                     <ActionForm action=update_recipe_ingredient>
-                                                        <div class="flex flex-wrap gap-2 items-center">
+                                                        <div class="flex flex-col gap-2 w-full">
                                                             // We need the id for the update but we don't want to show it.
                                                             <input type="hidden" name="recipe_ingredient_id" autocomplete="off" prop:value={move || model.get().recipe_ingredient_id.unwrap_or_default()}/>
 
                                                             // Recipe Ingredient: ingredient_name
-                                                            <div class="flex-1 min-w-[200px]">
+                                                            <div class="w-full">
                                                                 <div class="label p-0">
                                                                     <span class="label-text">"Ingredient Name"</span>
                                                                 </div>
@@ -164,26 +166,25 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                                             </div>
 
                                                             // Recipe Ingredient: quantity
-                                                            <div class="flex-1 min-w-[200px]">
+                                                            <div class="w-full">
                                                                 <div class="label p-0">
                                                                     <span class="label-text">"Quantity"</span>
                                                                 </div>
                                                                 <input type="text" 
                                                                     class="input input-bordered w-full"
                                                                     name="quantity"
-                                                                    required
                                                                     autocomplete="off"
-                                                                    prop:value={move || model.get().quantity_raw} 
+                                                                    prop:value={move || model.get().quantity.unwrap_or_default()} 
                                                                     on:input=move |ev| {
                                                                         model.update(|curr| {
-                                                                            curr.quantity_raw = event_target_value(&ev); 
+                                                                            curr.quantity = Some(event_target_value(&ev)); 
                                                                         });
                                                                     }
                                                                 />
                                                             </div>
 
                                                             // Recipe: unit
-                                                            <div class="flex-1 min-w-[200px]">
+                                                            <div class="w-full">
                                                                 <div class="label p-0">
                                                                     <span class="label-text">"Unit"</span>
                                                                 </div>
@@ -206,16 +207,16 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                                                 />
                                                             </div>
 
-                                                            <div class="sm:w-min w-full">
+                                                            <div class="w-full">
                                                                 <ActionForm action=delete_recipe_ingredient>
                                                                     // We need the id for the update but we don't want to show it.
                                                                     <input type="hidden" name="recipe_ingredient_id" autocomplete="off" prop:value={move || model.get().recipe_ingredient_id.unwrap_or_default()}/>
 
-                                                                    <button type="submit" class="btn btn-warning mt-[20px] sm:w-min w-full">"Delete"</button>
+                                                                    <button type="submit" class="btn btn-warning w-full">"Delete"</button>
                                                                 </ActionForm>
                                                             </div>
 
-                                                            <button type="submit" class="btn btn-primary mt-[20px] sm:w-min w-full">"Update"</button>
+                                                            <button type="submit" class="btn btn-primary w-full">"Update"</button>
                                                         </div>
                                                     </ActionForm>
                                                 }/>
@@ -233,12 +234,12 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                 <DialogComponent dialog_title="Add Ingredient" dialog_node_ref=add_dialog_ref_node dialog_content=move || {
                     view! {
                         <ActionForm action=add_recipe_ingredient>
-                            <div class="flex flex-wrap gap-2 items-center">
+                            <div class="flex flex-col gap-2 w-full">
                                 // We need the id for the update but we don't want to show it.
                                 <input type="hidden" name="recipe_id" autocomplete="off" prop:value={move || new_ingredient_model.get().recipe_id}/>
 
                                 // Recipe Ingredient: ingredient_name
-                                <div class="flex-1 min-w-[200px]">
+                                <div class="w-full">
                                     <div class="label p-0">
                                         <span class="label-text">"Ingredient Name"</span>
                                     </div>
@@ -257,26 +258,25 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                 </div>
 
                                 // Recipe Ingredient: quantity
-                                <div class="flex-1 min-w-[200px]">
+                                <div class="w-full">
                                     <div class="label p-0">
                                         <span class="label-text">"Quantity"</span>
                                     </div>
                                     <input type="text" 
                                         class="input input-bordered w-full"
                                         name="quantity"
-                                        required
                                         autocomplete="off"
-                                        prop:value={move || new_ingredient_model.get().quantity_raw} 
+                                        prop:value={move || new_ingredient_model.get().quantity.unwrap_or_default()} 
                                         on:input=move |ev| {
                                             new_ingredient_model.update(|curr| {
-                                                curr.quantity_raw = event_target_value(&ev);
+                                                curr.quantity = Some(event_target_value(&ev));
                                             });
                                         }
                                     />
                                 </div>
 
                                 // Recipe: unit
-                                <div class="flex-1 min-w-[200px]">
+                                <div class="w-full">
                                     <div class="label p-0">
                                         <span class="label-text">"Unit"</span>
                                     </div>
@@ -299,7 +299,7 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                     />
                                 </div>
 
-                                <button type="submit" class="btn btn-primary mt-[20px] sm:w-min w-full">"Add"</button>
+                                <button type="submit" class="btn btn-primary w-full">"Add"</button>
                             </div>
                         </ActionForm>
                     }
