@@ -1,6 +1,7 @@
 use crate::api::recipe::get_recipe;
 use crate::components::page_loading::PageLoadingComponent;
 use crate::components::recipe::add_edit_ingredients::ViewEditIngredientsComponent;
+use crate::components::recipe::add_edit_notes::ViewEditNotesComponent;
 use crate::components::recipe::add_edit_steps::ViewEditStepsComponent;
 use crate::components::recipe::delete_recipe_button::DeleteRecipeButton;
 use crate::components::recipe::edit_recipe::ViewEditRecipeComponent;
@@ -61,6 +62,9 @@ pub fn ViewEditRecipe() -> impl IntoView {
 
                                     // EDIT/ADD STEPS COMPONENT
                                     <ViewEditStepsComponent recipe_id=recipe_id/>
+
+                                    // EDIT/ADD NOTES COMPONENT
+                                    <ViewEditNotesComponent recipe_id=recipe_id/>
 
                                     // DELETE RECIPE BUTTON
                                     <DeleteRecipeButton recipe_id=recipe_id/>
