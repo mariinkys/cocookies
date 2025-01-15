@@ -2,7 +2,7 @@ use crate::api::recipe::add_recipe;
 use crate::components::page_loading::PageLoadingComponent;
 use crate::components::toast::{ToastMessage, ToastType};
 use crate::models::recipe::Recipe;
-use crate::utils::{upload_file, EnvOptions};
+use crate::utils::{env_utils::EnvOptions, file_utils::upload_file};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos_router::hooks::use_navigate;
@@ -187,7 +187,7 @@ pub fn NewRecipe() -> impl IntoView {
                                     <input disabled=loading type="file" accept="image/*" class="file-input file-input-bordered w-full" node_ref=file_input on:change=move |_ev| {
                                         if let Some(files) = file_input.get().unwrap().files() {
                                             if let Some(file) = files.get(0) {
-                                                let file_type = crate::utils::get_file_extension(&file); // Check if it's a valid file extension
+                                                let file_type = crate::utils::file_utils::get_file_extension(&file); // Check if it's a valid file extension
                                                 if file_type.is_none() {
                                                     set_toast.set(ToastMessage {
                                                         message: String::from("Not an image"),

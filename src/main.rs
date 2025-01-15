@@ -15,7 +15,7 @@ async fn main() -> std::io::Result<()> {
     use leptos::prelude::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
     use leptos_meta::MetaTags;
-    use utils::EnvOptions;
+    use utils::env_utils::EnvOptions;
 
     let conf = get_configuration(None).unwrap();
     let addr = conf.leptos_options.site_addr;
@@ -131,7 +131,7 @@ pub fn main() {
 async fn serve_image_uploads(filename: actix_web::web::Path<String>) -> actix_web::HttpResponse {
     use actix_web::HttpResponse;
 
-    let env_options = utils::EnvOptions::get();
+    let env_options = utils::env_utils::EnvOptions::get();
     let filepath = format!("{}/{}", env_options.upload_dir, filename.into_inner());
 
     match std::fs::read(filepath) {

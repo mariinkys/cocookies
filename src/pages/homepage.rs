@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 
 use crate::components::page_loading::PageLoadingComponent;
-use crate::utils::{truncate_str_with_ellipsis, EnvOptions};
+use crate::utils::{env_utils::EnvOptions, generic_utils::truncate_str_with_ellipsis};
 use crate::{api::recipe::get_all_recipes, models::recipe::Recipe};
 
 /// Renders the home page of your application.

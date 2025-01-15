@@ -7,7 +7,7 @@ use crate::{
         recipe::edit_main_photo::EditMainPhotoComponent,
         toast::{ToastMessage, ToastType},
     },
-    models::recipe::Recipe, utils::EnvOptions,
+    models::recipe::Recipe, utils::env_utils::EnvOptions,
 };
 
 #[component]

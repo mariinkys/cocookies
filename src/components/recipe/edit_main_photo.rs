@@ -3,7 +3,7 @@ use leptos::{prelude::*, task::spawn_local};
 use crate::{
     api::recipe::update_recipe_main_photo,
     components::toast::{ToastMessage, ToastType},
-    utils::{upload_file, EnvOptions},
+    utils::{env_utils::EnvOptions, file_utils::upload_file},
 };
 
 #[component]
@@ -85,7 +85,7 @@ pub fn EditMainPhotoComponent(recipe_id: i32) -> impl IntoView {
                     <input disabled=loading type="file" accept="image/*" class="file-input file-input-bordered w-full" node_ref=file_input on:change=move |_ev| {
                         if let Some(files) = file_input.get().unwrap().files() {
                             if let Some(file) = files.get(0) {
-                                let file_type = crate::utils::get_file_extension(&file); // Check if it's a valid file extension
+                                let file_type = crate::utils::file_utils::get_file_extension(&file); // Check if it's a valid file extension
                                 if file_type.is_none() {
                                     set_toast.set(ToastMessage {
                                         message: String::from("Not an image"),

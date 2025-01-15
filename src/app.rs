@@ -9,7 +9,7 @@ use crate::components::toast::ToastComponent;
 use crate::pages::homepage::HomePage;
 use crate::pages::new_recipe::NewRecipe;
 use crate::pages::view_edit_recipe::ViewEditRecipe;
-use crate::{components::navbar::NavbarComponent, utils::EnvOptions};
+use crate::{components::navbar::NavbarComponent, utils::env_utils::EnvOptions};
 
 #[component]
 pub fn App() -> impl IntoView {

@@ -1,5 +1,4 @@
 use leptos::prelude::*;
-use serde::{Deserialize, Serialize};
 
 #[server(UploadFile, "/api/uploadfile")]
 pub async fn upload_file(file_data: Vec<u8>, file_path: String) -> Result<String, ServerFnError> {
@@ -87,32 +86,5 @@ pub fn get_file_extension(file: &web_sys::File) -> Option<&'static str> {
         "image/gif" => None,
         "image/svg+xml" => None,
         _ => None, // Handle unsupported file types
-    }
-}
-
-pub fn truncate_str_with_ellipsis(input: &str, limit: usize) -> String {
-    if input.len() <= limit {
-        input.to_string()
-    } else {
-        let mut end = limit;
-        while !input.is_char_boundary(end) {
-            end -= 1;
-        }
-        format!("{}...", &input[..end])
-    }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct EnvOptions {
-    pub upload_dir: String,
-}
-
-impl EnvOptions {
-    pub fn get() -> Self {
-        // If we are on a docker enviorment the UPLOAD_DIR env will be set, it will default to assets/recipes on non-docker enviorments.
-        let upload_dir =
-            std::env::var("UPLOAD_DIR").unwrap_or_else(|_| "/assets/recipes".to_string());
-
-        EnvOptions { upload_dir }
     }
 }
