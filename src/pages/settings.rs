@@ -6,7 +6,7 @@ use crate::components::settings::{
 
 #[component]
 pub fn SettingsPage() -> impl IntoView {
-    let var_name = view! {
+    view! {
         <div class="py-4 px-4 xl:px-96 flex flex-col gap-2">
             <h1 class="text-4xl font-bold">"Settings"</h1>
 
@@ -18,6 +18,5 @@ pub fn SettingsPage() -> impl IntoView {
                 </div>
             </div>
         </div>
-    };
-    var_name
+    }
 }
