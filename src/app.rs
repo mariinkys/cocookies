@@ -8,6 +8,7 @@ use leptos_router::{
 use crate::components::toast::ToastComponent;
 use crate::pages::homepage::HomePage;
 use crate::pages::new_recipe::NewRecipe;
+use crate::pages::settings::SettingsPage;
 use crate::pages::view_edit_recipe::ViewEditRecipe;
 use crate::{components::navbar::NavbarComponent, utils::env_utils::EnvOptions};
 
@@ -43,6 +44,7 @@ pub fn App() -> impl IntoView {
                     <Route path=StaticSegment("") view=HomePage/>
                     <Route path=path!("/recipes/new") view=NewRecipe/>
                     <Route path=path!("/recipes/:id") view=ViewEditRecipe/>
+                    <Route path=path!("/settings") view=SettingsPage/>
                     <Route path=WildcardSegment("any") view=NotFound/>
                 </Routes>
             </main>
