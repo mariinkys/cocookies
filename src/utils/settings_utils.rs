@@ -17,8 +17,11 @@ pub struct FullRecipe {
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 
+    #[serde(default)]
     pub ingredients: Vec<RecipeIngredient>,
+    #[serde(default)]
     pub steps: Vec<RecipeStep>,
+    #[serde(default)]
     pub notes: Vec<RecipeNote>,
 }
 
@@ -56,20 +59,18 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
     "#;
 
     let rows = sqlx::query(query).fetch_all(&*pool).await;
-
     match rows {
         Ok(results) => {
             if results.is_empty() {
-                return Ok(Vec::new()); // Return empty list if no recipes found
+                return Ok(Vec::new()); 
             }
 
-            // Map to group rows by recipe_id
             let mut recipes_map: HashMap<i32, FullRecipe> = HashMap::new();
 
             for row in results {
+
                 let recipe_id: i32 = row.try_get("recipe_id").unwrap_or_default();
 
-                // Get or initialize the FullRecipe for this recipe_id
                 let recipe = recipes_map.entry(recipe_id).or_insert_with(|| FullRecipe {
                     recipe_id: Some(recipe_id),
                     name: row.try_get("name").unwrap_or_default(),
@@ -84,12 +85,10 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
                     notes: Vec::new(),
                 });
 
-                // Avoid duplicates by using HashMaps for each category
                 let mut ingredient_map: HashMap<i32, RecipeIngredient> = HashMap::new();
                 let mut step_map: HashMap<i32, RecipeStep> = HashMap::new();
                 let mut note_map: HashMap<i32, RecipeNote> = HashMap::new();
 
-                // Add ingredients if valid
                 if let Ok(ingredient_id) = row.try_get::<i32, _>("recipe_ingredient_id") {
                     if ingredient_id > 0 {
                         ingredient_map
@@ -106,7 +105,6 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
                     }
                 }
 
-                // Add steps if valid
                 if let Ok(step_id) = row.try_get::<i32, _>("step_id") {
                     if step_id > 0 {
                         step_map.entry(step_id).or_insert_with(|| RecipeStep {
@@ -120,7 +118,6 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
                     }
                 }
 
-                // Add notes if valid
                 if let Ok(note_id) = row.try_get::<i32, _>("note_id") {
                     if note_id > 0 {
                         note_map.entry(note_id).or_insert_with(|| RecipeNote {
@@ -133,16 +130,13 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
                     }
                 }
 
-                // Assign unique values back to the recipe
                 recipe.ingredients = ingredient_map.into_values().collect();
                 recipe.steps = step_map.into_values().collect();
                 recipe.notes = note_map.into_values().collect();
             }
 
-            // Convert the map to a vector of FullRecipe
             let mut recipes: Vec<FullRecipe> = recipes_map.into_values().collect();
 
-            // Sort ingredients, steps, and notes for each recipe
             for recipe in &mut recipes {
                 recipe
                     .ingredients
@@ -150,7 +144,6 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
                 recipe.steps.sort_by_key(|step| step.step_number);
                 recipe.notes.sort_by_key(|note| note.note_id);
             }
-
             Ok(recipes)
         }
         Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
@@ -168,27 +161,24 @@ pub async fn insert_full_recipes(recipes: Vec<FullRecipe>) -> Result<(), ServerF
     let pool: Arc<Pool<Sqlite>> = ext.into_inner();
 
     for recipe in recipes {
-        // Insert the recipe into the recipes table
         let row = sqlx::query(
             r#"
             INSERT INTO recipes (name, description, prep_time_minutes, servings, main_photo, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?)
             "#,
         )
-        .bind(&recipe.name)
-        .bind(&recipe.description)
+        .bind(recipe.name)
+        .bind(recipe.description)
         .bind(recipe.prep_time_minutes)
         .bind(recipe.servings)
-        .bind(&recipe.main_photo)
+        .bind(recipe.main_photo)
         .bind(recipe.created_at)
         .bind(recipe.updated_at)
         .execute(&*pool)  
         .await?;
 
-        // Get the `recipe_id` of the inserted recipe
         let recipe_id = row.last_insert_rowid();
 
-        // Insert the ingredients associated with the recipe
         for ingredient in recipe.ingredients {
             sqlx::query(
                 r#"
@@ -197,9 +187,9 @@ pub async fn insert_full_recipes(recipes: Vec<FullRecipe>) -> Result<(), ServerF
                 "#,
             )
             .bind(recipe_id)
-            .bind(&ingredient.ingredient_name)
-            .bind(&ingredient.quantity)
-            .bind(&ingredient.unit)
+            .bind(ingredient.ingredient_name)
+            .bind(ingredient.quantity)
+            .bind(ingredient.unit)
             .bind(ingredient.created_at)
             .bind(ingredient.updated_at)
             .execute(&*pool)  // Dereference the Arc here
@@ -216,14 +206,13 @@ pub async fn insert_full_recipes(recipes: Vec<FullRecipe>) -> Result<(), ServerF
             )
             .bind(recipe_id)
             .bind(step.step_number)
-            .bind(&step.instructions)
+            .bind(step.instructions)
             .bind(step.created_at)
             .bind(step.updated_at)
             .execute(&*pool)  
             .await?;
         }
 
-        // Insert the notes associated with the recipe
         for note in recipe.notes {
             sqlx::query(
                 r#"
@@ -232,7 +221,7 @@ pub async fn insert_full_recipes(recipes: Vec<FullRecipe>) -> Result<(), ServerF
                 "#,
             )
             .bind(recipe_id)
-            .bind(&note.note)
+            .bind(note.note)
             .bind(note.created_at)
             .bind(note.updated_at)
             .execute(&*pool) 
