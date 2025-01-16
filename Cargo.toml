@@ -25,6 +25,7 @@ sqlx = { version = "0.8.3", features = [
   "uuid",
 ], optional = true }
 serde = { version = "1.0.217" }
+serde_json = "1.0.135"
 chrono = { version = "0.4.31", features = ["serde"] }
 futures = { version = "0.3", optional = true }
 wasm-bindgen-futures = "0.4.49"
@@ -50,7 +51,7 @@ ssr = [
 # Added by me for file uploading
 [dependencies.web-sys]
 version = "0.3.72"
-features = ["File", "FileList"]
+features = ["File", "FileList", "HtmlElement"]
 
 # Defines a size-optimized profile for the WASM bundle in release mode
 [profile.wasm-release]
