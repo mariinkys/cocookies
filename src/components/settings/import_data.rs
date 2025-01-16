@@ -79,7 +79,7 @@ pub fn ImportDataCardComponent() -> impl IntoView {
                                 <form class="flex flex-col gap-3" on:submit=on_submit>
                                     <div>
                                         <div class="label p-0">
-                                            <span class="label-text">"Main Photo"</span>
+                                            <span class="label-text">"File to Import"</span>
                                         </div>
                                         <input disabled=loading type="file" accept=".json" class="file-input file-input-bordered w-full" node_ref=file_input on:change=move |_ev| {
                                             if let Some(files) = file_input.get().unwrap().files() {
