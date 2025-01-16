@@ -62,13 +62,12 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
     match rows {
         Ok(results) => {
             if results.is_empty() {
-                return Ok(Vec::new()); 
+                return Ok(Vec::new());
             }
 
             let mut recipes_map: HashMap<i32, FullRecipe> = HashMap::new();
 
             for row in results {
-
                 let recipe_id: i32 = row.try_get("recipe_id").unwrap_or_default();
 
                 let recipe = recipes_map.entry(recipe_id).or_insert_with(|| FullRecipe {
@@ -85,29 +84,23 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
                     notes: Vec::new(),
                 });
 
-                let mut ingredient_map: HashMap<i32, RecipeIngredient> = HashMap::new();
-                let mut step_map: HashMap<i32, RecipeStep> = HashMap::new();
-                let mut note_map: HashMap<i32, RecipeNote> = HashMap::new();
-
                 if let Ok(ingredient_id) = row.try_get::<i32, _>("recipe_ingredient_id") {
-                    if ingredient_id > 0 {
-                        ingredient_map
-                            .entry(ingredient_id)
-                            .or_insert_with(|| RecipeIngredient {
-                                recipe_ingredient_id: Some(ingredient_id),
-                                recipe_id,
-                                ingredient_name: row.try_get("ingredient_name").unwrap_or_default(),
-                                quantity: row.try_get("quantity").unwrap_or_default(),
-                                unit: row.try_get("unit").ok(),
-                                created_at: row.try_get("created_at").ok(),
-                                updated_at: row.try_get("updated_at").ok(),
-                            });
+                    if ingredient_id > 0 && !recipe.ingredients.iter().any(|i| i.recipe_ingredient_id == Some(ingredient_id)) {
+                        recipe.ingredients.push(RecipeIngredient {
+                            recipe_ingredient_id: Some(ingredient_id),
+                            recipe_id,
+                            ingredient_name: row.try_get("ingredient_name").unwrap_or_default(),
+                            quantity: row.try_get("quantity").unwrap_or_default(),
+                            unit: row.try_get("unit").ok(),
+                            created_at: row.try_get("created_at").ok(),
+                            updated_at: row.try_get("updated_at").ok(),
+                        });
                     }
                 }
 
                 if let Ok(step_id) = row.try_get::<i32, _>("step_id") {
-                    if step_id > 0 {
-                        step_map.entry(step_id).or_insert_with(|| RecipeStep {
+                    if step_id > 0 && !recipe.steps.iter().any(|s| s.step_id == Some(step_id)) {
+                        recipe.steps.push(RecipeStep {
                             step_id: Some(step_id),
                             recipe_id,
                             step_number: row.try_get("step_number").unwrap_or_default(),
@@ -119,8 +112,8 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
                 }
 
                 if let Ok(note_id) = row.try_get::<i32, _>("note_id") {
-                    if note_id > 0 {
-                        note_map.entry(note_id).or_insert_with(|| RecipeNote {
+                    if note_id > 0 && !recipe.notes.iter().any(|n| n.note_id == Some(note_id)) {
+                        recipe.notes.push(RecipeNote {
                             note_id: Some(note_id),
                             recipe_id,
                             note: row.try_get("note").unwrap_or_default(),
@@ -129,10 +122,6 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
                         });
                     }
                 }
-
-                recipe.ingredients = ingredient_map.into_values().collect();
-                recipe.steps = step_map.into_values().collect();
-                recipe.notes = note_map.into_values().collect();
             }
 
             let mut recipes: Vec<FullRecipe> = recipes_map.into_values().collect();
@@ -149,6 +138,7 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
         Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
     }
 }
+
 
 #[server(InsertFullRecipe, "/api/recipe/full/insert")]
 pub async fn insert_full_recipes(recipes: Vec<FullRecipe>) -> Result<(), ServerFnError> {
@@ -169,9 +159,9 @@ pub async fn insert_full_recipes(recipes: Vec<FullRecipe>) -> Result<(), ServerF
         )
         .bind(recipe.name)
         .bind(recipe.description)
-        .bind(recipe.prep_time_minutes)
-        .bind(recipe.servings)
-        .bind(recipe.main_photo)
+        .bind(recipe.prep_time_minutes.filter(|v| *v != 0))
+        .bind(recipe.servings.filter(|v| *v != 0))
+        .bind(None::<String>)
         .bind(recipe.created_at)
         .bind(recipe.updated_at)
         .execute(&*pool)  
