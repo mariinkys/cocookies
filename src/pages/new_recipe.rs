@@ -2,16 +2,12 @@ use crate::api::recipe::add_recipe;
 use crate::components::page_loading::PageLoadingComponent;
 use crate::components::toast::{ToastMessage, ToastType};
 use crate::models::recipe::Recipe;
-use crate::utils::{env_utils::EnvOptions, file_utils::upload_file};
 use leptos::prelude::*;
 use leptos::task::spawn_local;
-use leptos_router::hooks::use_navigate;
-use leptos_router::NavigateOptions;
 
 #[component]
 pub fn NewRecipe() -> impl IntoView {
     let set_toast: WriteSignal<ToastMessage> = expect_context();
-    let env_options: ReadSignal<EnvOptions> = expect_context();
     let loading = RwSignal::new(false);
 
     let file_input = NodeRef::<leptos::html::Input>::new();
@@ -23,53 +19,28 @@ pub fn NewRecipe() -> impl IntoView {
         // stop the page from reloading!
         ev.prevent_default();
         if !loading.get() {
-            let navigate = use_navigate();
             loading.set(true);
 
             // TODO: How to make loading appear on submit click (why does it wait for a while? file uploading?)
             spawn_local(async move {
-                // File upload handling
                 let image_bytes = main_photo_image.get_untracked();
                 if let Some(img) = image_bytes {
-                    let image_path = format!(
-                        "{}/{}",
-                        env_options.get_untracked().upload_dir,
-                        image_name.get_untracked()
-                    );
-
-                    if let Err(err) = upload_file(img, image_path).await {
-                        set_toast.set(ToastMessage {
-                            message: format!("Err {}", err),
-                            toast_type: ToastType::Error,
-                            visible: true,
-                        });
-                        loading.set(false);
-                        return;
-                    } else {
-                        let mut updated_model = model.get_untracked();
-                        updated_model.main_photo = Some(image_name.get_untracked());
-                        model.set(updated_model);
-                    }
-                }
-
-                // Recipe creation handling
-                match add_recipe(model.get_untracked()).await {
-                    Ok(_succ) => {
-                        set_toast.set(ToastMessage {
-                            message: String::from("Success"),
-                            toast_type: ToastType::Success,
-                            visible: true,
-                        });
-                        loading.set(false);
-                        navigate("/", NavigateOptions::default());
-                    }
-                    Err(err) => {
-                        set_toast.set(ToastMessage {
-                            message: format!("Err {}", err),
-                            toast_type: ToastType::Error,
-                            visible: true,
-                        });
-                        loading.set(false);
+                    match add_recipe(model.get_untracked(), image_name.get_untracked(), img).await {
+                        Ok(_succ) => {
+                            set_toast.set(ToastMessage {
+                                message: String::from("Success"),
+                                toast_type: ToastType::Success,
+                                visible: true,
+                            });
+                        }
+                        Err(err) => {
+                            set_toast.set(ToastMessage {
+                                message: format!("Err {}", err),
+                                toast_type: ToastType::Error,
+                                visible: true,
+                            });
+                            loading.set(false);
+                        }
                     }
                 }
             });

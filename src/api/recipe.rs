@@ -45,31 +45,48 @@ pub async fn get_recipe(id: i32) -> Result<Recipe, ServerFnError> {
 }
 
 #[server(AddRecipe, "/api/recipe/add")]
-pub async fn add_recipe(recipe: Recipe) -> Result<i32, ServerFnError> {
+pub async fn add_recipe(
+    recipe: Recipe,
+    image_name: String,
+    image_data: Vec<u8>,
+) -> Result<i32, ServerFnError> {
     let ext: Data<Pool<Sqlite>> = extract().await?;
     let pool: Arc<Pool<Sqlite>> = ext.into_inner();
 
-    let command_res = sqlx::query(
-        "INSERT INTO recipes (
-                name,
-                description,
-                prep_time_minutes,
-                servings,
-                main_photo
-            )
-            VALUES (?, ?, ?, ?, ?)
-        ",
-    )
-    .bind(recipe.name)
-    .bind(recipe.description)
-    .bind(recipe.prep_time_minutes)
-    .bind(recipe.servings)
-    .bind(recipe.main_photo)
-    .execute(&*pool)
-    .await;
+    let image_path = format!(
+        "{}/{}",
+        crate::utils::env_utils::EnvOptions::get().upload_dir,
+        image_name
+    );
 
-    match command_res {
-        Ok(result) => Ok(result.last_insert_rowid().try_into().unwrap()),
+    let image_upload_res = crate::utils::file_utils::upload_file(image_data, image_path).await;
+
+    match image_upload_res {
+        Ok(_) => {
+            let command_res = sqlx::query(
+                "INSERT INTO recipes (
+                        name,
+                        description,
+                        prep_time_minutes,
+                        servings,
+                        main_photo
+                    )
+                    VALUES (?, ?, ?, ?, ?)
+                ",
+            )
+            .bind(recipe.name)
+            .bind(recipe.description)
+            .bind(recipe.prep_time_minutes)
+            .bind(recipe.servings)
+            .bind(image_name)
+            .execute(&*pool)
+            .await;
+
+            match command_res {
+                Ok(result) => Ok(result.last_insert_rowid().try_into().unwrap()),
+                Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+            }
+        }
         Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
     }
 }
