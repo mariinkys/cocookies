@@ -4,6 +4,8 @@ use crate::components::toast::{ToastMessage, ToastType};
 use crate::models::recipe::Recipe;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
+use leptos_router::hooks::use_navigate;
+use leptos_router::NavigateOptions;
 
 #[component]
 pub fn NewRecipe() -> impl IntoView {
@@ -19,6 +21,7 @@ pub fn NewRecipe() -> impl IntoView {
         // stop the page from reloading!
         ev.prevent_default();
         if !loading.get() {
+            let navigate = use_navigate();
             loading.set(true);
 
             // TODO: How to make loading appear on submit click (why does it wait for a while? file uploading?)
@@ -32,6 +35,7 @@ pub fn NewRecipe() -> impl IntoView {
                                 toast_type: ToastType::Success,
                                 visible: true,
                             });
+                            navigate("/", NavigateOptions::default());
                         }
                         Err(err) => {
                             set_toast.set(ToastMessage {
