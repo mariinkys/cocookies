@@ -13,7 +13,7 @@ pub fn NewRecipe() -> impl IntoView {
     let loading = RwSignal::new(false);
 
     let file_input = NodeRef::<leptos::html::Input>::new();
-    let main_photo_image = RwSignal::new(None);
+    let main_photo_image: RwSignal<Option<Vec<u8>>> = RwSignal::new(None);
     let image_name = RwSignal::new(String::new());
 
     let model = RwSignal::new(Recipe::default());
@@ -28,7 +28,32 @@ pub fn NewRecipe() -> impl IntoView {
             spawn_local(async move {
                 let image_bytes = main_photo_image.get_untracked();
                 if let Some(img) = image_bytes {
-                    match add_recipe(model.get_untracked(), image_name.get_untracked(), img).await {
+                    match add_recipe(
+                        model.get_untracked(),
+                        Some(image_name.get_untracked()),
+                        Some(img),
+                    )
+                    .await
+                    {
+                        Ok(_succ) => {
+                            set_toast.set(ToastMessage {
+                                message: String::from("Success"),
+                                toast_type: ToastType::Success,
+                                visible: true,
+                            });
+                            navigate("/", NavigateOptions::default());
+                        }
+                        Err(err) => {
+                            set_toast.set(ToastMessage {
+                                message: format!("Err {}", err),
+                                toast_type: ToastType::Error,
+                                visible: true,
+                            });
+                            loading.set(false);
+                        }
+                    }
+                } else {
+                    match add_recipe(model.get_untracked(), None, None).await {
                         Ok(_succ) => {
                             set_toast.set(ToastMessage {
                                 message: String::from("Success"),

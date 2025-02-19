@@ -47,38 +47,72 @@ pub async fn get_recipe(id: i32) -> Result<Recipe, ServerFnError> {
 #[server(AddRecipe, "/api/recipe/add")]
 pub async fn add_recipe(
     recipe: Recipe,
-    image_name: String,
-    image_data: Vec<u8>,
+    image_name: Option<String>,
+    image_data: Option<Vec<u8>>,
 ) -> Result<i32, ServerFnError> {
     let ext: Data<Pool<Sqlite>> = extract().await?;
     let pool: Arc<Pool<Sqlite>> = ext.into_inner();
 
-    let image_path = format!(
-        "{}/{}",
-        crate::utils::env_utils::EnvOptions::get().upload_dir,
-        image_name
-    );
+    let image_path: Option<String> = if image_name.is_some() {
+        Some(format!(
+            "{}/{}",
+            crate::utils::env_utils::EnvOptions::get().upload_dir,
+            image_name.clone().unwrap()
+        ))
+    } else {
+        None
+    };
 
-    let image_upload_res = crate::utils::file_utils::upload_file(image_data, image_path).await;
+    let image_upload_res = if image_data.is_some() && image_path.is_some() {
+        Some(crate::utils::file_utils::upload_file(image_data.unwrap(), image_path.unwrap()).await)
+    } else {
+        None
+    };
 
     match image_upload_res {
-        Ok(_) => {
+        Some(img_res) => match img_res {
+            Ok(_) => {
+                let command_res = sqlx::query(
+                    "INSERT INTO recipes (
+                                name,
+                                description,
+                                prep_time_minutes,
+                                servings,
+                                main_photo
+                            )
+                            VALUES (?, ?, ?, ?, ?)
+                        ",
+                )
+                .bind(recipe.name)
+                .bind(recipe.description)
+                .bind(recipe.prep_time_minutes)
+                .bind(recipe.servings)
+                .bind(image_name.unwrap())
+                .execute(&*pool)
+                .await;
+
+                match command_res {
+                    Ok(result) => Ok(result.last_insert_rowid().try_into().unwrap()),
+                    Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+                }
+            }
+            Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+        },
+        None => {
             let command_res = sqlx::query(
                 "INSERT INTO recipes (
                         name,
                         description,
                         prep_time_minutes,
-                        servings,
-                        main_photo
+                        servings
                     )
-                    VALUES (?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?)
                 ",
             )
             .bind(recipe.name)
             .bind(recipe.description)
             .bind(recipe.prep_time_minutes)
             .bind(recipe.servings)
-            .bind(image_name)
             .execute(&*pool)
             .await;
 
@@ -87,7 +121,6 @@ pub async fn add_recipe(
                 Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
             }
         }
-        Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
     }
 }
 
