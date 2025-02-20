@@ -24,8 +24,8 @@ sqlx = { version = "0.8.3", features = [
   "chrono",
   "uuid",
 ], optional = true }
-serde = { version = "1.0.217" }
-serde_json = "1.0.138"
+serde = { version = "1.0.218" }
+serde_json = "1.0.139"
 chrono = { version = "0.4.31", features = ["serde"] }
 futures = { version = "0.3", optional = true }
 wasm-bindgen-futures = "0.4.50"
