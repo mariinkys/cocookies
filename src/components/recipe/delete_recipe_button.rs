@@ -17,7 +17,6 @@ pub fn DeleteRecipeButton(recipe_id: i32) -> impl IntoView {
     Effect::new(move |_| {
         if let Some(val) = value() {
             let navigate = use_navigate();
-            leptos::logging::log!("{:?}", val);
             match val {
                 Ok(_) => {
                     dialog_ref_node.get().unwrap().close();
