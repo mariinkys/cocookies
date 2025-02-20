@@ -14,7 +14,7 @@ pub fn NewRecipe() -> impl IntoView {
 
     let file_input = NodeRef::<leptos::html::Input>::new();
     let main_photo_image: RwSignal<Option<Vec<u8>>> = RwSignal::new(None);
-    let image_name = RwSignal::new(String::new());
+    let image_name: RwSignal<Option<String>> = RwSignal::new(None);
 
     let model = RwSignal::new(Recipe::default());
     let on_submit = move |ev: leptos::ev::SubmitEvent| {
@@ -26,50 +26,28 @@ pub fn NewRecipe() -> impl IntoView {
 
             // TODO: How to make loading appear on submit click (why does it wait for a while? file uploading?)
             spawn_local(async move {
-                let image_bytes = main_photo_image.get_untracked();
-                if let Some(img) = image_bytes {
-                    match add_recipe(
-                        model.get_untracked(),
-                        Some(image_name.get_untracked()),
-                        Some(img),
-                    )
-                    .await
-                    {
-                        Ok(_succ) => {
-                            set_toast.set(ToastMessage {
-                                message: String::from("Success"),
-                                toast_type: ToastType::Success,
-                                visible: true,
-                            });
-                            navigate("/", NavigateOptions::default());
-                        }
-                        Err(err) => {
-                            set_toast.set(ToastMessage {
-                                message: format!("Err {}", err),
-                                toast_type: ToastType::Error,
-                                visible: true,
-                            });
-                            loading.set(false);
-                        }
+                match add_recipe(
+                    model.get_untracked(),
+                    image_name.get_untracked(),
+                    main_photo_image.get_untracked(),
+                )
+                .await
+                {
+                    Ok(_succ) => {
+                        set_toast.set(ToastMessage {
+                            message: String::from("Success"),
+                            toast_type: ToastType::Success,
+                            visible: true,
+                        });
+                        navigate("/", NavigateOptions::default());
                     }
-                } else {
-                    match add_recipe(model.get_untracked(), None, None).await {
-                        Ok(_succ) => {
-                            set_toast.set(ToastMessage {
-                                message: String::from("Success"),
-                                toast_type: ToastType::Success,
-                                visible: true,
-                            });
-                            navigate("/", NavigateOptions::default());
-                        }
-                        Err(err) => {
-                            set_toast.set(ToastMessage {
-                                message: format!("Err {}", err),
-                                toast_type: ToastType::Error,
-                                visible: true,
-                            });
-                            loading.set(false);
-                        }
+                    Err(err) => {
+                        set_toast.set(ToastMessage {
+                            message: format!("Err {}", err),
+                            toast_type: ToastType::Error,
+                            visible: true,
+                        });
+                        loading.set(false);
                     }
                 }
             });
@@ -195,7 +173,7 @@ pub fn NewRecipe() -> impl IntoView {
                                                         visible: true,
                                                     });
                                                     main_photo_image.set(None);
-                                                    image_name.set(String::new());
+                                                    image_name.set(None);
                                                 } else {
                                                     spawn_local(async move {
                                                         let promise = file.array_buffer();
@@ -203,10 +181,10 @@ pub fn NewRecipe() -> impl IntoView {
                                                             let bytes = web_sys::js_sys::Uint8Array::new(&js_value).to_vec();
                                                             main_photo_image.set(Some(bytes));
 
-                                                            image_name.set(format!("{}.{}", uuid::Uuid::new_v4(), file_type.unwrap()))
+                                                            image_name.set(Some(format!("{}.{}", uuid::Uuid::new_v4(), file_type.unwrap())))
                                                         } else {
                                                             main_photo_image.set(None);
-                                                            image_name.set(String::new());
+                                                            image_name.set(None);
                                                         }
                                                     });
                                                 }
