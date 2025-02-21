@@ -43,8 +43,8 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
     let edit_dialog_ref: NodeRef<leptos::html::Dialog> = NodeRef::new();
 
     let change_main_photo_dialog_ref: NodeRef<leptos::html::Dialog> = NodeRef::new();
-    let photo_path = if model.get().main_photo.is_some() {
-        format!("..{}/{}", env_options.get().upload_dir, model.read_only().get().main_photo.unwrap_or_default())
+    let photo_path = if model.get_untracked().main_photo.is_some() {
+        format!("..{}/{}", env_options.get_untracked().upload_dir, model.read_only().get_untracked().main_photo.unwrap_or_default())
     } else {
         String::from("/assets/utils/image-not-found.png")
     };
