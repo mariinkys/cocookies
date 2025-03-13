@@ -4,8 +4,8 @@ use crate::components::toast::{ToastMessage, ToastType};
 use crate::models::recipe::Recipe;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
-use leptos_router::hooks::use_navigate;
 use leptos_router::NavigateOptions;
+use leptos_router::hooks::use_navigate;
 
 #[component]
 pub fn NewRecipe() -> impl IntoView {
@@ -70,7 +70,7 @@ pub fn NewRecipe() -> impl IntoView {
                                         <span class="label-text">"Name"</span>
                                     </div>
                                     <input type="text"
-                                        class="input input-bordered w-full"
+                                        class="input w-full"
                                         name="name"
                                         required
                                         autocomplete="off"
@@ -89,7 +89,7 @@ pub fn NewRecipe() -> impl IntoView {
                                         <span class="label-text">"Description"</span>
                                     </div>
                                     <input type="text"
-                                        class="input input-bordered w-full"
+                                        class="input w-full"
                                         name="description"
                                         autocomplete="off"
                                         disabled=loading
@@ -113,7 +113,7 @@ pub fn NewRecipe() -> impl IntoView {
                                         <span class="label-text">"Preparation Time (minutes)"</span>
                                     </div>
                                     <input type="number"
-                                        class="input input-bordered w-full"
+                                        class="input w-full"
                                         name="prep_time_minutes"
                                         autocomplete="off"
                                         disabled=loading
@@ -138,7 +138,7 @@ pub fn NewRecipe() -> impl IntoView {
                                         <span class="label-text">"Servings"</span>
                                     </div>
                                     <input type="number"
-                                        class="input input-bordered w-full"
+                                        class="input w-full"
                                         name="servings"
                                         autocomplete="off"
                                         disabled=loading
@@ -162,7 +162,7 @@ pub fn NewRecipe() -> impl IntoView {
                                     <div class="label p-0">
                                         <span class="label-text">"Main Photo"</span>
                                     </div>
-                                    <input disabled=loading type="file" accept="image/*" class="file-input file-input-bordered w-full" node_ref=file_input on:change=move |_ev| {
+                                    <input disabled=loading type="file" accept="image/*" class="file-input w-full" node_ref=file_input on:change=move |_ev| {
                                         if let Some(files) = file_input.get().unwrap().files() {
                                             if let Some(file) = files.get(0) {
                                                 let file_type = crate::utils::file_utils::get_file_extension(&file); // Check if it's a valid file extension

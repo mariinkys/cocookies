@@ -152,7 +152,7 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                                                     <span class="label-text">"Ingredient Name"</span>
                                                                 </div>
                                                                 <input type="text"
-                                                                    class="input input-bordered w-full"
+                                                                    class="input w-full"
                                                                     name="ingredient_name"
                                                                     required
                                                                     autocomplete="off"
@@ -171,7 +171,7 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                                                     <span class="label-text">"Quantity"</span>
                                                                 </div>
                                                                 <input type="text" 
-                                                                    class="input input-bordered w-full"
+                                                                    class="input w-full"
                                                                     name="quantity"
                                                                     autocomplete="off"
                                                                     prop:value={move || model.get().quantity.unwrap_or_default()} 
@@ -189,7 +189,7 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                                                     <span class="label-text">"Unit"</span>
                                                                 </div>
                                                                 <input type="text"
-                                                                    class="input input-bordered w-full"
+                                                                    class="input w-full"
                                                                     name="unit"
                                                                     autocomplete="off"
                                                                     prop:value=move || model.get().unit.unwrap_or_default()
@@ -244,7 +244,7 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                         <span class="label-text">"Ingredient Name"</span>
                                     </div>
                                     <input type="text"
-                                        class="input input-bordered w-full"
+                                        class="input w-full"
                                         name="ingredient_name"
                                         required
                                         autocomplete="off"
@@ -263,7 +263,7 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                         <span class="label-text">"Quantity"</span>
                                     </div>
                                     <input type="text" 
-                                        class="input input-bordered w-full"
+                                        class="input w-full"
                                         name="quantity"
                                         autocomplete="off"
                                         prop:value={move || new_ingredient_model.get().quantity.unwrap_or_default()} 
@@ -281,7 +281,7 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
                                         <span class="label-text">"Unit"</span>
                                     </div>
                                     <input type="text"
-                                        class="input input-bordered w-full"
+                                        class="input w-full"
                                         name="unit"
                                         autocomplete="off"
                                         prop:value=move || new_ingredient_model.get().unit.unwrap_or_default()

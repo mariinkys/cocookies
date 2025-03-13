@@ -2,7 +2,7 @@ use leptos::prelude::*;
 
 use crate::{
     api::recipe_steps::{
-        get_all_recipe_steps, AddRecipeSteps, DeleteRecipeStep, UpdateRecipeSteps,
+        AddRecipeSteps, DeleteRecipeStep, UpdateRecipeSteps, get_all_recipe_steps,
     },
     components::{
         dialog::DialogComponent,
@@ -156,7 +156,7 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
                                                                         <span class="label-text">"Step Number"</span>
                                                                     </div>
                                                                     <input type="number"
-                                                                        class="input input-bordered w-full"
+                                                                        class="input w-full"
                                                                         name="step_number"
                                                                         required
                                                                         autocomplete="off"
@@ -231,7 +231,7 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
                                         <span class="label-text">"Step Number"</span>
                                     </div>
                                     <input type="number"
-                                        class="input input-bordered w-full"
+                                        class="input w-full"
                                         name="step_number"
                                         required
                                         autocomplete="off"

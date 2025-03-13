@@ -114,7 +114,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
                                 <span class="label-text">"Recipe Name"</span>
                             </div>
                             <input type="text"
-                                class="input input-bordered w-full"
+                                class="input w-full"
                                 name="name"
                                 required
                                 autocomplete="off"
@@ -131,7 +131,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
                                 <span class="label-text">"Description"</span>
                             </div>
                             <input type="text"
-                                class="input input-bordered w-full"
+                                class="input w-full"
                                 name="description"
                                 autocomplete="off"
                                 prop:value=move || model.get().description.unwrap_or_default()
@@ -154,7 +154,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
                                     <span class="label-text">"Preparation Time (minutes)"</span>
                                 </div>
                                 <input type="number"
-                                    class="input input-bordered w-full"
+                                    class="input w-full"
                                     name="prep_time_minutes"
                                     autocomplete="off"
                                     prop:value={move || model.get().prep_time_minutes }
@@ -178,7 +178,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
                                     <span class="label-text">"Servings"</span>
                                 </div>
                                 <input type="number"
-                                    class="input input-bordered w-full"
+                                    class="input w-full"
                                     name="servings"
                                     autocomplete="off"
                                     prop:value={move || model.get().servings }
