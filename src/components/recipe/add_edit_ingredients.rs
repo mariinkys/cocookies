@@ -148,63 +148,66 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
 
                                                             // Recipe Ingredient: ingredient_name
                                                             <div class="w-full">
-                                                                <div class="label p-0">
-                                                                    <span class="label-text">"Ingredient Name"</span>
-                                                                </div>
-                                                                <input type="text"
-                                                                    class="input w-full"
-                                                                    name="ingredient_name"
-                                                                    required
-                                                                    autocomplete="off"
-                                                                    prop:value={move || model.get().ingredient_name}
-                                                                    on:input=move |ev| {
-                                                                        model.update(|curr| {
-                                                                            curr.ingredient_name = event_target_value(&ev);
-                                                                        });
-                                                                    }
-                                                                />
+                                                                <fieldset class="fieldset">
+                                                                    <label class="label" for="ingredient_name">"Ingredient Name"</label>
+                                                                    <input type="text"
+                                                                        class="input w-full"
+                                                                        name="ingredient_name"
+                                                                        id="ingredient_name"
+                                                                        required
+                                                                        autocomplete="off"
+                                                                        prop:value={move || model.get().ingredient_name}
+                                                                        on:input=move |ev| {
+                                                                            model.update(|curr| {
+                                                                                curr.ingredient_name = event_target_value(&ev);
+                                                                            });
+                                                                        }
+                                                                    />
+                                                                </fieldset>
                                                             </div>
 
                                                             // Recipe Ingredient: quantity
                                                             <div class="w-full">
-                                                                <div class="label p-0">
-                                                                    <span class="label-text">"Quantity"</span>
-                                                                </div>
-                                                                <input type="text" 
-                                                                    class="input w-full"
-                                                                    name="quantity"
-                                                                    autocomplete="off"
-                                                                    prop:value={move || model.get().quantity.unwrap_or_default()} 
-                                                                    on:input=move |ev| {
-                                                                        model.update(|curr| {
-                                                                            curr.quantity = Some(event_target_value(&ev)); 
-                                                                        });
-                                                                    }
-                                                                />
+                                                                <fieldset class="fieldset">
+                                                                    <label class="label" for="quantity">"Quantity"</label>
+                                                                    <input type="text" 
+                                                                        class="input w-full"
+                                                                        name="quantity"
+                                                                        id="quantity"
+                                                                        autocomplete="off"
+                                                                        prop:value={move || model.get().quantity.unwrap_or_default()} 
+                                                                        on:input=move |ev| {
+                                                                            model.update(|curr| {
+                                                                                curr.quantity = Some(event_target_value(&ev)); 
+                                                                            });
+                                                                        }
+                                                                    />
+                                                                </fieldset>
                                                             </div>
 
                                                             // Recipe: unit
                                                             <div class="w-full">
-                                                                <div class="label p-0">
-                                                                    <span class="label-text">"Unit"</span>
-                                                                </div>
-                                                                <input type="text"
-                                                                    class="input w-full"
-                                                                    name="unit"
-                                                                    autocomplete="off"
-                                                                    prop:value=move || model.get().unit.unwrap_or_default()
-                                                                    on:input=move |ev| {
-                                                                        if !event_target_value(&ev).is_empty() {
-                                                                            model.update(|curr| {
-                                                                                curr.unit = Some(event_target_value(&ev));
-                                                                            });
-                                                                        } else {
-                                                                            model.update(|curr| {
-                                                                                curr.unit = None;
-                                                                            });
+                                                                <fieldset class="fieldset">
+                                                                    <label class="label" for="unit">"Unit"</label>
+                                                                    <input type="text"
+                                                                        class="input w-full"
+                                                                        name="unit"
+                                                                        id="unit"
+                                                                        autocomplete="off"
+                                                                        prop:value=move || model.get().unit.unwrap_or_default()
+                                                                        on:input=move |ev| {
+                                                                            if !event_target_value(&ev).is_empty() {
+                                                                                model.update(|curr| {
+                                                                                    curr.unit = Some(event_target_value(&ev));
+                                                                                });
+                                                                            } else {
+                                                                                model.update(|curr| {
+                                                                                    curr.unit = None;
+                                                                                });
+                                                                            }
                                                                         }
-                                                                    }
-                                                                />
+                                                                    />
+                                                                </fieldset>
                                                             </div>
 
                                                             <div class="w-full">
@@ -240,63 +243,66 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
 
                                 // Recipe Ingredient: ingredient_name
                                 <div class="w-full">
-                                    <div class="label p-0">
-                                        <span class="label-text">"Ingredient Name"</span>
-                                    </div>
-                                    <input type="text"
-                                        class="input w-full"
-                                        name="ingredient_name"
-                                        required
-                                        autocomplete="off"
-                                        prop:value={move || new_ingredient_model.get().ingredient_name}
-                                        on:input=move |ev| {
-                                            new_ingredient_model.update(|curr| {
-                                                curr.ingredient_name = event_target_value(&ev);
-                                            });
-                                        }
-                                    />
+                                    <fieldset class="fieldset">
+                                        <label class="label" for="ingredient_name">"Ingredient Name"</label>
+                                        <input type="text"
+                                            class="input w-full"
+                                            name="ingredient_name"
+                                            id="ingredient_name"
+                                            required
+                                            autocomplete="off"
+                                            prop:value={move || new_ingredient_model.get().ingredient_name}
+                                            on:input=move |ev| {
+                                                new_ingredient_model.update(|curr| {
+                                                    curr.ingredient_name = event_target_value(&ev);
+                                                });
+                                            }
+                                        />
+                                    </fieldset>
                                 </div>
 
                                 // Recipe Ingredient: quantity
                                 <div class="w-full">
-                                    <div class="label p-0">
-                                        <span class="label-text">"Quantity"</span>
-                                    </div>
-                                    <input type="text" 
-                                        class="input w-full"
-                                        name="quantity"
-                                        autocomplete="off"
-                                        prop:value={move || new_ingredient_model.get().quantity.unwrap_or_default()} 
-                                        on:input=move |ev| {
-                                            new_ingredient_model.update(|curr| {
-                                                curr.quantity = Some(event_target_value(&ev));
-                                            });
-                                        }
-                                    />
+                                    <fieldset class="fieldset">
+                                        <label class="label" for="quantity">"Quantity"</label>
+                                        <input type="text" 
+                                            class="input w-full"
+                                            name="quantity"
+                                            id="quantity"
+                                            autocomplete="off"
+                                            prop:value={move || new_ingredient_model.get().quantity.unwrap_or_default()} 
+                                            on:input=move |ev| {
+                                                new_ingredient_model.update(|curr| {
+                                                    curr.quantity = Some(event_target_value(&ev));
+                                                });
+                                            }
+                                        />
+                                    </fieldset>
                                 </div>
 
                                 // Recipe: unit
                                 <div class="w-full">
-                                    <div class="label p-0">
-                                        <span class="label-text">"Unit"</span>
-                                    </div>
-                                    <input type="text"
-                                        class="input w-full"
-                                        name="unit"
-                                        autocomplete="off"
-                                        prop:value=move || new_ingredient_model.get().unit.unwrap_or_default()
-                                        on:input=move |ev| {
-                                            if !event_target_value(&ev).is_empty() {
-                                                new_ingredient_model.update(|curr| {
-                                                    curr.unit = Some(event_target_value(&ev));
-                                                });
-                                            } else {
-                                                new_ingredient_model.update(|curr| {
-                                                    curr.unit = None;
-                                                });
+                                    <fieldset class="fieldset">
+                                        <label class="label" for="unit">"Unit"</label>
+                                        <input type="text"
+                                            class="input w-full"
+                                            name="unit"
+                                            id="unit"
+                                            autocomplete="off"
+                                            prop:value=move || new_ingredient_model.get().unit.unwrap_or_default()
+                                            on:input=move |ev| {
+                                                if !event_target_value(&ev).is_empty() {
+                                                    new_ingredient_model.update(|curr| {
+                                                        curr.unit = Some(event_target_value(&ev));
+                                                    });
+                                                } else {
+                                                    new_ingredient_model.update(|curr| {
+                                                        curr.unit = None;
+                                                    });
+                                                }
                                             }
-                                        }
-                                    />
+                                        />
+                                    </fieldset>
                                 </div>
 
                                 <button type="submit" class="btn btn-primary w-full">"Add"</button>

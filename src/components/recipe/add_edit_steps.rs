@@ -152,45 +152,45 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
 
                                                                 // Recipe Step: step_number
                                                                 <div class="w-full">
-                                                                    <div class="label p-0">
-                                                                        <span class="label-text">"Step Number"</span>
-                                                                    </div>
-                                                                    <input type="number"
-                                                                        class="input w-full"
-                                                                        name="step_number"
-                                                                        required
-                                                                        autocomplete="off"
-                                                                        prop:value={move || model.get().step_number}
-                                                                        on:input=move |ev| {
-                                                                            if let Ok(value) = event_target_value(&ev).parse::<i32>() {
-                                                                                model.update(|curr| {
-                                                                                    curr.step_number = value;
-                                                                                });
-                                                                            } else {
-                                                                                model.update(|curr| {
-                                                                                    curr.step_number = 0;
-                                                                                });
+                                                                    <fieldset class="fieldset">
+                                                                        <label class="label" for="step_number">"Step Number"</label>
+                                                                        <input type="number"
+                                                                            class="input w-full"
+                                                                            name="step_number"
+                                                                            required
+                                                                            autocomplete="off"
+                                                                            prop:value={move || model.get().step_number}
+                                                                            on:input=move |ev| {
+                                                                                if let Ok(value) = event_target_value(&ev).parse::<i32>() {
+                                                                                    model.update(|curr| {
+                                                                                        curr.step_number = value;
+                                                                                    });
+                                                                                } else {
+                                                                                    model.update(|curr| {
+                                                                                        curr.step_number = 0;
+                                                                                    });
+                                                                                }
                                                                             }
-                                                                        }
-                                                                    />
+                                                                        />
+                                                                    </fieldset>
                                                                 </div>
 
                                                                 // Recipe Step: instructions
                                                                 <div class="w-full">
-                                                                    <div class="label p-0">
-                                                                        <span class="label-text">"Instructions"</span>
-                                                                    </div>
-                                                                    <textarea
-                                                                        class="textarea textarea-bordered w-full min-h-80"
-                                                                        name="instructions"
-                                                                        required
-                                                                        prop:value={move || model.get().instructions}
-                                                                        on:input=move |ev| {
-                                                                            model.update(|curr| {
-                                                                                curr.instructions = event_target_value(&ev);
-                                                                            });
-                                                                        }
-                                                                    />
+                                                                    <fieldset class="fieldset">
+                                                                        <label class="label" for="instructions">"Instructions"</label>
+                                                                        <textarea
+                                                                            class="textarea textarea-bordered w-full min-h-80"
+                                                                            name="instructions"
+                                                                            required
+                                                                            prop:value={move || model.get().instructions}
+                                                                            on:input=move |ev| {
+                                                                                model.update(|curr| {
+                                                                                    curr.instructions = event_target_value(&ev);
+                                                                                });
+                                                                            }
+                                                                        />
+                                                                    </fieldset>
                                                                 </div>
 
                                                                 <div class="w-full">
@@ -227,45 +227,47 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
 
                                 // Recipe Step: step_number
                                 <div class="w-full">
-                                    <div class="label p-0">
-                                        <span class="label-text">"Step Number"</span>
-                                    </div>
-                                    <input type="number"
-                                        class="input w-full"
-                                        name="step_number"
-                                        required
-                                        autocomplete="off"
-                                        prop:value={move || new_step_model.get().step_number}
-                                        on:input=move |ev| {
-                                            if let Ok(value) = event_target_value(&ev).parse::<i32>() {
-                                                new_step_model.update(|curr| {
-                                                    curr.step_number = value;
-                                                });
-                                            } else {
-                                                new_step_model.update(|curr| {
-                                                    curr.step_number = 0;
-                                                });
+                                    <fieldset class="fieldset">
+                                        <label class="label" for="step_number">"Step Number"</label>
+                                        <input type="number"
+                                            class="input w-full"
+                                            name="step_number"
+                                            id="step_number"
+                                            required
+                                            autocomplete="off"
+                                            prop:value={move || new_step_model.get().step_number}
+                                            on:input=move |ev| {
+                                                if let Ok(value) = event_target_value(&ev).parse::<i32>() {
+                                                    new_step_model.update(|curr| {
+                                                        curr.step_number = value;
+                                                    });
+                                                } else {
+                                                    new_step_model.update(|curr| {
+                                                        curr.step_number = 0;
+                                                    });
+                                                }
                                             }
-                                        }
-                                    />
+                                        />
+                                    </fieldset>
                                 </div>
 
                                 // Recipe Step: instructions
                                 <div class="w-full">
-                                    <div class="label p-0">
-                                        <span class="label-text">"Instructions"</span>
-                                    </div>
-                                    <textarea
-                                        class="textarea textarea-bordered w-full min-h-80"
-                                        name="instructions"
-                                        required
-                                        prop:value={move || new_step_model.get().instructions}
-                                        on:input=move |ev| {
-                                            new_step_model.update(|curr| {
-                                                curr.instructions = event_target_value(&ev);
-                                            });
-                                        }
-                                    />
+                                    <fieldset class="fieldset">
+                                        <label class="label" for="instructions">"Instructions"</label>
+                                        <textarea
+                                            class="textarea textarea-bordered w-full min-h-80"
+                                            name="instructions"
+                                            id="instructions"
+                                            required
+                                            prop:value={move || new_step_model.get().instructions}
+                                            on:input=move |ev| {
+                                                new_step_model.update(|curr| {
+                                                    curr.instructions = event_target_value(&ev);
+                                                });
+                                            }
+                                        />
+                                    </fieldset>
                                 </div>
 
                                 <button type="submit" class="btn btn-primary w-full">"Add"</button>

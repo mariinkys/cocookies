@@ -65,13 +65,12 @@ pub fn NewRecipe() -> impl IntoView {
                             <h1 class="text-3xl font-bold text-center">"New Recipe"</h1>
 
                             <form class="flex flex-col gap-3" on:submit=on_submit>
-                                <div>
-                                    <div class="label p-0">
-                                        <span class="label-text">"Name"</span>
-                                    </div>
+                                <fieldset class="fieldset">
+                                    <label class="label" for="name">"Name"</label>
                                     <input type="text"
                                         class="input w-full"
                                         name="name"
+                                        id="name"
                                         required
                                         autocomplete="off"
                                         disabled=loading
@@ -82,15 +81,14 @@ pub fn NewRecipe() -> impl IntoView {
                                             });
                                         }
                                     />
-                                </div>
+                                </fieldset>
 
-                                <div>
-                                    <div class="label p-0">
-                                        <span class="label-text">"Description"</span>
-                                    </div>
+                                <fieldset>
+                                    <label class="label" for="description">"Description"</label>
                                     <input type="text"
                                         class="input w-full"
                                         name="description"
+                                        id="description"
                                         autocomplete="off"
                                         disabled=loading
                                         prop:value=move || model.get().description.unwrap_or_default()
@@ -106,15 +104,14 @@ pub fn NewRecipe() -> impl IntoView {
                                             }
                                         }
                                     />
-                                </div>
+                                </fieldset>
 
-                                <div>
-                                    <div class="label p-0">
-                                        <span class="label-text">"Preparation Time (minutes)"</span>
-                                    </div>
+                                <fieldset>
+                                    <label class="label" for="prep_time_minutes">"Preparation Time (minutes)"</label>
                                     <input type="number"
                                         class="input w-full"
                                         name="prep_time_minutes"
+                                        id="prep_time_minutes"
                                         autocomplete="off"
                                         disabled=loading
                                         prop:value={move || model.get().prep_time_minutes }
@@ -131,15 +128,14 @@ pub fn NewRecipe() -> impl IntoView {
 
                                         }
                                     />
-                                </div>
+                                </fieldset>
 
-                                <div>
-                                    <div class="label p-0">
-                                        <span class="label-text">"Servings"</span>
-                                    </div>
+                                <fieldset>
+                                    <label class="label" for="servings">"Servings"</label>
                                     <input type="number"
                                         class="input w-full"
                                         name="servings"
+                                        id="servings"
                                         autocomplete="off"
                                         disabled=loading
                                         prop:value={move || model.get().servings }
@@ -156,13 +152,11 @@ pub fn NewRecipe() -> impl IntoView {
 
                                         }
                                     />
-                                </div>
+                                </fieldset>
 
-                                <div>
-                                    <div class="label p-0">
-                                        <span class="label-text">"Main Photo"</span>
-                                    </div>
-                                    <input disabled=loading type="file" accept="image/*" class="file-input w-full" node_ref=file_input on:change=move |_ev| {
+                                <fieldset>
+                                    <label class="label" for="main_photo">"Main Photo"</label>
+                                    <input id="main_photo" disabled=loading type="file" accept="image/*" class="file-input w-full" node_ref=file_input on:change=move |_ev| {
                                         if let Some(files) = file_input.get().unwrap().files() {
                                             if let Some(file) = files.get(0) {
                                                 let file_type = crate::utils::file_utils::get_file_extension(&file); // Check if it's a valid file extension
@@ -191,7 +185,7 @@ pub fn NewRecipe() -> impl IntoView {
                                             }
                                         }
                                     }/>
-                                </div>
+                                </fieldset>
 
                                 <button disabled=loading class="btn btn-primary mt-3 w-full" type="submit">"Add"</button>
                             </form>
