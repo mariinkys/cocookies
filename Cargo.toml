@@ -30,7 +30,7 @@ chrono = { version = "0.4.31", features = ["serde"] }
 futures = { version = "0.3", optional = true }
 wasm-bindgen-futures = "0.4.50"
 async-std = "1.13.0"
-uuid = { version = "1.14.0", features = ["v4", "js"] }
+uuid = { version = "1.16.0", features = ["v4", "js"] }
 
 [features]
 csr = ["leptos/csr"]
