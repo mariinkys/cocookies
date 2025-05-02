@@ -22,4 +22,4 @@ playwright/.cache/
 # Other
 .env
 cocookies.db
-assets/recipes
+app/

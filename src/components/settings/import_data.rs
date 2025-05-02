@@ -77,11 +77,9 @@ pub fn ImportDataCardComponent() -> impl IntoView {
                                 <p class="text-xl text-center text-red-500">"An error occurred: " {format!("{:?}", error)}</p>
                             }>
                                 <form class="flex flex-col gap-3" on:submit=on_submit>
-                                    <div>
-                                        <div class="label p-0">
-                                            <span class="label-text">"File to Import"</span>
-                                        </div>
-                                        <input disabled=loading type="file" accept=".json" class="file-input file-input-bordered w-full" node_ref=file_input on:change=move |_ev| {
+                                    <fieldset class="fieldset">
+                                        <label class="label" for="import_file_input">"File to Import"</label>
+                                        <input id="import_file_input" disabled=loading type="file" accept=".json" class="file-input w-full" node_ref=file_input on:change=move |_ev| {
                                             if let Some(files) = file_input.get().unwrap().files() {
                                                 if let Some(file) = files.get(0) {
                                                     if file.type_().as_str() != "application/json" {
@@ -110,7 +108,7 @@ pub fn ImportDataCardComponent() -> impl IntoView {
                                                 }
                                             }
                                         }/>
-                                    </div>
+                                    </fieldset>
                     
                                     <button disabled=loading class="btn btn-primary mt-3 w-full" type="submit">"Update"</button>
                                 </form>

@@ -7,7 +7,7 @@ use crate::{
 };
 
 #[component]
-pub fn EditMainPhotoComponent(recipe_id: i32) -> impl IntoView {
+pub fn EditMainPhotoComponent(recipe_id: i32, updated_toggle: WriteSignal<bool>) -> impl IntoView {
     let set_toast: WriteSignal<ToastMessage> = expect_context();
     let env_options: ReadSignal<EnvOptions> = expect_context();
     let loading = RwSignal::new(false);
@@ -56,6 +56,7 @@ pub fn EditMainPhotoComponent(recipe_id: i32) -> impl IntoView {
                             visible: true,
                         });
                         loading.set(false);
+                        updated_toggle.update(|value| *value = !*value);
                     }
                     Err(err) => {
                         set_toast.set(ToastMessage {
@@ -79,38 +80,38 @@ pub fn EditMainPhotoComponent(recipe_id: i32) -> impl IntoView {
         }>
             <form class="flex flex-col gap-3" on:submit=on_image_submit>
                 <div>
-                    <div class="label p-0">
-                        <span class="label-text">"Main Photo"</span>
-                    </div>
-                    <input disabled=loading type="file" accept="image/*" class="file-input file-input-bordered w-full" node_ref=file_input on:change=move |_ev| {
-                        if let Some(files) = file_input.get().unwrap().files() {
-                            if let Some(file) = files.get(0) {
-                                let file_type = crate::utils::file_utils::get_file_extension(&file); // Check if it's a valid file extension
-                                if file_type.is_none() {
-                                    set_toast.set(ToastMessage {
-                                        message: String::from("Not an image"),
-                                        toast_type: ToastType::Error,
-                                        visible: true,
-                                    });
-                                    main_photo_image.set(None);
-                                    image_name.set(String::new());
-                                } else {
-                                    spawn_local(async move {
-                                        let promise = file.array_buffer();
-                                        if let Ok(js_value) = wasm_bindgen_futures::JsFuture::from(promise).await {
-                                            let bytes = web_sys::js_sys::Uint8Array::new(&js_value).to_vec();
-                                            main_photo_image.set(Some(bytes));
+                    <fieldset class="fieldset">
+                        <label class="label" for="main_photo">"Main Photo"</label>
+                        <input id="main_photo" disabled=loading type="file" accept="image/*" class="file-input w-full" node_ref=file_input on:change=move |_ev| {
+                            if let Some(files) = file_input.get().unwrap().files() {
+                                if let Some(file) = files.get(0) {
+                                    let file_type = crate::utils::file_utils::get_file_extension(&file); // Check if it's a valid file extension
+                                    if file_type.is_none() {
+                                        set_toast.set(ToastMessage {
+                                            message: String::from("Not an image"),
+                                            toast_type: ToastType::Error,
+                                            visible: true,
+                                        });
+                                        main_photo_image.set(None);
+                                        image_name.set(String::new());
+                                    } else {
+                                        spawn_local(async move {
+                                            let promise = file.array_buffer();
+                                            if let Ok(js_value) = wasm_bindgen_futures::JsFuture::from(promise).await {
+                                                let bytes = web_sys::js_sys::Uint8Array::new(&js_value).to_vec();
+                                                main_photo_image.set(Some(bytes));
 
-                                            image_name.set(format!("{}.{}", uuid::Uuid::new_v4(), file_type.unwrap()))
-                                        } else {
-                                            main_photo_image.set(None);
-                                            image_name.set(String::new());
-                                        }
-                                    });
+                                                image_name.set(format!("{}.{}", uuid::Uuid::new_v4(), file_type.unwrap()))
+                                            } else {
+                                                main_photo_image.set(None);
+                                                image_name.set(String::new());
+                                            }
+                                        });
+                                    }
                                 }
                             }
-                        }
-                    }/>
+                        }/>
+                    </fieldset>
                 </div>
 
                 <button disabled=loading class="btn btn-primary mt-3 w-full" type="submit">"Update"</button>

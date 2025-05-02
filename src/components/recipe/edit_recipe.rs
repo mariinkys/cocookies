@@ -11,7 +11,7 @@ use crate::{
 };
 
 #[component]
-pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
+pub fn ViewEditRecipeComponent(recipe: Recipe, main_photo_change: WriteSignal<bool>) -> impl IntoView {
     let set_toast: WriteSignal<ToastMessage> = expect_context();
     let env_options: ReadSignal<EnvOptions> = expect_context();
     let model = RwSignal::new(recipe);
@@ -20,7 +20,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
     // 'value' holds the latest *returned* value from the server
     let value = update_recipe.value();
     Effect::new(move |_| {
-        if let Some(val) = value() {
+        if let Some(val) = value.get() {
             match val {
                 Ok(_) => {
                     set_toast.set(ToastMessage {
@@ -44,7 +44,12 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
 
     let change_main_photo_dialog_ref: NodeRef<leptos::html::Dialog> = NodeRef::new();
     let photo_path = if model.get_untracked().main_photo.is_some() {
-        format!("..{}/{}", env_options.get_untracked().upload_dir, model.read_only().get_untracked().main_photo.unwrap_or_default())
+        let upload_dir = env_options.get_untracked().upload_dir;
+        if upload_dir.starts_with('/') {
+            format!("{}/{}", upload_dir, model.read_only().get_untracked().main_photo.unwrap_or_default())
+        }else{
+            format!("/{}/{}", upload_dir, model.read_only().get_untracked().main_photo.unwrap_or_default())
+        }
     } else {
         String::from("/assets/utils/image-not-found.png")
     };
@@ -67,7 +72,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
                             let recipe_id = model.get_untracked().recipe_id.unwrap_or_default();
                             
                             view! {
-                                <EditMainPhotoComponent recipe_id=recipe_id/>
+                                <EditMainPhotoComponent recipe_id=recipe_id updated_toggle=main_photo_change/>
                             }
                         }/>
                     </div>
@@ -110,91 +115,95 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
                             <input type="hidden" name="recipe_id" autocomplete="off" prop:value={move || model.get().recipe_id.unwrap_or_default()}/>
 
                             // Recipe: name
-                            <div class="label p-0">
-                                <span class="label-text">"Recipe Name"</span>
-                            </div>
-                            <input type="text"
-                                class="input input-bordered w-full"
-                                name="name"
-                                required
-                                autocomplete="off"
-                                prop:value={move || model.get().name}
-                                on:input=move |ev| {
-                                    model.update(|curr| {
-                                        curr.name = event_target_value(&ev);
-                                    });
-                                }
-                            />
-
-                            // Recipe: description
-                            <div class="label p-0">
-                                <span class="label-text">"Description"</span>
-                            </div>
-                            <input type="text"
-                                class="input input-bordered w-full"
-                                name="description"
-                                autocomplete="off"
-                                prop:value=move || model.get().description.unwrap_or_default()
-                                on:input=move |ev| {
-                                    if !event_target_value(&ev).is_empty() {
+                            <fieldset class="fieldset">
+                                <label class="label" for="name">"Recipe Name"</label>
+                                <input type="text"
+                                    class="input w-full"
+                                    name="name"
+                                    id="name"
+                                    required
+                                    autocomplete="off"
+                                    prop:value={move || model.get().name}
+                                    on:input=move |ev| {
                                         model.update(|curr| {
-                                            curr.description = Some(event_target_value(&ev));
-                                        });
-                                    } else {
-                                        model.update(|curr| {
-                                            curr.description = None;
+                                            curr.name = event_target_value(&ev);
                                         });
                                     }
-                                }
-                            />
+                                />
+                            </fieldset>
 
-                            // Recipe: prep_time
-                            <div>
-                                <div class="label p-0">
-                                    <span class="label-text">"Preparation Time (minutes)"</span>
-                                </div>
-                                <input type="number"
-                                    class="input input-bordered w-full"
-                                    name="prep_time_minutes"
+                            // Recipe: description
+                            <fieldset>
+                                <label class="label" for="description">"Description"</label>
+                                <input type="text"
+                                    class="input w-full"
+                                    name="description"
+                                    id="description"
                                     autocomplete="off"
-                                    prop:value={move || model.get().prep_time_minutes }
+                                    prop:value=move || model.get().description.unwrap_or_default()
                                     on:input=move |ev| {
-                                        if let Ok(value) = event_target_value(&ev).parse::<i32>() {
+                                        if !event_target_value(&ev).is_empty() {
                                             model.update(|curr| {
-                                                curr.prep_time_minutes = Some(value);
+                                                curr.description = Some(event_target_value(&ev));
                                             });
                                         } else {
                                             model.update(|curr| {
-                                                curr.prep_time_minutes = None;
+                                                curr.description = None;
                                             });
                                         }
                                     }
                                 />
+                            </fieldset>
+
+                            // Recipe: prep_time
+                            <div>
+                                <fieldset>
+                                    <label class="label" for="prep_time_minutes">"Preparation Time (minutes)"</label>
+                                    <input type="number"
+                                        class="input w-full"
+                                        name="prep_time_minutes"
+                                        id="prep_time_minutes"
+                                        autocomplete="off"
+                                        prop:value={move || model.get().prep_time_minutes }
+                                        on:input=move |ev| {
+                                            if let Ok(value) = event_target_value(&ev).parse::<i32>() {
+                                                model.update(|curr| {
+                                                    curr.prep_time_minutes = Some(value);
+                                                });
+                                            } else {
+                                                model.update(|curr| {
+                                                    curr.prep_time_minutes = None;
+                                                });
+                                            }
+                                        }
+                                    />
+                                </fieldset>
                             </div>
 
                             // Recipe: servings
                             <div>
-                                <div class="label p-0">
-                                    <span class="label-text">"Servings"</span>
-                                </div>
-                                <input type="number"
-                                    class="input input-bordered w-full"
-                                    name="servings"
-                                    autocomplete="off"
-                                    prop:value={move || model.get().servings }
-                                    on:input=move |ev| {
-                                        if let Ok(value) = event_target_value(&ev).parse::<i32>() {
-                                            model.update(|curr| {
-                                                curr.servings = Some(value);
-                                            });
-                                        } else {
-                                            model.update(|curr| {
-                                                curr.servings = None;
-                                            });
-                                        }
+                                <fieldset>
+                                    <label class="label" for="servings">"Servings"</label>
+                                    <input type="number"
+                                        class="input w-full"
+                                        name="servings"
+                                        id="servings"
+                                        autocomplete="off"
+                                        prop:value={move || model.get().servings }
+                                        on:input=move |ev| {
+                                            if let Ok(value) = event_target_value(&ev).parse::<i32>() {
+                                                model.update(|curr| {
+                                                    curr.servings = Some(value);
+                                                });
+                                            } else {
+                                                model.update(|curr| {
+                                                    curr.servings = None;
+                                                });
+                                            }
 
-                                    }
-                                />
+                                        }
+                                    />
+                                </fieldset>
                             </div>
 
                             <button type="submit" class="btn btn-primary w-full mt-2">"Save"</button>

@@ -2,7 +2,7 @@ use leptos::prelude::*;
 
 use crate::{
     api::recipe_notes::{
-        get_all_recipe_notes, AddRecipeNotes, DeleteRecipeNote, UpdateRecipeNotes,
+        AddRecipeNotes, DeleteRecipeNote, UpdateRecipeNotes, get_all_recipe_notes,
     },
     components::{
         dialog::DialogComponent,
@@ -25,7 +25,7 @@ pub fn ViewEditNotesComponent(recipe_id: i32) -> impl IntoView {
     let update_recipe_note = ServerAction::<UpdateRecipeNotes>::new();
     let update_value = update_recipe_note.value();
     Effect::new(move |_| {
-        if let Some(val) = update_value() {
+        if let Some(val) = update_value.get() {
             match val {
                 Ok(_) => {
                     set_toast.set(ToastMessage {
@@ -49,7 +49,7 @@ pub fn ViewEditNotesComponent(recipe_id: i32) -> impl IntoView {
     let add_recipe_note = ServerAction::<AddRecipeNotes>::new();
     let add_value = add_recipe_note.value();
     Effect::new(move |_| {
-        if let Some(val) = add_value() {
+        if let Some(val) = add_value.get() {
             match val {
                 Ok(_) => {
                     new_note_model.set(RecipeNote::init(recipe_id));
@@ -74,7 +74,7 @@ pub fn ViewEditNotesComponent(recipe_id: i32) -> impl IntoView {
     let delete_recipe_note = ServerAction::<DeleteRecipeNote>::new();
     let delete_value = delete_recipe_note.value();
     Effect::new(move |_| {
-        if let Some(val) = delete_value() {
+        if let Some(val) = delete_value.get() {
             match val {
                 Ok(_) => {
                     recipe_notes_resource.refetch();
@@ -144,20 +144,21 @@ pub fn ViewEditNotesComponent(recipe_id: i32) -> impl IntoView {
 
                                                                 // Recipe Note: note
                                                                 <div class="w-full">
-                                                                    <div class="label p-0">
-                                                                        <span class="label-text">"Note"</span>
-                                                                    </div>
-                                                                    <textarea
-                                                                        class="textarea textarea-bordered w-full min-h-80"
-                                                                        name="note"
-                                                                        required
-                                                                        prop:value={move || model.get().note}
-                                                                        on:input=move |ev| {
-                                                                            model.update(|curr| {
-                                                                                curr.note = event_target_value(&ev);
-                                                                            });
-                                                                        }
-                                                                    />
+                                                                    <fieldset class="fieldset">
+                                                                        <label class="label" for="note">"Note"</label>
+                                                                        <textarea
+                                                                            class="textarea textarea-bordered w-full min-h-80"
+                                                                            name="note"
+                                                                            id="note"
+                                                                            required
+                                                                            prop:value={move || model.get().note}
+                                                                            on:input=move |ev| {
+                                                                                model.update(|curr| {
+                                                                                    curr.note = event_target_value(&ev);
+                                                                                });
+                                                                            }
+                                                                        />
+                                                                    </fieldset>
                                                                 </div>
 
                                                                 <div class="w-full">
@@ -194,20 +195,21 @@ pub fn ViewEditNotesComponent(recipe_id: i32) -> impl IntoView {
 
                                 // Recipe Note: note
                                 <div class="w-full">
-                                    <div class="label p-0">
-                                        <span class="label-text">"Note"</span>
-                                    </div>
-                                    <textarea
-                                        class="textarea textarea-bordered w-full min-h-80"
-                                        name="note"
-                                        required
-                                        prop:value={move || new_note_model.get().note}
-                                        on:input=move |ev| {
-                                            new_note_model.update(|curr| {
-                                                curr.note = event_target_value(&ev);
-                                            });
-                                        }
-                                    />
+                                    <fieldset class="fieldset">
+                                        <label class="label" for="note">"Note"</label>
+                                        <textarea
+                                            class="textarea textarea-bordered w-full min-h-80"
+                                            name="note"
+                                            id="note"
+                                            required
+                                            prop:value={move || new_note_model.get().note}
+                                            on:input=move |ev| {
+                                                new_note_model.update(|curr| {
+                                                    curr.note = event_target_value(&ev);
+                                                });
+                                            }
+                                        />
+                                    </fieldset>
                                 </div>
 
                                 <button type="submit" class="btn btn-primary w-full">"Add"</button>
