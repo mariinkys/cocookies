@@ -26,7 +26,7 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
     let update_recipe_ingredient = ServerAction::<UpdateRecipeIngredients>::new();
     let update_value = update_recipe_ingredient.value();
     Effect::new(move |_| {
-        if let Some(val) = update_value() {
+        if let Some(val) = update_value.get() {
             match val {
                 Ok(_) => {
                     set_toast.set(ToastMessage {
@@ -50,7 +50,7 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
     let add_recipe_ingredient = ServerAction::<AddRecipeIngredients>::new();
     let add_value = add_recipe_ingredient.value();
     Effect::new(move |_| {
-        if let Some(val) = add_value() {
+        if let Some(val) = add_value.get() {
             match val {
                 Ok(_) => {
                     new_ingredient_model.set(RecipeIngredient::init(recipe_id));
@@ -75,7 +75,7 @@ pub fn ViewEditIngredientsComponent(recipe_id: i32) -> impl IntoView {
     let delete_recipe_ingredient = ServerAction::<DeleteRecipeIngredient>::new();
     let delete_value = delete_recipe_ingredient.value();
     Effect::new(move |_| {
-        if let Some(val) = delete_value() {
+        if let Some(val) = delete_value.get() {
             match val {
                 Ok(_) => {
                     recipe_ingredients_resource.refetch();

@@ -20,7 +20,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
     // 'value' holds the latest *returned* value from the server
     let value = update_recipe.value();
     Effect::new(move |_| {
-        if let Some(val) = value() {
+        if let Some(val) = value.get() {
             match val {
                 Ok(_) => {
                     set_toast.set(ToastMessage {

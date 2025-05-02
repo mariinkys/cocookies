@@ -15,7 +15,7 @@ pub fn DeleteRecipeButton(recipe_id: i32) -> impl IntoView {
     // 'value' holds the latest *returned* value from the server
     let value = delete_recipe.value();
     Effect::new(move |_| {
-        if let Some(val) = value() {
+        if let Some(val) = value.get() {
             let navigate = use_navigate();
             match val {
                 Ok(_) => {

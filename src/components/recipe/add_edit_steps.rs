@@ -34,7 +34,7 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
     let update_recipe_step = ServerAction::<UpdateRecipeSteps>::new();
     let update_value = update_recipe_step.value();
     Effect::new(move |_| {
-        if let Some(val) = update_value() {
+        if let Some(val) = update_value.get() {
             match val {
                 Ok(_) => {
                     set_toast.set(ToastMessage {
@@ -58,7 +58,7 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
     let add_recipe_step = ServerAction::<AddRecipeSteps>::new();
     let add_value = add_recipe_step.value();
     Effect::new(move |_| {
-        if let Some(val) = add_value() {
+        if let Some(val) = add_value.get() {
             match val {
                 Ok(_) => {
                     recipe_steps_resource.refetch();
@@ -82,7 +82,7 @@ pub fn ViewEditStepsComponent(recipe_id: i32) -> impl IntoView {
     let delete_recipe_step = ServerAction::<DeleteRecipeStep>::new();
     let delete_value = delete_recipe_step.value();
     Effect::new(move |_| {
-        if let Some(val) = delete_value() {
+        if let Some(val) = delete_value.get() {
             match val {
                 Ok(_) => {
                     recipe_steps_resource.refetch();
