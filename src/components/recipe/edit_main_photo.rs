@@ -7,7 +7,7 @@ use crate::{
 };
 
 #[component]
-pub fn EditMainPhotoComponent(recipe_id: i32) -> impl IntoView {
+pub fn EditMainPhotoComponent(recipe_id: i32, updated_toggle: WriteSignal<bool>) -> impl IntoView {
     let set_toast: WriteSignal<ToastMessage> = expect_context();
     let env_options: ReadSignal<EnvOptions> = expect_context();
     let loading = RwSignal::new(false);
@@ -56,6 +56,7 @@ pub fn EditMainPhotoComponent(recipe_id: i32) -> impl IntoView {
                             visible: true,
                         });
                         loading.set(false);
+                        updated_toggle.update(|value| *value = !*value);
                     }
                     Err(err) => {
                         set_toast.set(ToastMessage {

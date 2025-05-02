@@ -41,6 +41,14 @@ pub fn ViewEditRecipe() -> impl IntoView {
         },
     );
 
+    let (main_photo, main_photo_change) = signal(false);
+    Effect::new(move |_| {
+        if main_photo.get() {
+            recipe_resource.refetch();
+            main_photo_change.set(false);
+        }
+    });
+
     view! {
         <div class="px-8">
             <Suspense fallback=move || view! { <PageLoadingComponent/> }>
@@ -55,7 +63,7 @@ pub fn ViewEditRecipe() -> impl IntoView {
 
                                 view! {
                                     // EDIT RECIPE
-                                    <ViewEditRecipeComponent recipe=recipe_result/>
+                                    <ViewEditRecipeComponent recipe=recipe_result main_photo_change=main_photo_change/>
 
                                     // EDIT/ADD INGREDIENTS COMPONENT
                                     <ViewEditIngredientsComponent recipe_id=recipe_id/>
