@@ -85,7 +85,7 @@ pub async fn add_recipe_ingredients(
 
     match command_res {
         Ok(result) => Ok(result.last_insert_rowid().try_into().unwrap()),
-        Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+        Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
     }
 }
 
@@ -118,7 +118,7 @@ pub async fn update_recipe_ingredients(
 
     match command_res {
         Ok(result) => Ok(result.last_insert_rowid().try_into().unwrap()),
-        Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+        Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
     }
 }
 
@@ -145,8 +145,7 @@ pub async fn delete_recipeingredients(recipe_ingredient_id: i32) -> Result<(), S
             "Recipe ingredient not found",
         ))),
         Err(err) => Err(ServerFnError::ServerError(format!(
-            "Failed to delete recipe ingredient: {}",
-            err
+            "Failed to delete recipe ingredient: {err}"
         ))),
     }
 }

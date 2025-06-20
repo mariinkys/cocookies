@@ -35,7 +35,7 @@ pub fn ToastComponent() -> impl IntoView {
             "opacity-0 invisible".to_string()
         };
 
-        format!("{} {}", base_toast_classes, opacity_class)
+        format!("{base_toast_classes} {opacity_class}")
     };
 
     let toast_child_classes = move || -> String {

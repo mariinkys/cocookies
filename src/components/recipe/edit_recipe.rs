@@ -31,7 +31,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe, main_photo_change: WriteSignal<bo
                 }
                 Err(err) => {
                     set_toast.set(ToastMessage {
-                        message: format!("Error Saving {}", err),
+                        message: format!("Error Saving {err}"),
                         toast_type: ToastType::Error,
                         visible: true,
                     });

@@ -29,7 +29,7 @@ pub fn DeleteRecipeButton(recipe_id: i32) -> impl IntoView {
                 }
                 Err(err) => {
                     set_toast.set(ToastMessage {
-                        message: format!("Error {}", err),
+                        message: format!("Error {err}"),
                         toast_type: ToastType::Error,
                         visible: true,
                     });

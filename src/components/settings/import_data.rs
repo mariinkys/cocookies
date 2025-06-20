@@ -36,7 +36,7 @@ pub fn ImportDataCardComponent() -> impl IntoView {
                             },
                             Err(e) => {
                                 set_toast.set(ToastMessage {
-                                    message: format!("Error Adding to DB: {}", e),
+                                    message: format!("Error Adding to DB: {e}"),
                                     toast_type: ToastType::Error,
                                     visible: true,
                                 });
@@ -74,14 +74,14 @@ pub fn ImportDataCardComponent() -> impl IntoView {
                     view! {
                         <Suspense fallback=move || view! { <PageLoadingComponent/> }>
                             <ErrorBoundary fallback=|error| view! {
-                                <p class="text-xl text-center text-red-500">"An error occurred: " {format!("{:?}", error)}</p>
+                                <p class="text-xl text-center text-red-500">"An error occurred: " {format!("{error:?}")}</p>
                             }>
                                 <form class="flex flex-col gap-3" on:submit=on_submit>
                                     <fieldset class="fieldset">
                                         <label class="label" for="import_file_input">"File to Import"</label>
                                         <input id="import_file_input" disabled=loading type="file" accept=".json" class="file-input w-full" node_ref=file_input on:change=move |_ev| {
-                                            if let Some(files) = file_input.get().unwrap().files() {
-                                                if let Some(file) = files.get(0) {
+                                            if let Some(files) = file_input.get().unwrap().files()
+                                                && let Some(file) = files.get(0) {
                                                     if file.type_().as_str() != "application/json" {
                                                         set_toast.set(ToastMessage {
                                                             message: String::from("Not JSON"),
@@ -106,7 +106,6 @@ pub fn ImportDataCardComponent() -> impl IntoView {
                                                         });
                                                     }
                                                 }
-                                            }
                                         }/>
                                     </fieldset>
                     

@@ -69,7 +69,7 @@ pub async fn add_recipe_notes(recipe_id: i32, note: String) -> Result<i32, Serve
 
     match command_res {
         Ok(result) => Ok(result.last_insert_rowid().try_into().unwrap()),
-        Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+        Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
     }
 }
 
@@ -93,7 +93,7 @@ pub async fn update_recipe_notes(note_id: i32, note: String) -> Result<i32, Serv
 
     match command_res {
         Ok(result) => Ok(result.last_insert_rowid().try_into().unwrap()),
-        Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+        Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
     }
 }
 
@@ -117,8 +117,7 @@ pub async fn delete_notes(note_id: i32) -> Result<(), ServerFnError> {
             "Recipe note not found",
         ))),
         Err(err) => Err(ServerFnError::ServerError(format!(
-            "Failed to delete note: {}",
-            err
+            "Failed to delete note: {err}"
         ))),
     }
 }

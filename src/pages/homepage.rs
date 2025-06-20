@@ -13,7 +13,7 @@ pub fn HomePage() -> impl IntoView {
     view! {
         <Suspense fallback=move || view! { <PageLoadingComponent/> }>
             <ErrorBoundary fallback=|error| view! {
-                <p class="text-xl text-center text-red-500">"An error occurred: " {format!("{:?}", error)}</p>
+                <p class="text-xl text-center text-red-500">"An error occurred: " {format!("{error:?}")}</p>
             }>
                 <Show  when=move || {recipes.get().is_some_and(|res| res.is_ok_and(|recipes| !recipes.is_empty()))}
                 fallback=move || view! {

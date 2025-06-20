@@ -40,7 +40,7 @@ pub async fn get_recipe(id: i32) -> Result<Recipe, ServerFnError> {
             Ok(recipe)
         }
         Err(Error::RowNotFound) => Err(ServerFnError::new(String::from("Recipe not found"))),
-        Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+        Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
     }
 }
 
@@ -93,10 +93,10 @@ pub async fn add_recipe(
 
                 match command_res {
                     Ok(result) => Ok(result.last_insert_rowid().try_into().unwrap()),
-                    Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+                    Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
                 }
             }
-            Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+            Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
         },
         None => {
             let command_res = sqlx::query(
@@ -118,7 +118,7 @@ pub async fn add_recipe(
 
             match command_res {
                 Ok(result) => Ok(result.last_insert_rowid().try_into().unwrap()),
-                Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+                Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
             }
         }
     }
@@ -156,7 +156,7 @@ pub async fn update_recipe(
 
     match command_res {
         Ok(result) => Ok(result.last_insert_rowid().try_into().unwrap()),
-        Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+        Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
     }
 }
 
@@ -232,7 +232,7 @@ pub async fn delete_recipe(recipe_id: i32) -> Result<(), ServerFnError> {
             return Err(ServerFnError::ServerError(String::from("Recipe not found")));
         }
         Err(err) => {
-            return Err(ServerFnError::ServerError(format!("Server Error: {}", err)));
+            return Err(ServerFnError::ServerError(format!("Server Error: {err}")));
         }
     };
 
@@ -246,8 +246,7 @@ pub async fn delete_recipe(recipe_id: i32) -> Result<(), ServerFnError> {
 
         if let Err(err) = crate::utils::file_utils::delete_file(photo_path).await {
             return Err(ServerFnError::ServerError(format!(
-                "Failed to delete main photo: {}",
-                err
+                "Failed to delete main photo: {err}"
             )));
         }
     }
@@ -264,8 +263,7 @@ pub async fn delete_recipe(recipe_id: i32) -> Result<(), ServerFnError> {
             Err(ServerFnError::ServerError(String::from("Recipe not found")))
         }
         Err(err) => Err(ServerFnError::ServerError(format!(
-            "Failed to delete recipe: {}",
-            err
+            "Failed to delete recipe: {err}"
         ))),
     }
 }
@@ -283,7 +281,7 @@ pub async fn update_recipe_main_photo(id: i32, photo_path: String) -> Result<(),
     let og_main_photo: Result<String, ServerFnError> = match row_result {
         Ok(row) => Ok(row.get("main_photo")),
         Err(Error::RowNotFound) => Err(ServerFnError::new(String::from("Recipe not found"))),
-        Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+        Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
     };
 
     if let Ok(og_main_photo) = og_main_photo {
@@ -312,7 +310,7 @@ pub async fn update_recipe_main_photo(id: i32, photo_path: String) -> Result<(),
                 }
                 Ok(())
             }
-            Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+            Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
         }
     } else {
         Err(og_main_photo.unwrap_err())

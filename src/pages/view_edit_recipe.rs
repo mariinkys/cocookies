@@ -53,7 +53,7 @@ pub fn ViewEditRecipe() -> impl IntoView {
         <div class="px-8">
             <Suspense fallback=move || view! { <PageLoadingComponent/> }>
                 <ErrorBoundary fallback=|error| view! {
-                    <p class="text-3xl text-center text-red-500">"An error occurred: " {format!("{:?}", error)}</p>
+                    <p class="text-3xl text-center text-red-500">"An error occurred: " {format!("{error:?}")}</p>
                 }>
 
                     { move || {

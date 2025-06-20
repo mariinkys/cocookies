@@ -36,7 +36,7 @@ pub fn ViewEditNotesComponent(recipe_id: i32) -> impl IntoView {
                 }
                 Err(err) => {
                     set_toast.set(ToastMessage {
-                        message: format!("Error Saving {}", err),
+                        message: format!("Error Saving {err}"),
                         toast_type: ToastType::Error,
                         visible: true,
                     });
@@ -62,7 +62,7 @@ pub fn ViewEditNotesComponent(recipe_id: i32) -> impl IntoView {
                 }
                 Err(err) => {
                     set_toast.set(ToastMessage {
-                        message: format!("Error Saving {}", err),
+                        message: format!("Error Saving {err}"),
                         toast_type: ToastType::Error,
                         visible: true,
                     });
@@ -86,7 +86,7 @@ pub fn ViewEditNotesComponent(recipe_id: i32) -> impl IntoView {
                 }
                 Err(err) => {
                     set_toast.set(ToastMessage {
-                        message: format!("Error Saving {}", err),
+                        message: format!("Error Saving {err}"),
                         toast_type: ToastType::Error,
                         visible: true,
                     });
@@ -111,7 +111,7 @@ pub fn ViewEditNotesComponent(recipe_id: i32) -> impl IntoView {
                 </div>
                 <Suspense fallback= move || view! { <PageLoadingComponent/> }>
                     <ErrorBoundary fallback=|error| view! {
-                        <p class="text-3xl text-center text-red-500">"An error occurred: " {format!("{:?}", error)}</p>
+                        <p class="text-3xl text-center text-red-500">"An error occurred: " {format!("{error:?}")}</p>
                     }>
                         { move || {
                             recipe_notes_resource.get().map(move |x| {

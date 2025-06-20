@@ -43,7 +43,7 @@ pub fn NewRecipe() -> impl IntoView {
                     }
                     Err(err) => {
                         set_toast.set(ToastMessage {
-                            message: format!("Err {}", err),
+                            message: format!("Err {err}"),
                             toast_type: ToastType::Error,
                             visible: true,
                         });
@@ -57,7 +57,7 @@ pub fn NewRecipe() -> impl IntoView {
     view! {
         <Suspense fallback=move || view! { <PageLoadingComponent/> }>
             <ErrorBoundary fallback=|error| view! {
-                <p class="text-xl text-center text-red-500">"An error occurred: " {format!("{:?}", error)}</p>
+                <p class="text-xl text-center text-red-500">"An error occurred: " {format!("{error:?}")}</p>
             }>
                 <Show when=move || !loading.get() fallback=move || view! { <PageLoadingComponent/> }>
                     <div class="mx-auto max-w-lg card shadow-xl">
@@ -157,8 +157,8 @@ pub fn NewRecipe() -> impl IntoView {
                                 <fieldset>
                                     <label class="label" for="main_photo">"Main Photo"</label>
                                     <input id="main_photo" disabled=loading type="file" accept="image/*" class="file-input w-full" node_ref=file_input on:change=move |_ev| {
-                                        if let Some(files) = file_input.get().unwrap().files() {
-                                            if let Some(file) = files.get(0) {
+                                        if let Some(files) = file_input.get().unwrap().files()
+                                            && let Some(file) = files.get(0) {
                                                 let file_type = crate::utils::file_utils::get_file_extension(&file); // Check if it's a valid file extension
                                                 if file_type.is_none() {
                                                     set_toast.set(ToastMessage {
@@ -183,7 +183,6 @@ pub fn NewRecipe() -> impl IntoView {
                                                     });
                                                 }
                                             }
-                                        }
                                     }/>
                                 </fieldset>
 
