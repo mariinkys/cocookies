@@ -57,3 +57,63 @@ pub async fn update_config(gotenberg_location: String) -> Result<i32, ServerFnEr
         Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
     }
 }
+
+#[server(ExportPdf, "/api/config/exportpdf")]
+pub async fn export_pdf(body_html: String) -> Result<String, ServerFnError> {
+    use base64::{Engine as _, engine::general_purpose::STANDARD};
+
+    let config = get_config()
+        .await
+        .map_err(|err| ServerFnError::new(format!("Failed to get config: {err}")))?;
+
+    if config
+        .gotenberg_location
+        .as_ref()
+        .is_none_or(|loc| loc.is_empty())
+    {
+        return Err(ServerFnError::new(
+            "No Gotenberg location found".to_string(),
+        ));
+    }
+
+    //  let static_dir = std::env::var("LEPTOS_SITE_ROOT")
+    //     .or_else(|_| std::env::var("STATIC_DIR"))
+    //     .unwrap_or_else(|_| "target/site".to_string());
+
+    // let css_path = format!("{}/pkg/cocookies.css", static_dir);
+    // let css = std::fs::read_to_string(&css_path)
+    //     .map_err(|err| ServerFnError::new(format!("Failed to read CSS file: {err}")))?;
+
+    let current_dir = std::env::current_dir()
+        .map_err(|err| ServerFnError::new(format!("Failed to get current directory: {err}")))?;
+    let css_path = current_dir.join("target/site/pkg/cocookies.css");
+    let css = std::fs::read_to_string(&css_path).map_err(|err| {
+        ServerFnError::new(format!("Failed to read CSS from {css_path:?}: {err}"))
+    })?;
+
+    let html = format!(
+        r#"<!DOCTYPE html>
+            <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <style>{css}</style>
+                </head>
+                <body>
+                    {body_html}
+                </body>
+            </html>"#
+    );
+
+    let client = gotenberg_pdf::Client::new(&config.gotenberg_location.unwrap());
+    let result = client
+        .pdf_from_html(&html, gotenberg_pdf::WebOptions::default())
+        .await;
+
+    match result {
+        Ok(bytes) => Ok(STANDARD.encode(&bytes)),
+        Err(err) => {
+            eprintln!("{err}");
+            Err(ServerFnError::new(format!("Gotenberg Error: {err}")))
+        }
+    }
+}
