@@ -80,14 +80,25 @@ pub fn ViewEditRecipeComponent(recipe: Recipe, main_photo_change: WriteSignal<bo
                         <div class="w-full">
                             <div class="flex justify-between items-center w-full">
                                 <h1 class="text-4xl font-bold">{move || model.read_only().get().name}</h1>
-                                <button
-                                    class="btn btn-sm btn-ghost"
-                                    on:click=move |_| {
-                                        let _ = edit_dialog_ref.get().unwrap().show_modal();
-                                    }
-                                >
-                                    "Edit"
-                                </button>
+                                <div class="flex gap-1">
+                                    <button
+                                        class="btn btn-sm btn-ghost"
+                                        on:click=move |_| {
+                                            let _ = edit_dialog_ref.get().unwrap().show_modal();
+                                        }
+                                    >
+                                        "Edit"
+                                    </button>
+
+                                    <button
+                                        class="btn btn-sm btn-secondary text-black"
+                                        on:click=move |_| {
+                                            
+                                        }
+                                    >
+                                        "Export PDF"
+                                    </button>
+                                </div>
                             </div>
                             <p>{move || model.read_only().get().description}</p>
                         </div>

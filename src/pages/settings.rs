@@ -1,7 +1,8 @@
 use leptos::prelude::*;
 
 use crate::components::settings::{
-    export_data::ExportDataCardComponent, import_data::ImportDataCardComponent,
+    export_data::ExportDataCardComponent, export_pdf_options::ExportPDFOptionsComponent,
+    import_data::ImportDataCardComponent,
 };
 
 #[component]
@@ -15,6 +16,12 @@ pub fn SettingsPage() -> impl IntoView {
                 <div class="flex flex-wrap gap-2">
                     <ExportDataCardComponent/>
                     <ImportDataCardComponent/>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold">"Export PDF"</h2>
+                <div class="flex flex-wrap gap-2">
+                    <ExportPDFOptionsComponent/>
                 </div>
             </div>
         </div>
