@@ -24,7 +24,7 @@ pub async fn upload_file(file_data: Vec<u8>, file_path: String) -> Result<String
             return Err(ServerFnError::new("Error Creating Directory Path"));
         }
     } else {
-        return Err(ServerFnError::new(format!("Wrong Path: {}", file_path)));
+        return Err(ServerFnError::new(format!("Wrong Path: {file_path}")));
     }
 
     // Now create the file itself
@@ -33,11 +33,11 @@ pub async fn upload_file(file_data: Vec<u8>, file_path: String) -> Result<String
         Ok(mut file) => {
             let res = file.write_all(&file_data).await;
             match res {
-                Ok(_) => Ok(format!("File uploaded to {}", file_path)),
-                Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+                Ok(_) => Ok(format!("File uploaded to {file_path}")),
+                Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
             }
         }
-        Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+        Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
     }
 }
 

@@ -27,9 +27,9 @@ async fn main() -> std::io::Result<()> {
         if !std::path::Path::new(filename).exists() {
             // Create the file
             std::fs::File::create(filename)?;
-            println!("Database '{}' created.", filename);
+            println!("Database '{filename}' created.");
         } else {
-            println!("Database '{}' already exists.", filename);
+            println!("Database '{filename}' already exists.");
         }
     };
     let pool = sqlx::sqlite::SqlitePoolOptions::new()
@@ -41,7 +41,7 @@ async fn main() -> std::io::Result<()> {
     match sqlx::migrate!("./migrations").run(&pool).await {
         Ok(_) => println!("Migrations run successfully"),
         Err(err) => {
-            eprintln!("Error occurred running migrations: {}", err);
+            eprintln!("Error occurred running migrations: {err}");
             std::process::exit(1);
         }
     };

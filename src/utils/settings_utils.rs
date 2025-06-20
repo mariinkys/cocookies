@@ -84,6 +84,7 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
                     notes: Vec::new(),
                 });
 
+                #[allow(clippy::collapsible_if)]
                 if let Ok(ingredient_id) = row.try_get::<i32, _>("recipe_ingredient_id") {
                     if ingredient_id > 0 && !recipe.ingredients.iter().any(|i| i.recipe_ingredient_id == Some(ingredient_id)) {
                         recipe.ingredients.push(RecipeIngredient {
@@ -98,6 +99,7 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
                     }
                 }
 
+                #[allow(clippy::collapsible_if)]
                 if let Ok(step_id) = row.try_get::<i32, _>("step_id") {
                     if step_id > 0 && !recipe.steps.iter().any(|s| s.step_id == Some(step_id)) {
                         recipe.steps.push(RecipeStep {
@@ -111,6 +113,7 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
                     }
                 }
 
+                #[allow(clippy::collapsible_if)]
                 if let Ok(note_id) = row.try_get::<i32, _>("note_id") {
                     if note_id > 0 && !recipe.notes.iter().any(|n| n.note_id == Some(note_id)) {
                         recipe.notes.push(RecipeNote {
@@ -135,7 +138,7 @@ pub async fn get_full_recipes() -> Result<Vec<FullRecipe>, ServerFnError> {
             }
             Ok(recipes)
         }
-        Err(err) => Err(ServerFnError::new(format!("Server Error: {}", err))),
+        Err(err) => Err(ServerFnError::new(format!("Server Error: {err}"))),
     }
 }
 
