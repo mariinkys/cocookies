@@ -24,6 +24,8 @@ pub fn SettingsPage() -> impl IntoView {
                     <ExportPDFOptionsComponent/>
                 </div>
             </div>
+            <br/>
+            <p class="text-center">"Made by Alex Marín - FLOSS, now and always! - "<a class="link-primary" href="https://github.com/mariinkys/cocookies/releases" target="_blank">"v"{env!("CARGO_PKG_VERSION")}</a></p>
         </div>
     }
 }
