@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 
 use crate::{
-    api::recipe::UpdateRecipe,
+    api::{config::export_pdf, recipe::UpdateRecipe},
     components::{
         dialog::DialogComponent,
         recipe::edit_main_photo::EditMainPhotoComponent,
@@ -54,6 +54,38 @@ pub fn ViewEditRecipeComponent(recipe: Recipe, main_photo_change: WriteSignal<bo
         String::from("/assets/utils/image-not-found.png")
     };
 
+    let export_pdf_action = Action::new(move |recipe_id: &i32| {
+        let recipe_id = *recipe_id;
+        async move { 
+            let result = export_pdf(recipe_id).await;
+            match result {
+                Ok(base64_pdf) => {
+                     let download_pdf = move || {
+                        let data_url = format!("data:application/pdf;base64,{base64_pdf}");
+                        
+                        let document = leptos::prelude::window().document().unwrap();
+                        let a = document.create_element("a").unwrap();
+                        a.set_attribute("href", &data_url).unwrap();
+                        a.set_attribute("download", "export.pdf").unwrap();
+                        
+                        if let Some(a_element) = wasm_bindgen::JsCast::dyn_ref::<web_sys::HtmlElement>(&a) {
+                            a_element.click();
+                        }
+                    };
+    
+                    download_pdf();
+                },
+                Err(err) => {
+                     set_toast.set(ToastMessage {
+                        message: format!("Error Exporting {err}"),
+                        toast_type: ToastType::Error,
+                        visible: true,
+                    });
+                },
+            }
+        }
+    });
+
     view! {
         <div class="w-full card shadow-xl">
             <div class="card-body">
@@ -80,14 +112,25 @@ pub fn ViewEditRecipeComponent(recipe: Recipe, main_photo_change: WriteSignal<bo
                         <div class="w-full">
                             <div class="flex justify-between items-center w-full">
                                 <h1 class="text-4xl font-bold">{move || model.read_only().get().name}</h1>
-                                <button
-                                    class="btn btn-sm btn-ghost"
-                                    on:click=move |_| {
-                                        let _ = edit_dialog_ref.get().unwrap().show_modal();
-                                    }
-                                >
-                                    "Edit"
-                                </button>
+                                <div class="flex gap-1">
+                                    <button
+                                        class="btn btn-sm btn-ghost"
+                                        on:click=move |_| {
+                                            let _ = edit_dialog_ref.get().unwrap().show_modal();
+                                        }
+                                    >
+                                        "Edit"
+                                    </button>
+
+                                    <button
+                                        class="btn btn-sm btn-secondary text-black"
+                                        on:click=move |_| {
+                                            export_pdf_action.dispatch(model.get_untracked().recipe_id.unwrap_or_default());
+                                        }
+                                    >
+                                        "Export PDF"
+                                    </button>
+                                </div>
                             </div>
                             <p>{move || model.read_only().get().description}</p>
                         </div>

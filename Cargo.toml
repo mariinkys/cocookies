@@ -31,6 +31,8 @@ futures = { version = "0.3", optional = true }
 wasm-bindgen-futures = "0.4.50"
 async-std = "1.13.1"
 uuid = { version = "1.17.0", features = ["v4", "js"] }
+gotenberg_pdf = { version = "0.5.2", optional = true }
+base64 = { version = "0.22.1", optional = true }
 
 [features]
 csr = ["leptos/csr"]
@@ -46,6 +48,8 @@ ssr = [
   #Added by me
   "dep:sqlx",
   "dep:futures",
+  "dep:gotenberg_pdf",
+  "dep:base64",
 ]
 
 # Added by me for file uploading
