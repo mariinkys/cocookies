@@ -54,12 +54,10 @@ pub fn ViewEditRecipeComponent(recipe: Recipe, main_photo_change: WriteSignal<bo
         String::from("/assets/utils/image-not-found.png")
     };
 
-    let photo_path_for_action = photo_path.clone();
-    let export_pdf_action = Action::new(move |body_html: &String| {
-        let body = body_html.clone();
-        let photo_path_for_action = photo_path_for_action.clone();
+    let export_pdf_action = Action::new(move |recipe_id: &i32| {
+        let recipe_id = *recipe_id;
         async move { 
-            let result = export_pdf(body, photo_path_for_action).await;
+            let result = export_pdf(recipe_id).await;
             match result {
                 Ok(base64_pdf) => {
                      let download_pdf = move || {
@@ -127,10 +125,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe, main_photo_change: WriteSignal<bo
                                     <button
                                         class="btn btn-sm btn-secondary text-black"
                                         on:click=move |_| {
-                                            if let Some(body) = leptos::prelude::document().body() {
-                                                let body_html = body.inner_html();
-                                                export_pdf_action.dispatch(body_html);
-                                            };
+                                            export_pdf_action.dispatch(model.get_untracked().recipe_id.unwrap_or_default());
                                         }
                                     >
                                         "Export PDF"
