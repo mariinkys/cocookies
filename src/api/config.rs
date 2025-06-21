@@ -59,7 +59,10 @@ pub async fn update_config(gotenberg_location: String) -> Result<i32, ServerFnEr
 }
 
 #[server(ExportPdf, "/api/config/exportpdf")]
-pub async fn export_pdf(body_html: String) -> Result<String, ServerFnError> {
+pub async fn export_pdf(
+    body_html: String,
+    recipe_image_path: String,
+) -> Result<String, ServerFnError> {
     use base64::{Engine as _, engine::general_purpose::STANDARD};
 
     let config = get_config()
@@ -90,6 +93,14 @@ pub async fn export_pdf(body_html: String) -> Result<String, ServerFnError> {
     let css = std::fs::read_to_string(&css_path).map_err(|err| {
         ServerFnError::new(format!("Failed to read CSS from {css_path:?}: {err}"))
     })?;
+
+    let base64_image = if let Ok(image) = std::fs::read(&recipe_image_path) {
+        STANDARD.encode(&image)
+    } else {
+        return Err(ServerFnError::new(format!(
+            "Can't encode image with path: {recipe_image_path}"
+        )));
+    };
 
     let html = format!(
         r#"<!DOCTYPE html>

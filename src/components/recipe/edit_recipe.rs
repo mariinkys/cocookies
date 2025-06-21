@@ -54,10 +54,12 @@ pub fn ViewEditRecipeComponent(recipe: Recipe, main_photo_change: WriteSignal<bo
         String::from("/assets/utils/image-not-found.png")
     };
 
+    let photo_path_for_action = photo_path.clone();
     let export_pdf_action = Action::new(move |body_html: &String| {
         let body = body_html.clone();
+        let photo_path_for_action = photo_path_for_action.clone();
         async move { 
-            let result = export_pdf(body).await;
+            let result = export_pdf(body, photo_path_for_action).await;
             match result {
                 Ok(base64_pdf) => {
                      let download_pdf = move || {
