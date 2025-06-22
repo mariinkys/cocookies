@@ -191,8 +191,8 @@ pub async fn export_pdf(recipe_id: i32) -> Result<String, ServerFnError> {
 
     let recipe_html = format!(
         r#"<h1>{}</h1>
-            <p>{} ({} servings, {}min)</p>
-        "#,
+        <p class="recipe-meta">{} ({} servings, {}min)</p>
+    "#,
         recipe.name,
         recipe.description.unwrap_or_default(),
         recipe.servings.unwrap_or_default(),
@@ -203,41 +203,83 @@ pub async fn export_pdf(recipe_id: i32) -> Result<String, ServerFnError> {
     for ingredient in recipe_ingredients {
         if ingredient.quantity.is_some() || ingredient.unit.is_some() {
             ingredients_html += &format!(
-                "<p>{} {} - {}</p>",
+                r#"<p class="ingredient">{} {} - {}</p>"#,
                 ingredient.quantity.unwrap_or_default(),
                 ingredient.unit.unwrap_or_default(),
                 ingredient.ingredient_name
-            )
-            .to_string();
+            );
         } else {
-            ingredients_html += &format!("<p>{}</p>", ingredient.ingredient_name).to_string();
+            ingredients_html += &format!(
+                r#"<p class="ingredient">{}</p>"#,
+                ingredient.ingredient_name
+            );
         }
     }
 
     let mut steps_html = String::from("<h1>Steps</h1>");
     for step in recipe_steps {
-        steps_html += &format!("<p>{}</p>", step.instructions,).to_string();
+        steps_html += &format!(r#"<p class="step">{}</p>"#, step.instructions);
     }
 
     let mut notes_html = String::from("<h1>Notes</h1>");
     for note in recipe_notes {
-        notes_html += &format!("<p>{}</p>", note.note,).to_string();
+        notes_html += &format!(r#"<p class="note">{}</p>"#, note.note);
     }
 
     let result_html = format!(
         r#"<!DOCTYPE html>
-            <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Recipe Export</title>
-                </head>
-                <body>
-                    {recipe_html}
-                    {ingredients_html}
-                    {steps_html}
-                    {notes_html}
-                </body>
-            </html>"#
+        <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <title>Recipe Export</title>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        margin: 40px;
+                        line-height: 1.6;
+                        color: #333;
+                        background-color: #fff;
+                    }}
+                    h1 {{
+                        color: #2c3e50;
+                        border-bottom: 2px solid #ecf0f1;
+                        padding-bottom: 5px;
+                        margin-top: 40px;
+                    }}
+                    p {{
+                        margin: 10px 0;
+                    }}
+                    .recipe-meta {{
+                        font-style: italic;
+                        color: #7f8c8d;
+                    }}
+                    .ingredient {{
+                        padding: 6px;
+                        background: #f9f9f9;
+                        border-left: 4px solid #3498db;
+                        margin: 5px 0;
+                    }}
+                    .step {{
+                        background: #ecf0f1;
+                        padding: 10px;
+                        border-radius: 5px;
+                        margin: 10px 0;
+                    }}
+                    .note {{
+                        background: #fef9e7;
+                        padding: 10px;
+                        border-left: 4px solid #f1c40f;
+                        margin: 10px 0;
+                    }}
+                </style>
+            </head>
+            <body>
+                {recipe_html}
+                {ingredients_html}
+                {steps_html}
+                {notes_html}
+            </body>
+        </html>"#
     );
 
     let client = gotenberg_pdf::Client::new(&config.gotenberg_location.unwrap());
