@@ -1,15 +1,72 @@
+use std::{fmt::Display, str::FromStr};
+
 use serde::{Deserialize, Serialize};
 
-#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum PdfTheme {
+    #[default]
     Simple,
     Fresh,
     Dark,
-    #[default]
     Pink,
 }
 
+impl Display for PdfTheme {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let theme_name = match self {
+            PdfTheme::Simple => "Simple",
+            PdfTheme::Fresh => "Fresh",
+            PdfTheme::Dark => "Dark",
+            PdfTheme::Pink => "Pink",
+        };
+        write!(f, "{theme_name}")
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ParsePdfThemeError {
+    pub invalid_value: String,
+}
+
+impl Display for ParsePdfThemeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Invalid PDF theme: '{}'", self.invalid_value)
+    }
+}
+
+impl std::error::Error for ParsePdfThemeError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        None
+    }
+
+    fn description(&self) -> &str {
+        "description() is deprecated; use Display"
+    }
+
+    fn cause(&self) -> Option<&dyn std::error::Error> {
+        self.source()
+    }
+}
+
+impl FromStr for PdfTheme {
+    type Err = ParsePdfThemeError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.trim() {
+            "Simple" => Ok(PdfTheme::Simple),
+            "Fresh" => Ok(PdfTheme::Fresh),
+            "Dark" => Ok(PdfTheme::Dark),
+            "Pink" => Ok(PdfTheme::Pink),
+            _ => Err(ParsePdfThemeError {
+                invalid_value: s.to_string(),
+            }),
+        }
+    }
+}
+
 impl PdfTheme {
+    pub const ALL: &'static [Self] = &[Self::Simple, Self::Fresh, Self::Dark, Self::Pink];
+
     pub fn get_style(&self) -> &'static str {
         match &self {
             PdfTheme::Simple => simple_theme(),

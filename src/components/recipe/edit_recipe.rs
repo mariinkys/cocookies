@@ -7,7 +7,7 @@ use crate::{
         recipe::edit_main_photo::EditMainPhotoComponent,
         toast::{ToastMessage, ToastType},
     },
-    models::recipe::Recipe, utils::env_utils::EnvOptions,
+    models::recipe::Recipe, utils::{env_utils::EnvOptions, pdf_themes::PdfTheme},
 };
 
 #[component]
@@ -54,10 +54,12 @@ pub fn ViewEditRecipeComponent(recipe: Recipe, main_photo_change: WriteSignal<bo
         String::from("/assets/utils/image-not-found.png")
     };
 
-    let export_pdf_action = Action::new(move |recipe_id: &i32| {
+    let export_dialog_ref: NodeRef<leptos::html::Dialog> = NodeRef::new();
+    let export_pdf_action = Action::new(move |(recipe_id, selected_theme): &(i32, Option<PdfTheme>)| {
         let recipe_id = *recipe_id;
+        let selected_theme = selected_theme.clone();
         async move { 
-            let result = export_pdf(recipe_id, None).await;
+            let result = export_pdf(recipe_id, selected_theme).await;
             match result {
                 Ok(base64_pdf) => {
                      let download_pdf = move || {
@@ -125,11 +127,61 @@ pub fn ViewEditRecipeComponent(recipe: Recipe, main_photo_change: WriteSignal<bo
                                     <button
                                         class="btn btn-sm btn-secondary text-black"
                                         on:click=move |_| {
-                                            export_pdf_action.dispatch(model.get_untracked().recipe_id.unwrap_or_default());
+                                            let _ = export_dialog_ref.get().unwrap().show_modal();
                                         }
                                     >
                                         "Export PDF"
                                     </button>
+                                    <DialogComponent dialog_title="Export PDF" dialog_node_ref=export_dialog_ref dialog_content=move || {
+                                        let recipe_id = model.get_untracked().recipe_id.unwrap_or_default();
+                                        let selected_theme = RwSignal::new(PdfTheme::default());
+                                        
+                                        view! {
+                                            <div class="flex flex-col gap-2 w-full">
+                                                <div class="w-full">
+                                                    <fieldset class="fieldset">
+                                                        <label class="label" for="theme">"Theme"</label>
+                                                        <select
+                                                            class="select select-primary w-full"
+                                                            id="theme"
+                                                            on:change=move |ev| {
+                                                                let new_theme_str = event_target_value(&ev);
+                                                                if let Ok(new_theme) = new_theme_str.parse::<PdfTheme>() {
+                                                                    selected_theme.set(new_theme);
+                                                                }
+                                                            }
+                                                        >
+                                                            <For
+                                                                each=move || PdfTheme::ALL.iter()
+                                                                key=|theme| *theme
+                                                                children=move |theme| {
+                                                                    let is_selected = move || selected_theme.get() == *theme;
+                                                                    
+                                                                    view! {
+                                                                        <option 
+                                                                            value=theme.to_string()
+                                                                            selected=is_selected
+                                                                        >
+                                                                            {theme.to_string()}
+                                                                        </option>
+                                                                    }
+                                                                }
+                                                            />
+                                                        </select>
+                                                    </fieldset>
+                                                </div>
+
+                                                <button
+                                                    class="btn btn-primary w-full" 
+                                                    on:click=move |_| {
+                                                        export_pdf_action.dispatch((recipe_id, Some(selected_theme.get_untracked())));
+                                                    }
+                                                >
+                                                    "Export"
+                                                </button>
+                                            </div>
+                                        }
+                                    }/>
                                 </div>
                             </div>
                             <p>{move || model.read_only().get().description}</p>
