@@ -200,30 +200,42 @@ pub async fn export_pdf(recipe_id: i32, theme: Option<PdfTheme>) -> Result<Strin
     );
 
     let mut ingredients_html = String::from("<h1>Ingredients</h1>");
-    for ingredient in recipe_ingredients {
-        if ingredient.quantity.is_some() || ingredient.unit.is_some() {
-            ingredients_html += &format!(
-                r#"<p class="ingredient">{} {} - {}</p>"#,
-                ingredient.quantity.unwrap_or_default(),
-                ingredient.unit.unwrap_or_default(),
-                ingredient.ingredient_name
-            );
-        } else {
-            ingredients_html += &format!(
-                r#"<p class="ingredient">{}</p>"#,
-                ingredient.ingredient_name
-            );
+    if recipe_ingredients.is_empty() {
+        ingredients_html += "<p>No Ingredients...</p>"
+    } else {
+        for ingredient in recipe_ingredients {
+            if ingredient.quantity.is_some() || ingredient.unit.is_some() {
+                ingredients_html += &format!(
+                    r#"<p class="ingredient">{} {} - {}</p>"#,
+                    ingredient.quantity.unwrap_or_default(),
+                    ingredient.unit.unwrap_or_default(),
+                    ingredient.ingredient_name
+                );
+            } else {
+                ingredients_html += &format!(
+                    r#"<p class="ingredient">{}</p>"#,
+                    ingredient.ingredient_name
+                );
+            }
         }
     }
 
     let mut steps_html = String::from("<h1>Steps</h1>");
-    for step in recipe_steps {
-        steps_html += &format!(r#"<p class="step">{}</p>"#, step.instructions);
+    if recipe_steps.is_empty() {
+        steps_html += "<p>No Steps...</p>"
+    } else {
+        for step in recipe_steps {
+            steps_html += &format!(r#"<p class="step">{}</p>"#, step.instructions);
+        }
     }
 
     let mut notes_html = String::from("<h1>Notes</h1>");
-    for note in recipe_notes {
-        notes_html += &format!(r#"<p class="note">{}</p>"#, note.note);
+    if recipe_notes.is_empty() {
+        notes_html += "<p>No Notes...</p>"
+    } else {
+        for note in recipe_notes {
+            notes_html += &format!(r#"<p class="note">{}</p>"#, note.note);
+        }
     }
 
     let style = theme.unwrap_or_default().get_style();
