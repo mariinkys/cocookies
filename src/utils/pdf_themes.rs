@@ -61,6 +61,19 @@ fn simple_theme() -> &'static str {
                 border-left: 4px solid #f1c40f;
                 margin: 10px 0;
             }
+            footer {
+                text-align: center;
+                margin-top: 30px;
+                font-size: 14px;
+                color: #7f8c8d;
+                font-style: italic;
+                border-top: 1px solid #ecf0f1;
+                padding-top: 12px;
+            }
+            footer a {
+                text-decoration: none;
+                color: inherit;
+            }
         </style>
     "#
 }
@@ -110,6 +123,19 @@ fn fresh_theme() -> &'static str {
                 border-left: 5px solid #e17055;
                 color: #2d3436;
             }
+            footer {
+                text-align: center;
+                margin-top: 30px;
+                font-size: 14px;
+                color: #00b894;
+                font-style: italic;
+                border-top: 1px dashed #dfe6e9;
+                padding-top: 12px;
+            }
+            footer a {
+                text-decoration: none;
+                color: inherit;
+            }
         </style>
     "#
 }
@@ -158,6 +184,19 @@ fn dark_theme() -> &'static str {
                 border-left: 4px solid #f1c40f;
                 margin: 10px 0;
                 font-size: 14px;
+            }
+            footer {
+                text-align: center;
+                margin-top: 30px;
+                font-size: 14px;
+                color: #f39c12;
+                font-style: italic;
+                border-top: 1px dashed #444;
+                padding-top: 12px;
+            }
+            footer a {
+                text-decoration: none;
+                color: inherit;
             }
         </style>
     "#
@@ -213,6 +252,19 @@ fn pink_theme() -> &'static str {
                 font-style: italic;
                 font-size: 14px;
                 color: #5a2c2c;
+            }
+            footer {
+                text-align: center;
+                margin-top: 30px;
+                font-size: 14px;
+                color: #d63384;
+                font-style: italic;
+                border-top: 1px dashed #f8bbd0;
+                padding-top: 12px;
+            }
+            footer a {
+                text-decoration: none;
+                color: inherit;
             }
         </style>
     "#

@@ -241,6 +241,7 @@ pub async fn export_pdf(recipe_id: i32, theme: Option<PdfTheme>) -> Result<Strin
                 {ingredients_html}
                 {steps_html}
                 {notes_html}
+                <footer><a href="https://github.com/mariinkys/cocookies" target="_blank">Made with Cocookies ❤️</a></footer>
             </body>
         </html>"#
     );
