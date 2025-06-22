@@ -13,10 +13,6 @@
 <sub>(image from the main menu of the application)</sub>
 </div>
 
-> [!WARNING]
-> This project is work in progress, do not use this as your only site to save your recipes, data loss may occur.
-> If you use the Docker version stay on tagged releases like 0.1.1..., on latest issues may occur.
-
 # 🛠️ Using the Software
 This software is being developed with the idea of it being used inside a Docker container, in particular It's being developed so that my girlfriend can store her recipes on our [CasaOS](https://www.casaos.io/) HomeServer.
 You can find a working docker-compose for CasaOS on the `resources` subfolder in this repository. A Docker image is also [available](https://hub.docker.com/r/mariinkys/cocookies) if you want to try it out.
