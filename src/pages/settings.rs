@@ -4,7 +4,8 @@ use leptos::prelude::*;
 
 use crate::components::settings::{
     export_data::ExportDataCardComponent, export_pdf_options::ExportPDFOptionsComponent,
-    import_data::ImportDataCardComponent, test_pdf_options::TestPDFOptionsComponent,
+    import_data::ImportDataCardComponent, refresh_cache::RefreshCacheComponent,
+    test_pdf_options::TestPDFOptionsComponent,
 };
 
 #[component]
@@ -25,6 +26,12 @@ pub fn SettingsPage() -> impl IntoView {
                 <div class="flex flex-wrap gap-2">
                     <ExportPDFOptionsComponent/>
                     <TestPDFOptionsComponent/>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold">"Miscellaneous"</h2>
+                <div class="flex flex-wrap gap-2">
+                    <RefreshCacheComponent/>
                 </div>
             </div>
             <br/>
