@@ -57,7 +57,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe, main_photo_change: WriteSignal<bo
     let export_pdf_action = Action::new(move |recipe_id: &i32| {
         let recipe_id = *recipe_id;
         async move { 
-            let result = export_pdf(recipe_id).await;
+            let result = export_pdf(recipe_id, None).await;
             match result {
                 Ok(base64_pdf) => {
                      let download_pdf = move || {

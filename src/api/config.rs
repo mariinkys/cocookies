@@ -9,7 +9,7 @@ use sqlx::{Error, Pool, Row, Sqlite};
 #[cfg(feature = "ssr")]
 use std::sync::Arc;
 
-use crate::models::config::Config;
+use crate::{models::config::Config, utils::pdf_themes::PdfTheme};
 
 #[server(GetConfig, "/api/config")]
 pub async fn get_config() -> Result<Config, ServerFnError> {
@@ -161,7 +161,7 @@ pub async fn test_config() -> Result<(), ServerFnError> {
 // }
 
 #[server(ExportPdf, "/api/config/exportpdf")]
-pub async fn export_pdf(recipe_id: i32) -> Result<String, ServerFnError> {
+pub async fn export_pdf(recipe_id: i32, theme: Option<PdfTheme>) -> Result<String, ServerFnError> {
     use base64::{Engine as _, engine::general_purpose::STANDARD};
 
     let config = get_config()
@@ -226,52 +226,15 @@ pub async fn export_pdf(recipe_id: i32) -> Result<String, ServerFnError> {
         notes_html += &format!(r#"<p class="note">{}</p>"#, note.note);
     }
 
+    let style = theme.unwrap_or_default().get_style();
+
     let result_html = format!(
         r#"<!DOCTYPE html>
         <html lang="en">
             <head>
                 <meta charset="UTF-8">
                 <title>Recipe Export</title>
-                <style>
-                    body {{
-                        font-family: Arial, sans-serif;
-                        margin: 40px;
-                        line-height: 1.6;
-                        color: #333;
-                        background-color: #fff;
-                    }}
-                    h1 {{
-                        color: #2c3e50;
-                        border-bottom: 2px solid #ecf0f1;
-                        padding-bottom: 5px;
-                        margin-top: 40px;
-                    }}
-                    p {{
-                        margin: 10px 0;
-                    }}
-                    .recipe-meta {{
-                        font-style: italic;
-                        color: #7f8c8d;
-                    }}
-                    .ingredient {{
-                        padding: 6px;
-                        background: #f9f9f9;
-                        border-left: 4px solid #3498db;
-                        margin: 5px 0;
-                    }}
-                    .step {{
-                        background: #ecf0f1;
-                        padding: 10px;
-                        border-radius: 5px;
-                        margin: 10px 0;
-                    }}
-                    .note {{
-                        background: #fef9e7;
-                        padding: 10px;
-                        border-left: 4px solid #f1c40f;
-                        margin: 10px 0;
-                    }}
-                </style>
+                {style}
             </head>
             <body>
                 {recipe_html}
