@@ -1,8 +1,11 @@
+// SPDX-License-Identifier: GPL-3.0-only
+
 use leptos::prelude::*;
-use leptos_meta::{provide_meta_context, Link, Stylesheet, Title};
+use leptos_meta::{Link, Stylesheet, Title, provide_meta_context};
 use leptos_router::{
+    StaticSegment, WildcardSegment,
     components::{Route, Router, Routes},
-    path, StaticSegment, WildcardSegment,
+    path,
 };
 
 use crate::components::toast::ToastComponent;

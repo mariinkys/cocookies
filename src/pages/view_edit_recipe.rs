@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-only
+
 use crate::api::recipe::get_recipe;
 use crate::components::page_loading::PageLoadingComponent;
 use crate::components::recipe::add_edit_ingredients::ViewEditIngredientsComponent;

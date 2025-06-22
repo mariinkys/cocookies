@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-only
+
 use crate::components::dialog::DialogComponent;
 use crate::components::toast::ToastMessage;
 use crate::components::toast::ToastType;

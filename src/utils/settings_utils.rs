@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-only
+
 use chrono::NaiveDateTime;
 use leptos::prelude::*;
 use serde::{Deserialize, Serialize};

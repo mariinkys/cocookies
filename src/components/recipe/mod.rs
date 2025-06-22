@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-only
+
 pub mod add_edit_ingredients;
 pub mod add_edit_notes;
 pub mod add_edit_steps;
