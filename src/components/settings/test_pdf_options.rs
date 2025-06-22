@@ -40,21 +40,19 @@ pub fn TestPDFOptionsComponent() -> impl IntoView {
             <ErrorBoundary fallback=|error| view! {
                 <p class="text-xl text-center text-red-500">"An error occurred: " {format!("{error:?}")}</p>
             }>
-                <ActionForm action=test_config>
-                    <div class="card bg-base-100 shadow-xl w-96">
-                        <div class="card-body w-full">
+                <div class="card bg-base-100 shadow-xl w-96">
+                    <ActionForm action=test_config attr:class="h-full">
+                        <div class="card-body w-full h-full justify-between">
                             <p class="text-xl">"Test Gotenberg Status"</p>
-                            <div class="flex flex-row-reverse gap-1">
-                                <button class="btn btn-success w-full"
-                                    on:click=move |_| {
-                                    
-                                }>
-                                    "Test"
-                                </button>
-                            </div>
+                            <button class="btn btn-success w-full"
+                                on:click=move |_| {
+                                
+                            }>
+                                "Test"
+                            </button>
                         </div>
-                    </div>
-                </ActionForm>
+                    </ActionForm>
+                </div>
             </ErrorBoundary>
         </Suspense>
     }.into_any()

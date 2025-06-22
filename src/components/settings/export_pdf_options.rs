@@ -47,8 +47,8 @@ pub fn ExportPDFOptionsComponent() -> impl IntoView {
                         let model = RwSignal::new(config);
 
                         view! {
-                            <ActionForm action=update_config>
-                                <div class="card bg-base-100 shadow-xl w-96">
+                            <div class="card bg-base-100 shadow-xl w-96">
+                                <ActionForm action=update_config>
                                     <div class="card-body w-full">
                                         <a class="link text-xl" target="_blank" href="https://github.com/gotenberg/gotenberg">"Set Gotenberg Server Location"</a>
                                         <p class="text-xs">"*Ej: http://localhost:3000"</p>
@@ -83,8 +83,8 @@ pub fn ExportPDFOptionsComponent() -> impl IntoView {
                                             </button>
                                         </div>
                                     </div>
-                                </div>
-                            </ActionForm>
+                                </ActionForm>
+                            </div>
                         }
                     })
                 })
