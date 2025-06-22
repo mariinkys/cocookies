@@ -64,16 +64,38 @@ pub fn ViewEditRecipeComponent(recipe: Recipe, main_photo_change: WriteSignal<bo
             let result = export_pdf(recipe_id, selected_theme).await;
             match result {
                 Ok(base64_pdf) => {
-                     let download_pdf = move || {
-                        let data_url = format!("data:application/pdf;base64,{base64_pdf}");
+                    let download_pdf = move || {
+                        let window = leptos::prelude::window();
+                        let document = window.document().unwrap();
                         
-                        let document = leptos::prelude::window().document().unwrap();
+                        // Decode base64
+                        let binary_string = window.atob(&base64_pdf).unwrap();
+                        let bytes = web_sys::js_sys::Uint8Array::new_with_length(binary_string.len() as u32);
+                        
+                        for (i, char) in binary_string.chars().enumerate() {
+                            bytes.set_index(i as u32, char as u8);
+                        }
+                        
+                        let array = web_sys::js_sys::Array::new();
+                        array.push(&bytes);
+                        let blob = web_sys::Blob::new_with_u8_array_sequence(&array).unwrap();
+                        
+                        let url = web_sys::Url::create_object_url_with_blob(&blob).unwrap();
+                        
                         let a = document.create_element("a").unwrap();
-                        a.set_attribute("href", &data_url).unwrap();
+                        a.set_attribute("href", &url).unwrap();
                         a.set_attribute("download", "export.pdf").unwrap();
                         
                         if let Some(a_element) = wasm_bindgen::JsCast::dyn_ref::<web_sys::HtmlElement>(&a) {
+                            document.body().unwrap().append_child(&a).unwrap();
                             a_element.click();
+                            document.body().unwrap().remove_child(&a).unwrap();
+                            
+                            // Clean up immediately after click
+                            web_sys::Url::revoke_object_url(&url).unwrap();
+                        } else {
+                            // Clean up if casting failed
+                            web_sys::Url::revoke_object_url(&url).unwrap();
                         }
                     };
     
