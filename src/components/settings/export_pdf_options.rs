@@ -48,7 +48,7 @@ pub fn ExportPDFOptionsComponent() -> impl IntoView {
                             <ActionForm action=update_config>
                                 <div class="card bg-base-100 shadow-xl w-96">
                                     <div class="card-body w-full">
-                                        <a class="link" target="_blank" href="https://github.com/gotenberg/gotenberg" class="text-xl">"Set Gotenberg Server Location"</a>
+                                        <a class="link text-xl" target="_blank" href="https://github.com/gotenberg/gotenberg">"Set Gotenberg Server Location"</a>
                                         <p class="text-xs">"*Ej: http://localhost:3000"</p>
                                         <br/>
                                         <fieldset>

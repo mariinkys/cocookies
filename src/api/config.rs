@@ -58,6 +58,37 @@ pub async fn update_config(gotenberg_location: String) -> Result<i32, ServerFnEr
     }
 }
 
+#[server(TestConfig, "/api/config/test")]
+pub async fn test_config() -> Result<(), ServerFnError> {
+    let config = get_config()
+        .await
+        .map_err(|err| ServerFnError::new(format!("Failed to get config: {err}")))?;
+
+    if config
+        .gotenberg_location
+        .as_ref()
+        .is_none_or(|loc| loc.is_empty())
+    {
+        return Err(ServerFnError::new("No Gotenberg location found"));
+    }
+
+    let client = gotenberg_pdf::Client::new(&config.gotenberg_location.unwrap());
+    let result = client.health_check().await;
+
+    match result {
+        Ok(health) => match health.status {
+            gotenberg_pdf::health::HealthStatus::Up => Ok(()),
+            gotenberg_pdf::health::HealthStatus::Down => {
+                Err(ServerFnError::new("Gotenberg Health is Down"))
+            }
+        },
+        Err(err) => {
+            eprintln!("{err}");
+            Err(ServerFnError::new(format!("Gotenberg Error: {err}")))
+        }
+    }
+}
+
 // #[server(ExportPdf, "/api/config/exportpdf")]
 // pub async fn export_pdf(
 //     body_html: String,
@@ -142,9 +173,7 @@ pub async fn export_pdf(recipe_id: i32) -> Result<String, ServerFnError> {
         .as_ref()
         .is_none_or(|loc| loc.is_empty())
     {
-        return Err(ServerFnError::new(
-            "No Gotenberg location found".to_string(),
-        ));
+        return Err(ServerFnError::new("No Gotenberg location found"));
     }
 
     let recipe = crate::api::recipe::get_recipe(recipe_id)
