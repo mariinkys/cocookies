@@ -43,7 +43,7 @@ pub fn TestPDFOptionsComponent() -> impl IntoView {
                 <div class="card bg-base-100 shadow-xl w-96">
                     <ActionForm action=test_config attr:class="h-full">
                         <div class="card-body w-full h-full justify-between">
-                            <p class="text-xl">"Test Gotenberg Status"</p>
+                            <p class="text-xl text-center">"Test Gotenberg Status"</p>
                             <button class="btn btn-success w-full"
                                 on:click=move |_| {
                                 
