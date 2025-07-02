@@ -17,10 +17,9 @@ pub async fn upload_file(file_data: Vec<u8>, file_path: String) -> Result<String
 
     let path = Path::new(&fpath);
 
-    // Check if the file path has a parent directory
     let parent_dir = path.parent();
 
-    // If there is a parent directory, else don't create
+    // if there is a parent directory, else don't create
     if let Some(parent) = parent_dir {
         if fs::create_dir_all(parent).await.is_err() {
             return Err(ServerFnError::new("Error Creating Directory Path"));
@@ -29,7 +28,7 @@ pub async fn upload_file(file_data: Vec<u8>, file_path: String) -> Result<String
         return Err(ServerFnError::new(format!("Wrong Path: {file_path}")));
     }
 
-    // Now create the file itself
+    // create the file
     let file = File::create(path).await;
     match file {
         Ok(mut file) => {
@@ -57,7 +56,6 @@ pub async fn delete_file(file_path: String) -> Result<String, ServerFnError> {
 
     let file_path = Path::new(&fpath);
 
-    // Check if the file exists asynchronously
     if !file_path.exists().await {
         return Err(ServerFnError::ServerError(format!(
             "File not found: {}",
@@ -65,7 +63,6 @@ pub async fn delete_file(file_path: String) -> Result<String, ServerFnError> {
         )));
     }
 
-    // Attempt to delete the file asynchronously
     match fs::remove_file(file_path).await {
         Ok(_) => Ok(format!(
             "File deleted successfully: {}",
@@ -87,6 +84,6 @@ pub fn get_file_extension(file: &web_sys::File) -> Option<&'static str> {
         "image/webp" => Some("webp"),
         "image/gif" => None,
         "image/svg+xml" => None,
-        _ => None, // Handle unsupported file types
+        _ => None,
     }
 }

@@ -317,6 +317,4 @@ pub async fn update_recipe_main_photo(id: i32, photo_path: String) -> Result<(),
     } else {
         Err(og_main_photo.unwrap_err())
     }
-
-    // Use delete_file(file_path) to delete old photo if anything before fails delete the new photo_path instead
 }

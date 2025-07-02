@@ -187,11 +187,10 @@ pub async fn insert_full_recipes(recipes: Vec<FullRecipe>) -> Result<(), ServerF
             .bind(ingredient.unit)
             .bind(ingredient.created_at)
             .bind(ingredient.updated_at)
-            .execute(&*pool)  // Dereference the Arc here
+            .execute(&*pool)  
             .await?;
         }
 
-        // Insert the steps associated with the recipe
         for step in recipe.steps {
             sqlx::query(
                 r#"
