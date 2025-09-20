@@ -4,8 +4,8 @@ use leptos::prelude::*;
 
 #[server(UploadFile, "/api/uploadfile")]
 pub async fn upload_file(file_data: Vec<u8>, file_path: String) -> Result<String, ServerFnError> {
-    use async_std::fs::{self, File};
-    use async_std::io::prelude::*;
+    use smol::fs::{self, File};
+    use smol::io::AsyncWriteExt;
     use std::path::Path;
 
     // TODO: This is awful
@@ -44,8 +44,8 @@ pub async fn upload_file(file_data: Vec<u8>, file_path: String) -> Result<String
 
 #[server(DeleteFile, "/api/uploadfile")]
 pub async fn delete_file(file_path: String) -> Result<String, ServerFnError> {
-    use async_std::fs;
-    use async_std::path::Path;
+    use smol::fs;
+    use std::path::Path;
 
     // TODO: This is awful
     let fpath = if file_path.starts_with('/') && file_path.starts_with("/assets/") {
@@ -56,23 +56,25 @@ pub async fn delete_file(file_path: String) -> Result<String, ServerFnError> {
 
     let file_path = Path::new(&fpath);
 
-    if !file_path.exists().await {
-        return Err(ServerFnError::ServerError(format!(
-            "File not found: {}",
-            file_path.display()
-        )));
-    }
-
     match fs::remove_file(file_path).await {
         Ok(_) => Ok(format!(
             "File deleted successfully: {}",
             file_path.display()
         )),
-        Err(e) => Err(ServerFnError::ServerError(format!(
-            "Failed to delete file: {}. Error: {}",
-            file_path.display(),
-            e
-        ))),
+        Err(e) => {
+            if e.kind() == std::io::ErrorKind::NotFound {
+                Err(ServerFnError::ServerError(format!(
+                    "File not found: {}",
+                    file_path.display()
+                )))
+            } else {
+                Err(ServerFnError::ServerError(format!(
+                    "Failed to delete file: {}. Error: {}",
+                    file_path.display(),
+                    e
+                )))
+            }
+        }
     }
 }
 
