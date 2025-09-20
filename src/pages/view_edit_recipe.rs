@@ -47,7 +47,7 @@ pub fn ViewEditRecipe() -> impl IntoView {
     provide_context(main_photo_change);
     Effect::new(move |_| {
         if main_photo.get() {
-            //recipe_resource.refetch(); // TODO: This line causes exceptions after updating the photo
+            recipe_resource.refetch();
             main_photo_change.set(false);
         }
     });
