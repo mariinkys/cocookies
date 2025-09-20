@@ -13,7 +13,7 @@ use crate::{
 };
 
 #[component]
-pub fn ViewEditRecipeComponent(recipe: Recipe, main_photo_change: WriteSignal<bool>) -> impl IntoView {
+pub fn ViewEditRecipeComponent(recipe: Recipe) -> impl IntoView {
     let set_toast: WriteSignal<ToastMessage> = expect_context();
     let env_options: ReadSignal<EnvOptions> = expect_context();
     let model = RwSignal::new(recipe);
@@ -130,7 +130,7 @@ pub fn ViewEditRecipeComponent(recipe: Recipe, main_photo_change: WriteSignal<bo
                             let recipe_id = model.get_untracked().recipe_id.unwrap_or_default();
                             
                             view! {
-                                <EditMainPhotoComponent recipe_id=recipe_id updated_toggle=main_photo_change/>
+                                <EditMainPhotoComponent recipe_id=recipe_id/>
                             }
                         }/>
                     </div>

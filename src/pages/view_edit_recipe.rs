@@ -44,9 +44,10 @@ pub fn ViewEditRecipe() -> impl IntoView {
     );
 
     let (main_photo, main_photo_change) = signal(false);
+    provide_context(main_photo_change);
     Effect::new(move |_| {
         if main_photo.get() {
-            recipe_resource.refetch();
+            //recipe_resource.refetch(); // TODO: This line causes exceptions after updating the photo
             main_photo_change.set(false);
         }
     });
@@ -65,7 +66,7 @@ pub fn ViewEditRecipe() -> impl IntoView {
 
                                 view! {
                                     // EDIT RECIPE
-                                    <ViewEditRecipeComponent recipe=recipe_result main_photo_change=main_photo_change/>
+                                    <ViewEditRecipeComponent recipe=recipe_result/>
 
                                     // EDIT/ADD INGREDIENTS COMPONENT
                                     <ViewEditIngredientsComponent recipe_id=recipe_id/>
