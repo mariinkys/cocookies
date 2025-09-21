@@ -9,9 +9,10 @@ use crate::{
 };
 
 #[component]
-pub fn EditMainPhotoComponent(recipe_id: i32, updated_toggle: WriteSignal<bool>) -> impl IntoView {
+pub fn EditMainPhotoComponent(recipe_id: i32) -> impl IntoView {
     let set_toast: WriteSignal<ToastMessage> = expect_context();
     let env_options: ReadSignal<EnvOptions> = expect_context();
+    let updated_toggle: WriteSignal<bool> = expect_context();
     let loading = RwSignal::new(false);
 
     let file_input = NodeRef::<leptos::html::Input>::new();
@@ -52,13 +53,13 @@ pub fn EditMainPhotoComponent(recipe_id: i32, updated_toggle: WriteSignal<bool>)
                 // Recipe main photo update handling
                 match update_recipe_main_photo(recipe_id, image_name.get_untracked()).await {
                     Ok(_succ) => {
+                        updated_toggle.update(|value| *value = !*value);
                         set_toast.set(ToastMessage {
                             message: String::from("Success"),
                             toast_type: ToastType::Success,
                             visible: true,
                         });
                         loading.set(false);
-                        updated_toggle.update(|value| *value = !*value);
                     }
                     Err(err) => {
                         set_toast.set(ToastMessage {
