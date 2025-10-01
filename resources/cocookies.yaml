@@ -1,7 +1,7 @@
 name: cocookies
 services:
   cocookies:
-    image: mariinkys/cocookies:latest
+    image: ghcr.io/mariinkys/cocookies:latest
     container_name: cocookies
     cpu_shares: 128  
     deploy:
