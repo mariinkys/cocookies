@@ -15,7 +15,7 @@
 
 # 🛠️ Using the Software
 This software is being developed with the idea of it being used inside a Docker container, in particular It's being developed so that my girlfriend can store her recipes on our [CasaOS](https://www.casaos.io/) HomeServer.
-You can find a working docker-compose for CasaOS on the `resources` subfolder in this repository. A Docker image is also [available](https://hub.docker.com/r/mariinkys/cocookies) if you want to try it out.
+You can find a working docker-compose for CasaOS on the `resources` subfolder in this repository. A Docker image is also [available](https://github.com/mariinkys/cocookies/pkgs/container/cocookies) if you want to try it out.
 
 # 🧰 Contributing
 
