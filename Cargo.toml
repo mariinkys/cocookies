@@ -7,15 +7,15 @@ edition = "2024"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-actix-files = { version = "0.6.9", optional = true }
-actix-web = { version = "4.12.1", optional = true, features = ["macros"] }
+actix-files = { version = "0.6.10", optional = true }
+actix-web = { version = "4.13.0", optional = true, features = ["macros"] }
 console_error_panic_hook = "0.1"
 http = { version = "1.4.0", optional = true }
-leptos = { version = "0.8.15", features = ["nightly"] }
-leptos_meta = { version = "0.8.5" }
-leptos_actix = { version = "0.8.6", optional = true }
-leptos_router = { version = "0.8.11", features = ["nightly"] }
-wasm-bindgen = "=0.2.106"
+leptos = { version = "0.8.17", features = ["nightly"] }
+leptos_meta = { version = "0.8.6" }
+leptos_actix = { version = "0.8.7", optional = true }
+leptos_router = { version = "0.8.12", features = ["nightly"] }
+wasm-bindgen = "=0.2.114"
 
 # Added by me
 sqlx = { version = "0.8.6", features = [
@@ -25,13 +25,13 @@ sqlx = { version = "0.8.6", features = [
   "uuid",
 ], optional = true }
 serde = { version = "1.0.228" }
-serde_json = "1.0.145"
-chrono = { version = "0.4.42", features = ["serde"] }
-futures = { version = "0.3", optional = true }
-wasm-bindgen-futures = "0.4.56"
+serde_json = "1.0.149"
+chrono = { version = "0.4.44", features = ["serde"] }
+futures = { version = "0.3.32", optional = true }
+wasm-bindgen-futures = "0.4.64"
 smol = { version = "2.0.2", optional = true }
-uuid = { version = "1.19.0", features = ["v4", "js"] }
-gotenberg_pdf = { version = "0.5.2", optional = true }
+uuid = { version = "1.21.0", features = ["v4", "js"] }
+gotenberg_pdf = { git = "https://github.com/mariinkys/gotenberg_pdf", optional = true }
 base64 = { version = "0.22.1", optional = true }
 
 [features]
@@ -55,7 +55,7 @@ ssr = [
 
 # Added by me for file uploading
 [dependencies.web-sys]
-version = "0.3.83"
+version = "0.3.91"
 features = [
   "File",
   "FileList",
