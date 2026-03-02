@@ -17,7 +17,7 @@ COPY . .
 
 RUN npm install
 
-RUN cargo leptos build --release -vv
+RUN RUSTFLAGS="--cfg erase_components" cargo leptos build --release -vv
 
 FROM rustlang/rust:nightly-alpine as runner
 
