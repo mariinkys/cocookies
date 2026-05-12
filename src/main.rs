@@ -50,7 +50,7 @@ async fn main() -> std::io::Result<()> {
 
     let _shared_env_options = SharedValue::new(EnvOptions::get);
 
-    println!("listening on http://{}", &addr);
+    println!("listening on http://{}", addr);
 
     HttpServer::new(move || {
         // Generate the list of routes in your Leptos App
