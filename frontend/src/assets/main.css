@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+@import 'tailwindcss-primeui';
+
+@custom-variant dark (&:where(.my-app-dark, .my-app-dark *));
+
+html {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+body {
+  margin: 0;
+  background-color: var(--p-surface-50);
+  color: var(--p-surface-900);
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+/* Subtle pink tint on the very top of the page — stays out of content areas */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at 80% 0%,
+      color-mix(in srgb, var(--p-primary-color) 6%, transparent) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 20% 0%,
+      color-mix(in srgb, var(--p-primary-color) 4%, transparent) 0%,
+      transparent 40%
+    );
+  z-index: 0;
+}
+
+#app {
+  position: relative;
+  z-index: 1;
+}

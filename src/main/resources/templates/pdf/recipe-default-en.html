@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Georgia, serif;
+            color: #4b2e2e;
+            margin: 40px;
+            line-height: 1.7;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 28px;
+            page-break-inside: avoid;
+        }
+
+        .recipe-title {
+            font-size: 30px;
+            color: #d63384;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+        }
+
+        .recipe-meta {
+            font-size: 13px;
+            color: #a05265;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .recipe-meta-pills {
+            margin-bottom: 14px;
+        }
+
+        .pill {
+            display: inline-block;
+            background-color: #ffe4ec;
+            border: 1px solid #f8bbd0;
+            border-radius: 10px;
+            padding: 2px 12px;
+            font-size: 12px;
+            color: #a05265;
+            margin-right: 4px;
+            font-style: normal;
+        }
+
+        .recipe-image-wrap {
+            text-align: center;
+            margin-bottom: 14px;
+            page-break-inside: avoid;
+        }
+
+        .recipe-image-wrap img {
+            width: 220px;
+            height: 180px;
+            border-radius: 10px;
+            border: 2px solid #f8bbd0;
+            display: inline-block;
+        }
+
+        .description {
+            display: block;
+            font-size: 13px;
+            color: #5a2c2c;
+            font-style: italic;
+            text-align: center;
+            margin-bottom: 4px;
+            page-break-inside: avoid;
+        }
+
+        .section-divider {
+            border: none;
+            border-top: 2px dashed #f8bbd0;
+            margin: 24px 0 8px 0;
+        }
+
+        h2 {
+            font-size: 22px;
+            color: #d63384;
+            border-bottom: 2px dashed #f8bbd0;
+            padding-bottom: 6px;
+            margin-top: 32px;
+            margin-bottom: 14px;
+            page-break-after: avoid;
+        }
+
+        .ingredient {
+            display: block;
+            padding: 9px 14px;
+            background-color: #ffe4ec;
+            border-left: 5px solid #e75480;
+            margin-bottom: 7px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #4b2e2e;
+            page-break-inside: avoid;
+        }
+
+        .step {
+            display: block;
+            background-color: #fce4ec;
+            padding: 11px 14px;
+            border: 1px solid #f8bbd0;
+            border-radius: 6px;
+            margin-bottom: 9px;
+            font-size: 14px;
+            color: #4b2e2e;
+            page-break-inside: avoid;
+        }
+
+        .step-number {
+            font-weight: bold;
+            color: #d63384;
+        }
+
+        .step-duration {
+            font-size: 12px;
+            color: #a05265;
+            font-style: italic;
+        }
+
+        .empty-note {
+            font-size: 13px;
+            color: #c98098;
+            font-style: italic;
+        }
+
+        .dates {
+            margin-top: 28px;
+            font-size: 11px;
+            color: #c98098;
+            font-style: italic;
+            border-top: 1px dashed #f8bbd0;
+            padding-top: 8px;
+        }
+
+        .dates-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dates-table td { padding: 0; }
+        .dates-right { text-align: right; }
+    </style>
+</head>
+<body>
+
+<div class="header-section">
+
+    <div th:if="${not #strings.isEmpty(recipe.imageUrl)}" class="recipe-image-wrap">
+        <img th:src="${recipe.imageUrl}" th:alt="${recipe.title}"/>
+    </div>
+
+    <div class="recipe-title" th:text="${recipe.title}">Recipe Title</div>
+
+    <div class="recipe-meta">
+        <span th:if="${recipe.servings > 0}"
+              th:text="${recipe.servings} + ' servings'">0 servings</span>
+        <span th:if="${recipe.servings > 0
+                       and recipe.prepTime != null
+                       and recipe.prepTime > 0}"> &#183; </span>
+        <span th:if="${recipe.prepTime != null and recipe.prepTime > 0}"
+              th:text="${recipe.prepTime} + ' min prep'">0 min prep</span>
+        <span th:if="${recipe.prepTime != null and recipe.prepTime > 0
+                       and recipe.cookTime != null
+                       and recipe.cookTime > 0}"> &#183; </span>
+        <span th:if="${recipe.cookTime != null and recipe.cookTime > 0}"
+              th:text="${recipe.cookTime} + ' min cook'">0 min cook</span>
+    </div>
+
+    <div class="recipe-meta-pills">
+        <span class="pill"
+              th:if="${not #strings.isEmpty(recipe.category)}"
+              th:text="${recipe.category}">Category</span>
+        <span class="pill"
+              th:if="${not #strings.isEmpty(recipe.difficulty)}"
+              th:text="${recipe.difficulty}">Difficulty</span>
+    </div>
+
+    <div th:if="${not #strings.isEmpty(recipe.description)}"
+         class="description"
+         th:text="${recipe.description}">—</div>
+
+</div>
+
+<hr class="section-divider"/>
+
+<h2>Ingredients</h2>
+
+<div th:if="${#lists.isEmpty(recipe.ingredients)}">
+    <span class="empty-note">No ingredients listed.</span>
+</div>
+
+<div th:each="ing : ${recipe.ingredients}">
+    <div class="ingredient">
+        <span th:if="${ing.quantity != null}"
+              th:text="${ing.quantity}
+                        + (${ing.unit != null ? ' ' + ing.unit + ' &#8212; ' : ' &#8212; '})"></span>
+        <span th:text="${ing.name}">Ingredient</span>
+        <span th:if="${ing.notes != null and not #strings.isEmpty(ing.notes)}"
+              th:text="' (' + ${ing.notes} + ')'"></span>
+    </div>
+</div>
+
+<h2>Instructions</h2>
+
+<div th:if="${#lists.isEmpty(recipe.steps)}">
+    <span class="empty-note">No steps listed.</span>
+</div>
+
+<div th:each="step : ${recipe.steps}">
+    <div class="step">
+        <span class="step-number"
+              th:text="'Step ' + ${step.stepNumber} + '. '">Step 1. </span>
+        <span th:text="${step.instructions}">Instructions.</span>
+        <span th:if="${step.duration != null}"
+              class="step-duration"
+              th:text="' (' + ${step.duration} + ' min)'"></span>
+    </div>
+</div>
+
+<div class="dates">
+    <table class="dates-table" cellspacing="0" cellpadding="0">
+        <tr>
+            <td th:if="${not #strings.isEmpty(recipe.createdAt)}">
+                Created: <span th:text="${recipe.createdAt}">—</span>
+            </td>
+            <td th:if="${#strings.isEmpty(recipe.createdAt)}"></td>
+            <td style="text-align: center">Made with Cocookies</td>
+            <td class="dates-right">
+                Updated At: <span th:text="${recipe.updatedAt}">—</span>
+            </td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+app:
+  cors:
+    allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:5173}
+  cookie:
+    secure: ${COOKIE_SECURE:false}   # set to true in production (requires HTTPS)
+  security:
+    max-login-attempts: 5
+    lockout-duration-minutes: 15
+    trust-proxy: ${TRUST_PROXY:false} # only set true when behind a trusted proxy
+    filter:
+      order: 10
+
+spring:
+  application:
+    name: Cocookies
+  datasource:
+    url: ${DB_URL:jdbc:sqlite:cocookies.db}
+    driver-class-name: org.sqlite.JDBC
+  ai:
+    ollama:
+      base-url: ${OLLAMA_URL:http://localhost:11434}
+      chat:
+        model: ${OLLAMA_MODEL:gemma3:4b}
+        temperature: 0.1
+
+  jpa:
+    hibernate:
+      ddl-auto: validate # IMPORTANT: Flyway manages schema, not Hibernate
+    show-sql: ${SHOW_SQL:true}
+    properties:
+      hibernate:
+        dialect: org.hibernate.community.dialect.SQLiteDialect
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    url: ${DB_URL:jdbc:sqlite:cocookies.db}
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:local-dev-secret-change-this-please-32chars}
+    expiration: 10800000

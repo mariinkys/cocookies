@@ -1,49 +1,20 @@
-# Get started with a build env with Rust nightly
-FROM rustlang/rust:nightly-alpine as builder
-
-RUN apk update && \
-    apk add --no-cache bash curl npm libc-dev binaryen
-
-RUN npm install -g sass
-
-RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/leptos-rs/cargo-leptos/releases/latest/download/cargo-leptos-installer.sh | sh
-#RUN cargo install --locked cargo-leptos@0.2.35
-
-# Add the WASM target
-RUN rustup target add wasm32-unknown-unknown
-
-WORKDIR /work
-COPY . .
-
-RUN npm install
-
-RUN RUSTFLAGS="--cfg erase_components" cargo leptos build --release -vv
-
-FROM rustlang/rust:nightly-alpine as runner
-
+# Build Stage
+FROM docker.io/library/maven:3.9-eclipse-temurin-26 AS build
 WORKDIR /app
+COPY pom.xml .
 
-COPY --from=builder /work/target/release/cocookies /app/
-COPY --from=builder /work/target/site /app/site
-COPY --from=builder /work/Cargo.toml /app/
+RUN mvn dependency:go-offline -B
+COPY src ./src
+RUN mvn package -DskipTests -B
 
-ENV RUST_LOG="info"
-ENV LEPTOS_SITE_ADDR="0.0.0.0:8080"
-ENV LEPTOS_SITE_ROOT=./site
-ENV DATABASE_URL="sqlite:/app/db/cocookies.db"
-ENV UPLOAD_DIR="/app/uploads"
+# Runtime Stage
+FROM docker.io/library/eclipse-temurin:26-jre-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+
+# Non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
 EXPOSE 8080
-
-# Create a directory for the database
-RUN mkdir -p /app/db
-
-# Create a directory for uploaded images
-RUN mkdir -p $UPLOAD_DIR
-
-# Use VOLUME to mark the database directory as a mount point
-VOLUME /app/db
-
-# Use VOLUME to mark the uploads directory as a mount point
-VOLUME $UPLOAD_DIR
-
-CMD ["/app/cocookies"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
