@@ -1,0 +1,81 @@
+# Note that for the app to work you have to give proper permissions to the mount directory of the app's backend, in this case: /media/ZimaOS-HD/AppData/Cocookies
+name: cocookies
+services:
+  backend:
+    cpu_shares: 90
+    command: []
+    container_name: cocookies-backend
+    deploy:
+      resources:
+        limits:
+          memory: 16546189312
+        reservations:
+          devices: []
+    environment:
+      - COOKIE_SECURE=false
+      - CORS_ALLOWED_ORIGIN=http://SERVERIP:8080
+      - DB_URL=jdbc:sqlite:/app/data/cocookies.db
+      - JWT_SECRET=EnterYourOwn
+      - OLLAMA_MODEL=gemma3:4b
+      - OLLAMA_URL=http://SERVERIP:11434
+      - SPRING_PROFILES_ACTIVE=prod
+      - TRUST_PROXY=false
+    image: ghcr.io/mariinkys/cocookies-backend:latest
+    labels:
+      icon: https://raw.githubusercontent.com/mariinkys/cocookies/refs/heads/main/frontend/src/assets/icon.png
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /media/ZimaOS-HD/AppData/Cocookies
+        target: /app/data
+    ports: []
+    devices: []
+    cap_add: []
+    networks:
+      - cocookies
+    privileged: false
+  frontend:
+    cpu_shares: 90
+    command: []
+    container_name: cocookies-frontend
+    depends_on:
+      backend:
+        condition: service_started
+        required: true
+    deploy:
+      resources:
+        limits:
+          memory: 16546189312
+        reservations:
+          devices: []
+    image: ghcr.io/mariinkys/cocookies-frontend:latest
+    labels:
+      icon: https://raw.githubusercontent.com/mariinkys/cocookies/refs/heads/main/frontend/src/assets/icon.png
+    ports:
+      - target: 80
+        published: "8080"
+        protocol: tcp
+    restart: unless-stopped
+    volumes: []
+    devices: []
+    cap_add: []
+    environment: []
+    networks:
+      - cocookies
+    privileged: false
+networks:
+  cocookies:
+    name: cocookies
+x-casaos:
+  author: self
+  category: self
+  hostname: ""
+  icon: https://raw.githubusercontent.com/mariinkys/cocookies/refs/heads/main/frontend/src/assets/icon.png
+  index: /
+  is_uncontrolled: false
+  port_map: "8080"
+  scheme: http
+  store_app_id: coocokies
+  title:
+    custom: Cocookies
+    en_us: backend
