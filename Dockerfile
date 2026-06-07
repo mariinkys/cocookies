@@ -12,8 +12,11 @@ FROM docker.io/library/eclipse-temurin:26-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
+RUN mkdir -p /app/data
+
 # Non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN chown -R appuser:appgroup /app
 USER appuser
 
 EXPOSE 8080
