@@ -14,18 +14,18 @@ const routes = [
   //   component: () => import('@/views/recipes/SharedRecipes.vue'),
   //   meta: { requiresAuth: true },
   // },
-  // {
-  //   path: '/login',
-  //   name: 'Login',
-  //   component: () => import('@/views/auth/LoginView.vue'),
-  //   meta: { guestOnly: true },
-  // },
-  // {
-  //   path: '/register',
-  //   name: 'Register',
-  //   component: () => import('@/views/auth/RegisterView.vue'),
-  //   meta: { guestOnly: true },
-  // },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/views/auth/LoginView.vue'),
+    meta: { guestOnly: true },
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import('@/views/auth/RegisterView.vue'),
+    meta: { guestOnly: true },
+  },
   // {
   //   path: '/users/:id/edit',
   //   name: 'Update User',

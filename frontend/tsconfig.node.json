@@ -27,6 +27,9 @@
     // NuxtUI
     "paths": {
       "#build/ui": ["./node_modules/.nuxt-ui/ui"]
-    }
+    },
+
+    // Zod
+    "strict": true
   }
 }
