@@ -46,7 +46,7 @@ export function useRecipeIngredients(model: Ref<RecipeRequest>) {
 
   function validate(): boolean {
     if (!name.value.trim()) {
-      error.value = t('recipes.validation.ingredientNameRequired')
+      error.value = t('common.validation.required')
       return false
     }
     error.value = ''

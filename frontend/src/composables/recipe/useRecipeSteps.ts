@@ -40,7 +40,7 @@ export function useRecipeSteps(model: Ref<RecipeRequest>) {
 
   function validate(): boolean {
     if (!instructions.value.trim()) {
-      error.value = t('recipes.validation.stepInstructionsRequired')
+      error.value = t('common.validation.required')
       return false
     }
     error.value = ''

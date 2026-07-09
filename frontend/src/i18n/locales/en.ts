@@ -78,6 +78,10 @@ export default {
       passwordMinLength: 'Password must be at least 8 characters',
       max100: 'Must not exceed 100 characters',
       min8: 'Must be at least 8 characters',
+      min1: 'Must be at least 1',
+      exceedsChars: 'Exceeds the maximum number of characters',
+      exceedsMax: 'Exceeds maximum',
+      intOnly: 'Integer numbers only',
     },
 
     states: {

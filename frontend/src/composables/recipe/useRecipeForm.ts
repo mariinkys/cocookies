@@ -86,40 +86,34 @@ export function useRecipeForm(recipeId: ComputedRef<string | undefined> | Ref<st
     name: v.pipe(
       v.string(),
       v.trim(),
-      v.minLength(1, t('recipes.validation.ingredientNameRequired')),
-      v.maxLength(150, t('recipes.validation.ingredientNameMax')),
+      v.minLength(1, t('common.validation.required')),
+      v.maxLength(150, t('common.validation.exceedsMax')),
     ),
     quantity: v.nullable(v.number()),
-    unit: v.nullable(
-      v.pipe(v.string(), v.maxLength(50, t('recipes.validation.ingredientUnitMax'))),
-    ),
+    unit: v.nullable(v.pipe(v.string(), v.maxLength(50, t('common.validation.exceedsMax')))),
     notes: v.nullable(v.string()),
-    sortOrder: v.pipe(v.number(), v.integer(t('recipes.validation.integerOnly'))),
+    sortOrder: v.pipe(v.number(), v.integer(t('common.validation.intOnly'))),
   })
 
   const stepSchema = v.object({
     stepNumber: v.pipe(
       v.number(),
-      v.integer(t('recipes.validation.integerOnly')),
-      v.minValue(1, t('recipes.validation.stepNumberMin')),
+      v.integer(t('common.validation.intOnly')),
+      v.minValue(1, t('common.validation.min1')),
     ),
-    instructions: v.pipe(
-      v.string(),
-      v.trim(),
-      v.minLength(1, t('recipes.validation.stepInstructionsRequired')),
-    ),
-    duration: v.nullable(v.pipe(v.number(), v.integer(t('recipes.validation.integerOnly')))),
+    instructions: v.pipe(v.string(), v.trim(), v.minLength(1, t('common.validation.required'))),
+    duration: v.nullable(v.pipe(v.number(), v.integer(t('common.validation.intOnly')))),
   })
 
   const nutritionSchema = v.object({
     servingSizeValue: v.pipe(
-      v.number(t('recipes.validation.servingSizeValueRequired')),
-      v.check((value) => value > 0, t('recipes.validation.servingSizeValuePositive')),
+      v.number(t('common.validation.required')),
+      v.check((value) => value > 0, t('common.validation.min1')),
     ),
     servingSizeUnit: v.pipe(
-      v.string(t('recipes.validation.servingSizeUnitRequired')),
+      v.string(t('common.validation.required')),
       v.trim(),
-      v.minLength(1, t('recipes.validation.servingSizeUnitRequired')),
+      v.minLength(1, t('common.validation.required')),
     ),
     calories: v.nullable(v.number()),
     proteinG: v.nullable(v.number()),
@@ -135,26 +129,23 @@ export function useRecipeForm(recipeId: ComputedRef<string | undefined> | Ref<st
     title: v.pipe(
       v.string(),
       v.trim(),
-      v.minLength(1, t('recipes.validation.titleRequired')),
-      v.maxLength(255, t('recipes.validation.titleMax')),
+      v.minLength(1, t('common.validation.required')),
+      v.maxLength(255, t('common.validation.exceedsMax')),
     ),
     description: v.nullable(v.string()),
     categoryId: v.nullable(v.string()),
     difficultyId: v.nullable(v.string()),
-    prepTime: v.nullable(v.pipe(v.number(), v.integer(t('recipes.validation.integerOnly')))),
-    cookTime: v.nullable(v.pipe(v.number(), v.integer(t('recipes.validation.integerOnly')))),
+    prepTime: v.nullable(v.pipe(v.number(), v.integer(t('common.validation.intOnly')))),
+    cookTime: v.nullable(v.pipe(v.number(), v.integer(t('common.validation.intOnly')))),
     servings: v.pipe(
       v.number(),
-      v.integer(t('recipes.validation.integerOnly')),
-      v.minValue(1, t('recipes.validation.servingsMin')),
+      v.integer(t('common.validation.intOnly')),
+      v.minValue(1, t('common.validation.min1')),
     ),
     imageUrl: v.nullable(v.string()),
     shared: v.boolean(),
-    steps: v.pipe(v.array(stepSchema), v.minLength(1, t('recipes.validation.stepsRequired'))),
-    ingredients: v.pipe(
-      v.array(ingredientSchema),
-      v.minLength(1, t('recipes.validation.ingredientsRequired')),
-    ),
+    steps: v.pipe(v.array(stepSchema), v.minLength(1, t('common.validation.required'))),
+    ingredients: v.pipe(v.array(ingredientSchema), v.minLength(1, t('common.validation.required'))),
     nutrition: v.nullable(nutritionSchema),
   })
   type Schema = v.InferOutput<typeof schema>

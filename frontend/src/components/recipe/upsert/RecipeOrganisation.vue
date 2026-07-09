@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import type { RecipeRequest } from '@/types/recipe.types'
-import CategorySelect from '@/components/category/SelectorComponent.vue'
-import DifficultySelect from '@/components/difficulty/SelectorComponent.vue'
+import CategorySelect from '@/components/category/CategorySelectorComponent.vue'
+import DifficultySelect from '@/components/difficulty/DifficultySelectorComponent.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 
