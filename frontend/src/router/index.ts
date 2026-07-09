@@ -32,24 +32,24 @@ const routes = [
   //   component: () => import('@/views/users/UpdateView.vue'),
   //   meta: { requiresAuth: true, requiresSelf: true },
   // },
-  // {
-  //   path: '/recipes/new',
-  //   name: 'New Recipe',
-  //   component: () => import('@/views/recipes/UpsertView.vue'),
-  //   meta: { requiresAuth: true },
-  // },
-  // {
-  //   path: '/recipes/:id/edit',
-  //   name: 'Update Recipe',
-  //   component: () => import('@/views/recipes/UpsertView.vue'),
-  //   meta: { requiresAuth: true },
-  // },
-  // {
-  //   path: '/recipes/:id/view',
-  //   name: 'View Recipe',
-  //   component: () => import('@/views/recipes/DetailsView.vue'),
-  //   meta: { requiresAuth: true },
-  // },
+  {
+    path: '/recipes/new',
+    name: 'New Recipe',
+    component: () => import('@/views/recipes/UpsertView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/recipes/:id/edit',
+    name: 'Update Recipe',
+    component: () => import('@/views/recipes/UpsertView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/recipes/:id/view',
+    name: 'View Recipe',
+    component: () => import('@/views/recipes/DetailsView.vue'),
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({
