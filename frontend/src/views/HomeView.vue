@@ -217,7 +217,6 @@ onMounted(fetchRecipes)
                 color="neutral"
                 variant="solid"
                 size="sm"
-                class="bg-default/90 backdrop-blur"
                 :aria-label="t('recipes.actions.edit')"
                 @click="goTo(`/recipes/${recipe.id}/edit`)"
               />
@@ -226,7 +225,6 @@ onMounted(fetchRecipes)
                 color="error"
                 variant="solid"
                 size="sm"
-                class="bg-default/90 backdrop-blur"
                 :aria-label="t('recipes.actions.delete')"
                 @click="askDelete($event, recipe)"
               />

@@ -15,7 +15,7 @@ export function useRecipeIngredients(model: Ref<RecipeRequest>) {
 
   const isAdding = computed(() => editingIndex.value === null)
   const dialogTitle = computed(() =>
-    isAdding.value ? t('recipes.dialogs.addIngredient') : t('recipes.dialogs.editIngredient'),
+    isAdding.value ? t('recipes.actions.addIngredient') : t('recipes.actions.editIngredient'),
   )
 
   function resetFields() {

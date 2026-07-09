@@ -17,6 +17,7 @@ export default {
       signOut: 'Cerrar sesión',
       save: 'Guardar',
       remove: 'Eliminar',
+      clear: 'Limpiar',
     },
 
     feedback: {

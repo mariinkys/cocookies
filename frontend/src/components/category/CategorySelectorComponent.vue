@@ -7,6 +7,8 @@ import CreateCategoryDialog from '@/components/category/CreateCategoryDialog.vue
 
 const { t } = useI18n({ useScope: 'global' })
 
+defineOptions({ inheritAttrs: false })
+
 const modelValue = defineModel<string | null>({ required: true })
 defineProps<{ disabled?: boolean }>()
 
@@ -34,7 +36,7 @@ function onCategoryCreated(category: CategoryResponse) {
 </script>
 
 <template>
-  <div class="flex items-center gap-2">
+  <div class="flex items-center gap-2" v-bind="$attrs">
     <USelectMenu
       :model-value="modelValue ?? undefined"
       @update:model-value="modelValue = ($event as string | undefined) ?? null"

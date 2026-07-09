@@ -13,7 +13,7 @@ export function useRecipeSteps(model: Ref<RecipeRequest>) {
 
   const isAdding = computed(() => editingIndex.value === null)
   const dialogTitle = computed(() =>
-    isAdding.value ? t('recipes.dialogs.addStep') : t('recipes.dialogs.editStep'),
+    isAdding.value ? t('recipes.actions.addStep') : t('recipes.actions.editStep'),
   )
 
   function resetFields() {

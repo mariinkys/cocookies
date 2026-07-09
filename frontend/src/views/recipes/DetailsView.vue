@@ -74,8 +74,7 @@ onMounted(fetchRecipe)
 </script>
 
 <template>
-  <div class="mx-auto max-w-5xl space-y-6 p-6">
-    <!-- Loading -->
+  <div class="mx-auto max-w-6xl space-y-6 p-6">
     <div v-if="fetchLoading" class="space-y-6">
       <USkeleton class="h-8 w-28" />
 
@@ -114,7 +113,6 @@ onMounted(fetchRecipe)
         @click="router.back()"
       />
 
-      <!-- Hero -->
       <UCard :ui="{ body: 'p-0' }" class="overflow-hidden">
         <div class="flex flex-col sm:flex-row">
           <div v-if="recipe.imageUrl" class="h-52 shrink-0 sm:h-auto sm:w-64">
@@ -239,7 +237,6 @@ onMounted(fetchRecipe)
       </UCard>
 
       <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
-        <!-- Steps -->
         <div class="lg:col-span-2">
           <UCard>
             <template #header>
@@ -277,7 +274,6 @@ onMounted(fetchRecipe)
         </div>
 
         <div class="space-y-4 lg:col-span-1">
-          <!-- Ingredients -->
           <UCard>
             <template #header>
               <h2 class="text-sm font-semibold uppercase tracking-wide text-muted">
@@ -318,7 +314,6 @@ onMounted(fetchRecipe)
             :servings="recipe.servings"
           />
 
-          <!-- Metadata -->
           <UCard>
             <template #header>
               <h2 class="text-sm font-semibold uppercase tracking-wide text-muted">

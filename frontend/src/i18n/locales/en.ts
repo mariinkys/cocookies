@@ -17,6 +17,7 @@ export default {
       signOut: 'Sign out',
       save: 'Save',
       remove: 'Remove',
+      clear: 'Clear',
     },
 
     feedback: {

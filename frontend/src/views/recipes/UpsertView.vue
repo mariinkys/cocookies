@@ -53,7 +53,7 @@ onMounted(fetchRecipe)
 </script>
 
 <template>
-  <div class="pb-6">
+  <div class="mx-auto max-w-7xl space-y-6 p-6">
     <div v-if="fetchLoading" class="flex items-center justify-center py-24">
       <UIcon name="i-lucide-loader-2" class="size-6 animate-spin text-dimmed" />
     </div>

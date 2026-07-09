@@ -80,7 +80,7 @@ function close() {
   >
     <template #body>
       <div class="space-y-4">
-        <UButtonGroup class="w-full">
+        <UFieldGroup class="w-full">
           <UButton
             :label="t('recipes.import.modes.file')"
             icon="i-lucide-file-up"
@@ -101,7 +101,7 @@ function close() {
             variant="outline"
             @click="selectUrlMode"
           />
-        </UButtonGroup>
+        </UFieldGroup>
 
         <div v-if="mode === 'file'" class="flex flex-col gap-1.5">
           <label class="text-sm font-medium text-muted">
