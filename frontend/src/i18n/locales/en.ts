@@ -241,6 +241,7 @@ export default {
       removeIngredient: 'Remove ingredient',
       downloadPdf: 'Download PDF',
       pdfError: 'Failed to generate PDF',
+      notAvailable: 'Not yet available',
     },
 
     sections: {

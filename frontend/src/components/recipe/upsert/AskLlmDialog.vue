@@ -26,14 +26,13 @@ const canSubmit = computed(() => {
   return mode.value === 'url' ? url.value.trim().length > 0 : file.value !== null
 })
 
-// URL import isn't wired up on the backend yet — keep the option visible so
-// people know it's coming, but bounce back to file mode with an explanation.
 function selectUrlMode() {
   toast.add({
     color: 'info',
     title: t('common.feedback.notAvailable'),
-    description: t('recipes.messages.notAvailable'),
+    description: t('recipes.actions.notAvailable'),
   })
+  reset()
 }
 
 async function submit() {
@@ -89,7 +88,7 @@ function close() {
             :variant="mode === 'file' ? 'solid' : 'outline'"
             @click="
               () => {
-                mode = 'url'
+                mode = 'file'
               }
             "
           />
