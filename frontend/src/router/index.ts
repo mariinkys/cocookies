@@ -8,12 +8,12 @@ const routes = [
     component: () => import('@/views/HomeView.vue'),
     meta: { requiresAuth: true },
   },
-  // {
-  //   path: '/sharedrecipes',
-  //   name: 'Shared Recipes',
-  //   component: () => import('@/views/recipes/SharedRecipes.vue'),
-  //   meta: { requiresAuth: true },
-  // },
+  {
+    path: '/sharedrecipes',
+    name: 'Shared Recipes',
+    component: () => import('@/views/recipes/SharedView.vue'),
+    meta: { requiresAuth: true },
+  },
   {
     path: '/login',
     name: 'Login',
