@@ -26,12 +26,12 @@ const routes = [
     component: () => import('@/views/auth/RegisterView.vue'),
     meta: { guestOnly: true },
   },
-  // {
-  //   path: '/users/:id/edit',
-  //   name: 'Update User',
-  //   component: () => import('@/views/users/UpdateView.vue'),
-  //   meta: { requiresAuth: true, requiresSelf: true },
-  // },
+  {
+    path: '/users/:id/edit',
+    name: 'Update User',
+    component: () => import('@/views/users/UpdateView.vue'),
+    meta: { requiresAuth: true, requiresSelf: true },
+  },
   {
     path: '/recipes/new',
     name: 'New Recipe',
