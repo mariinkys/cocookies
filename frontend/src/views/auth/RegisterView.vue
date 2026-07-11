@@ -12,6 +12,8 @@ const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
 const toast = useToast()
 const loading = ref(false)
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
 
 const schema = v.pipe(
   v.object({
@@ -77,81 +79,140 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <div class="flex h-full items-center justify-center px-6 transition-colors duration-200">
-    <UCard class="w-full max-w-md">
-      <div class="space-y-8 p-2">
-        <div class="text-center space-y-1">
-          <h1 class="text-xl font-semibold text-highlighted">
-            {{ t('auth.register.title') }}
-          </h1>
-          <p class="text-sm text-muted">
-            {{ t('auth.register.description') }}
-          </p>
+  <div
+    class="relative flex min-h-full items-center justify-center overflow-hidden px-6 py-12 transition-colors duration-200"
+  >
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div class="absolute -left-32 -top-32 size-96 rounded-full bg-primary/10 blur-3xl" />
+      <div class="absolute -bottom-40 -right-32 size-96 rounded-full bg-primary/5 blur-3xl" />
+    </div>
+
+    <UCard
+      class="relative w-full max-w-md shadow-lg ring-1 ring-default"
+      :ui="{ body: 'p-6 sm:p-8' }"
+    >
+      <div class="space-y-8">
+        <div class="flex flex-col items-center gap-4 text-center">
+          <div
+            class="flex size-14 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20"
+          >
+            <UIcon name="i-lucide-chef-hat" class="size-7 text-primary" />
+          </div>
+          <div class="space-y-1">
+            <h1 class="text-2xl font-semibold tracking-tight text-highlighted">
+              {{ t('auth.register.title') }}
+            </h1>
+            <p class="text-sm text-muted">
+              {{ t('auth.register.description') }}
+            </p>
+          </div>
         </div>
 
         <UForm :schema="schema" :state="model" class="space-y-5" @submit="onSubmit">
-          <UFormField :label="t('common.fields.name')" name="name" class="flex flex-col gap-1.5">
+          <UFormField :label="t('common.fields.name')" name="name">
             <UInput
               v-model="model.name"
+              size="lg"
+              icon="i-lucide-user"
               :placeholder="t('common.placeholders.enterYourName')"
               autocomplete="name"
               class="w-full"
             />
           </UFormField>
 
-          <UFormField :label="t('common.fields.email')" name="email" class="flex flex-col gap-1.5">
+          <UFormField :label="t('common.fields.email')" name="email">
             <UInput
               v-model="model.email"
               type="email"
+              size="lg"
+              icon="i-lucide-mail"
               :placeholder="t('common.placeholders.enterYourEmail')"
               autocomplete="email"
               class="w-full"
             />
           </UFormField>
 
-          <UFormField
-            :label="t('common.fields.password')"
-            name="password"
-            class="flex flex-col gap-1.5"
-          >
+          <UFormField :label="t('common.fields.password')" name="password">
             <UInput
               v-model="model.password"
-              type="password"
+              :type="showPassword ? 'text' : 'password'"
+              size="lg"
+              icon="i-lucide-lock"
               :placeholder="t('common.placeholders.enterPassword')"
               autocomplete="new-password"
               class="w-full"
-            />
+              :ui="{ trailing: 'pe-1' }"
+            >
+              <template #trailing>
+                <UButton
+                  color="neutral"
+                  variant="link"
+                  size="sm"
+                  :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                  :aria-label="showConfirmPassword ? 'Hide Password' : 'Show Password'"
+                  :aria-pressed="showPassword"
+                  @click="
+                    () => {
+                      showPassword = !showPassword
+                    }
+                  "
+                />
+              </template>
+            </UInput>
           </UFormField>
 
-          <UFormField
-            :label="t('common.fields.confirmPassword')"
-            name="confirmPassword"
-            class="flex flex-col gap-1.5"
-          >
+          <UFormField :label="t('common.fields.confirmPassword')" name="confirmPassword">
             <UInput
               v-model="model.confirmPassword"
-              type="password"
+              :type="showConfirmPassword ? 'text' : 'password'"
+              size="lg"
+              icon="i-lucide-lock-keyhole"
               :placeholder="t('common.placeholders.confirmPassword')"
               autocomplete="new-password"
               class="w-full"
-            />
+              :ui="{ trailing: 'pe-1' }"
+            >
+              <template #trailing>
+                <UButton
+                  color="neutral"
+                  variant="link"
+                  size="sm"
+                  :icon="showConfirmPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                  :aria-label="showConfirmPassword ? 'Hide Password' : 'Show Password'"
+                  :aria-pressed="showConfirmPassword"
+                  @click="
+                    () => {
+                      showConfirmPassword = !showConfirmPassword
+                    }
+                  "
+                />
+              </template>
+            </UInput>
           </UFormField>
 
           <UButton
             type="submit"
+            size="lg"
             :label="t('auth.register.submit')"
             :loading="loading"
             trailing-icon="i-lucide-user-plus"
-            class="w-full justify-center"
+            class="justify-center"
             block
           />
-
-          <p class="text-center text-sm text-muted">
-            <RouterLink to="/login" class="font-medium text-primary hover:underline">
-              {{ t('navigation.items.alreadyHaveAccount') }}
-            </RouterLink>
-          </p>
         </UForm>
+
+        <div class="space-y-4">
+          <USeparator />
+          <UButton
+            to="/login"
+            :label="t('navigation.items.alreadyHaveAccount')"
+            icon="i-lucide-log-in"
+            color="neutral"
+            variant="outline"
+            class="justify-center"
+            block
+          />
+        </div>
       </div>
     </UCard>
   </div>

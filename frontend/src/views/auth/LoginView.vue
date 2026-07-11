@@ -13,7 +13,9 @@ const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
 const toast = useToast()
+
 const loading = ref(false)
+const showPassword = ref(false)
 
 const schema = v.object({
   email: v.pipe(
@@ -51,59 +53,113 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <div class="flex h-full items-center justify-center px-6 transition-colors duration-200">
-    <UCard class="w-full max-w-md">
-      <div class="space-y-8 p-2">
-        <div class="text-center space-y-1">
-          <h1 class="text-xl font-semibold text-highlighted">
-            {{ t('auth.login.title') }}
-          </h1>
-          <p class="text-sm text-muted">
-            {{ t('auth.login.description') }}
-          </p>
+  <div class="relative flex h-full items-center justify-center overflow-hidden px-6 py-12">
+    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      <div
+        class="absolute left-1/2 top-0 size-144 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl"
+      />
+    </div>
+
+    <div class="w-full max-w-md">
+      <div class="overflow-hidden rounded-xl border border-default bg-default shadow-sm">
+        <div
+          class="relative flex h-28 items-center justify-center overflow-hidden border-b border-default bg-elevated"
+        >
+          <div
+            class="absolute inset-0 flex items-center justify-around text-dimmed/40"
+            aria-hidden="true"
+          >
+            <UIcon name="i-lucide-carrot" class="size-6 -rotate-12" />
+            <UIcon name="i-lucide-cooking-pot" class="size-7 rotate-6" />
+            <UIcon name="i-lucide-utensils" class="size-6 -rotate-6" />
+            <UIcon name="i-lucide-croissant" class="size-7 rotate-12" />
+          </div>
+
+          <div
+            class="relative flex size-14 items-center justify-center rounded-full bg-default shadow-sm ring-1 ring-default"
+          >
+            <UIcon name="i-lucide-chef-hat" class="size-7 text-primary" />
+          </div>
         </div>
 
-        <UForm :schema="schema" :state="model" class="space-y-5" @submit="onSubmit">
-          <UFormField :label="t('common.fields.email')" name="email" class="flex flex-col gap-1.5">
-            <UInput
-              v-model="model.email"
-              type="email"
-              :placeholder="t('common.placeholders.enterYourEmail')"
-              autocomplete="email"
-              class="w-full"
-            />
-          </UFormField>
+        <div class="space-y-6 p-6 sm:p-8">
+          <div class="space-y-1 text-center">
+            <h1 class="text-xl font-semibold tracking-tight text-highlighted">
+              {{ t('auth.login.title') }}
+            </h1>
+            <p class="text-sm text-muted">
+              {{ t('auth.login.description') }}
+            </p>
+          </div>
 
-          <UFormField
-            :label="t('common.fields.password')"
-            name="password"
-            class="flex flex-col gap-1.5"
-          >
-            <UInput
-              v-model="model.password"
-              type="password"
-              :placeholder="t('common.placeholders.enterPassword')"
-              autocomplete="current-password"
-              class="w-full"
+          <UForm :schema="schema" :state="model" class="space-y-5" @submit="onSubmit">
+            <UFormField :label="t('common.fields.email')" name="email">
+              <UInput
+                v-model="model.email"
+                type="email"
+                icon="i-lucide-mail"
+                :placeholder="t('common.placeholders.enterYourEmail')"
+                autocomplete="email"
+                size="lg"
+                class="w-full"
+              />
+            </UFormField>
+
+            <UFormField :label="t('common.fields.password')" name="password">
+              <UInput
+                v-model="model.password"
+                :type="showPassword ? 'text' : 'password'"
+                icon="i-lucide-lock"
+                :placeholder="t('common.placeholders.enterPassword')"
+                autocomplete="current-password"
+                size="lg"
+                class="w-full"
+                :ui="{ trailing: 'pe-1' }"
+              >
+                <template #trailing>
+                  <UButton
+                    color="neutral"
+                    variant="link"
+                    size="sm"
+                    :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                    :aria-label="showPassword ? 'Hide Password' : 'Show Password'"
+                    :aria-pressed="showPassword"
+                    @click="
+                      () => {
+                        showPassword = !showPassword
+                      }
+                    "
+                  />
+                </template>
+              </UInput>
+            </UFormField>
+
+            <UButton
+              type="submit"
+              :label="t('auth.login.submit')"
+              :loading="loading"
+              trailing-icon="i-lucide-log-in"
+              size="lg"
+              block
             />
-          </UFormField>
+          </UForm>
+
+          <USeparator :label="t('auth.login.noAccount')" :ui="{ label: 'text-dimmed text-xs' }" />
 
           <UButton
-            type="submit"
-            :label="t('auth.login.submit')"
-            :loading="loading"
-            trailing-icon="i-lucide-log-in"
-            class="w-full justify-center"
+            :label="t('navigation.items.newAccount')"
+            icon="i-lucide-user-plus"
+            color="neutral"
+            variant="outline"
             block
+            @click="
+              () => {
+                router.push('/register')
+              }
+            "
           />
-
-          <p class="text-center text-sm text-muted">
-            <RouterLink to="/register" class="font-medium text-primary hover:underline">
-              {{ t('navigation.items.newAccount') }}
-            </RouterLink>
-          </p>
-        </UForm>
+        </div>
       </div>
-    </UCard>
+    </div>
   </div>
 </template>
