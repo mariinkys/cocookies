@@ -1,37 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import Button from 'primevue/button'
 import VersionChip from '@/components/VersionChip.vue'
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
+import ColorSwitcher from './ColorSwitcher.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
 
-const STORAGE_KEY = 'socios-peix-theme'
-const isDark = ref(false)
-const menuOpen = ref(false)
-
-const applyTheme = (dark: boolean) => {
-  isDark.value = dark
-  document.documentElement.classList.toggle('my-app-dark', dark)
-  localStorage.setItem(STORAGE_KEY, dark ? 'dark' : 'light')
-}
-
-onMounted(() => {
-  const saved = localStorage.getItem(STORAGE_KEY)
-  if (saved) {
-    applyTheme(saved === 'dark')
-  } else {
-    applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches)
-  }
-})
-
-const toggleTheme = () => applyTheme(!isDark.value)
+const mobileOpen = ref(false)
 
 const logout = async () => {
   await auth.logout()
@@ -39,16 +20,21 @@ const logout = async () => {
 }
 
 const isActive = (path: string) => route.path === path
+
+const navLinks = computed(() => [
+  {
+    label: t('navigation.items.sharedRecipes'),
+    to: '/sharedrecipes',
+  },
+])
 </script>
 
 <template>
   <header
-    class="sticky top-0 z-50 border-b border-surface-200 dark:border-surface-700 bg-white/80 dark:bg-surface-900/80 backdrop-blur-sm transition-colors duration-200"
+    class="sticky top-0 z-50 border-b border-default bg-(--ui-bg)/80 backdrop-blur-sm transition-colors duration-200"
   >
     <div class="flex items-center justify-between px-6 h-14">
-      <!-- Left Side -->
       <div class="flex items-center gap-4">
-        <!-- Logo -->
         <RouterLink to="/" class="flex items-center gap-2 shrink-0 select-none">
           <img
             src="@/assets/icon.png"
@@ -57,88 +43,73 @@ const isActive = (path: string) => route.path === path
             width="28"
             height="28"
           />
-          <span class="text-sm font-semibold text-surface-900 dark:text-surface-0 tracking-tight">
-            Cocookies
-          </span>
+          <span class="text-sm font-semibold text-highlighted tracking-tight"> Cocookies </span>
         </RouterLink>
 
-        <!-- Divider, desktop only -->
-        <div
-          v-if="auth.isAuthenticated"
-          class="hidden md:block w-px h-5 bg-surface-200 dark:bg-surface-700"
-        ></div>
+        <template v-if="auth.isAuthenticated">
+          <div class="hidden md:block w-px h-5 bg-border" />
 
-        <!-- Nav links, desktop only -->
-        <nav v-if="auth.isAuthenticated" class="hidden md:flex items-center gap-1">
-          <RouterLink
-            to="/sharedrecipes"
-            :class="[
-              'px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-150',
-              isActive('/sharedrecipes')
-                ? 'bg-surface-100 dark:bg-surface-800 text-surface-900 dark:text-surface-0'
-                : 'text-surface-500 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-0 hover:bg-surface-50 dark:hover:bg-surface-800',
-            ]"
-          >
-            {{ t('navigation.items.sharedRecipes') }}
-          </RouterLink>
-        </nav>
+          <nav class="hidden md:flex items-center gap-1">
+            <RouterLink
+              v-for="link in navLinks"
+              :key="link.to"
+              :to="link.to"
+              :class="[
+                'px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-150',
+                isActive(link.to)
+                  ? 'bg-elevated text-highlighted'
+                  : 'text-muted hover:text-default hover:bg-elevated',
+              ]"
+            >
+              {{ link.label }}
+            </RouterLink>
+          </nav>
+        </template>
 
-        <div v-if="!auth.isAuthenticated">
-          <VersionChip />
-        </div>
+        <VersionChip v-if="!auth.isAuthenticated" />
       </div>
 
-      <!-- Right Side -->
       <div class="flex items-center gap-1">
-        <!-- User email, desktop only -->
-        <span
+        <RouterLink
           v-if="auth.isAuthenticated"
-          class="hidden md:inline text-xs text-surface-400 dark:text-surface-500 mr-2 max-w-[180px] truncate"
+          :to="`/users/${auth.user?.id}/edit`"
+          class="hidden md:inline text-xs text-muted mr-2 max-w-45 truncate hover:text-default transition-colors"
         >
-          <RouterLink :to="`/users/${auth.user?.id}/edit`">
-            {{ auth.user?.email }}
-          </RouterLink>
-        </span>
+          {{ auth.user?.email }}
+        </RouterLink>
 
-        <!-- Logout, desktop only -->
-        <div class="hidden md:flex items-center" v-if="auth.isAuthenticated">
-          <Button
-            v-tooltip.bottom="t('common.actions.signOut')"
-            icon="pi pi-sign-out"
-            severity="secondary"
-            text
-            rounded
-            size="small"
-            @click="logout"
-          />
-        </div>
-
-        <Button
-          :icon="isDark ? 'pi pi-sun' : 'pi pi-moon'"
-          :aria-label="
-            isDark ? t('common.theme.switchToLightMode') : t('common.theme.switchToDarkMode')
-          "
-          severity="secondary"
-          text
-          rounded
-          size="small"
-          @click="toggleTheme"
+        <UButton
+          v-if="auth.isAuthenticated"
+          class="hidden md:flex"
+          :aria-label="t('common.actions.signOut')"
+          icon="i-lucide-log-out"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          square
+          @click="logout"
         />
+
+        <ColorSwitcher />
 
         <LanguageSwitcher />
 
-        <!-- Hamburger, mobile only -->
-        <div class="md:hidden" v-if="auth.isAuthenticated">
-          <Button
-            :icon="menuOpen ? 'pi pi-times' : 'pi pi-bars'"
-            severity="secondary"
-            text
-            rounded
-            size="small"
-            :aria-label="t('common.theme.toggleMenu')"
-            @click="menuOpen = !menuOpen"
-          />
-        </div>
+        <!-- Hamburger (mobile) -->
+        <UButton
+          v-if="auth.isAuthenticated"
+          class="md:hidden"
+          :icon="mobileOpen ? 'i-lucide-x' : 'i-lucide-menu'"
+          :aria-label="t('common.theme.toggleMenu')"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          square
+          @click="
+            () => {
+              mobileOpen = !mobileOpen
+            }
+          "
+        />
       </div>
     </div>
 
@@ -152,35 +123,40 @@ const isActive = (path: string) => route.path === path
       leave-to-class="opacity-0 -translate-y-1"
     >
       <div
-        v-if="menuOpen && auth.isAuthenticated"
-        class="md:hidden border-t border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900 px-4 py-3 space-y-1"
+        v-if="mobileOpen && auth.isAuthenticated"
+        class="md:hidden border-t border-default bg-default px-4 py-3 space-y-1"
       >
         <RouterLink
-          to="/sharedrecipes"
+          v-for="link in navLinks"
+          :key="link.to"
+          :to="link.to"
           :class="[
-            'flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150',
-            isActive('/sharedrecipes')
-              ? 'bg-surface-100 dark:bg-surface-800 text-surface-900 dark:text-surface-0'
-              : 'text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800',
+            'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150',
+            isActive(link.to)
+              ? 'bg-elevated text-highlighted'
+              : 'text-muted hover:bg-elevated hover:text-default',
           ]"
-          @click="menuOpen = false"
+          @click="mobileOpen = false"
         >
-          <i class="pi pi-users mr-2 text-xs"></i>
-          {{ t('navigation.items.sharedRecipes') }}
+          <UIcon name="i-lucide-users" class="w-3.5 h-3.5" />
+          {{ link.label }}
         </RouterLink>
 
-        <div
-          class="pt-2 mt-2 border-t border-surface-100 dark:border-surface-800 flex items-center justify-between"
-        >
-          <span class="text-xs text-surface-400 dark:text-surface-500 truncate max-w-[200px]">
+        <div class="pt-2 mt-2 border-t border-muted flex items-center justify-between">
+          <RouterLink
+            :to="`/users/${auth.user?.id}/edit`"
+            class="text-xs text-muted truncate max-w-50 hover:text-default transition-colors"
+            @click="mobileOpen = false"
+          >
             {{ auth.user?.email }}
-          </span>
-          <Button
+          </RouterLink>
+
+          <UButton
             :label="t('common.actions.signOut')"
-            icon="pi pi-sign-out"
-            severity="secondary"
-            text
-            size="small"
+            icon="i-lucide-log-out"
+            color="neutral"
+            variant="ghost"
+            size="sm"
             @click="logout"
           />
         </div>

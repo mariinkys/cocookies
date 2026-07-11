@@ -1,15 +1,10 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
-import Button from 'primevue/button'
-import Message from 'primevue/message'
 
 const { t } = useI18n({ useScope: 'global' })
 
 defineProps<{
-  visible: boolean
+  open: boolean
   title: string
   isAdding: boolean
   name: string
@@ -20,7 +15,7 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'update:visible': [value: boolean]
+  'update:open': [value: boolean]
   'update:name': [value: string]
   'update:quantity': [value: number | null]
   'update:unit': [value: string | null]
@@ -32,96 +27,83 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <Dialog
-    :visible="visible"
-    @update:visible="emit('update:visible', $event)"
-    :header="title"
-    :style="{ width: '95vw', maxWidth: '520px' }"
-    :modal="true"
-    :closable="true"
-    :draggable="false"
+  <UModal
+    :open="open"
+    @update:open="emit('update:open', $event)"
+    :title="title"
+    :ui="{ footer: 'justify-between' }"
+    @close="emit('close')"
   >
-    <div class="space-y-4 pt-1">
-      <div class="flex flex-col gap-1.5">
-        <label class="text-sm font-medium text-surface-700 dark:text-surface-300">
-          {{ t('recipes.fields.ingredients.name') }}
-          <span class="text-red-500">*</span>
-        </label>
-        <InputText
-          :modelValue="name"
-          @update:modelValue="emit('update:name', $event as string)"
-          :placeholder="t('recipes.fields.ingredients.namePlaceholder')"
-          :invalid="!!error"
-          fluid
-          autofocus
-        />
-        <Message v-if="error" severity="error" size="small" variant="simple">{{ error }}</Message>
-      </div>
+    <template #body>
+      <div class="space-y-4">
+        <UFormField :label="t('recipes.fields.ingredients.name')" required>
+          <UInput
+            :model-value="name"
+            @update:model-value="emit('update:name', $event as string)"
+            :placeholder="t('recipes.fields.ingredients.namePlaceholder')"
+            :color="error ? 'error' : undefined"
+            :highlight="!!error"
+            :maxlength="150"
+            class="w-full"
+            autofocus
+          />
+          <p v-if="error" class="mt-1.5 text-sm text-error">{{ error }}</p>
+        </UFormField>
 
-      <div class="grid grid-cols-2 gap-3">
-        <div class="flex flex-col gap-1.5">
-          <label class="text-sm font-medium text-surface-700 dark:text-surface-300">
-            {{ t('recipes.fields.ingredients.quantity') }}
-          </label>
-          <InputNumber
-            :modelValue="quantity"
-            @update:modelValue="emit('update:quantity', $event)"
-            :placeholder="t('recipes.fields.ingredients.quantityPlaceholder')"
-            :min="0"
-            :max-fraction-digits="3"
-            fluid
-          />
+        <div class="grid grid-cols-2 gap-3">
+          <UFormField :label="t('recipes.fields.ingredients.quantity')">
+            <UInputNumber
+              :model-value="quantity ?? undefined"
+              @update:model-value="emit('update:quantity', $event ?? null)"
+              :placeholder="t('recipes.fields.ingredients.quantityPlaceholder')"
+              :min="0"
+              :step="0.1"
+              class="w-full"
+            />
+          </UFormField>
+          <UFormField :label="t('recipes.fields.ingredients.unit')">
+            <UInput
+              :model-value="unit ?? ''"
+              @update:model-value="emit('update:unit', ($event as string) || null)"
+              :placeholder="t('recipes.fields.ingredients.unitPlaceholder')"
+              :maxlength="50"
+              class="w-full"
+            />
+          </UFormField>
         </div>
-        <div class="flex flex-col gap-1.5">
-          <label class="text-sm font-medium text-surface-700 dark:text-surface-300">
-            {{ t('recipes.fields.ingredients.unit') }}
-          </label>
-          <InputText
-            :modelValue="unit ?? ''"
-            @update:modelValue="emit('update:unit', $event || null)"
-            :placeholder="t('recipes.fields.ingredients.unitPlaceholder')"
-            fluid
-          />
-        </div>
-      </div>
 
-      <div class="flex flex-col gap-1.5">
-        <label class="text-sm font-medium text-surface-700 dark:text-surface-300">
-          {{ t('recipes.fields.ingredients.notes') }}
-        </label>
-        <InputText
-          :modelValue="notes ?? ''"
-          @update:modelValue="emit('update:notes', $event || null)"
-          :placeholder="t('recipes.fields.ingredients.notesPlaceholder')"
-          fluid
-        />
-      </div>
-    </div>
-
-    <template #footer>
-      <div class="flex justify-between items-center w-full">
-        <Button
-          :label="t('common.actions.close')"
-          severity="secondary"
-          text
-          @click="emit('close')"
-        />
-        <div class="flex gap-2">
-          <Button
-            v-if="isAdding"
-            :label="t('recipes.actions.saveAndClose')"
-            severity="secondary"
-            outlined
-            @click="emit('saveAndClose')"
+        <UFormField :label="t('recipes.fields.ingredients.notes')">
+          <UInput
+            :model-value="notes ?? ''"
+            @update:model-value="emit('update:notes', ($event as string) || null)"
+            :placeholder="t('recipes.fields.ingredients.notesPlaceholder')"
+            class="w-full"
           />
-          <Button
-            :label="isAdding ? t('recipes.actions.saveAndAddAnother') : t('common.actions.save')"
-            :icon="isAdding ? 'pi pi-plus' : 'pi pi-check'"
-            icon-pos="right"
-            @click="emit('save')"
-          />
-        </div>
+        </UFormField>
       </div>
     </template>
-  </Dialog>
+
+    <template #footer>
+      <UButton
+        :label="t('common.actions.close')"
+        color="neutral"
+        variant="ghost"
+        @click="emit('close')"
+      />
+      <div class="flex gap-2">
+        <UButton
+          v-if="isAdding"
+          :label="t('recipes.actions.saveAndClose')"
+          color="neutral"
+          variant="outline"
+          @click="emit('saveAndClose')"
+        />
+        <UButton
+          :label="isAdding ? t('recipes.actions.saveAndAddAnother') : t('common.actions.save')"
+          :trailing-icon="isAdding ? 'i-lucide-plus' : 'i-lucide-check'"
+          @click="emit('save')"
+        />
+      </div>
+    </template>
+  </UModal>
 </template>

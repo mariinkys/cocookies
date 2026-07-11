@@ -11,7 +11,7 @@ const routes = [
   {
     path: '/sharedrecipes',
     name: 'Shared Recipes',
-    component: () => import('@/views/recipes/SharedRecipes.vue'),
+    component: () => import('@/views/recipes/SharedView.vue'),
     meta: { requiresAuth: true },
   },
   {

@@ -3,15 +3,13 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { recipesService } from '@/services/recipes.service'
+import { useAuthStore } from '@/stores/auth'
 import type { RecipeResponse } from '@/types/recipe.types'
 
 const { t } = useI18n({ useScope: 'global' })
 const toast = useToast()
 const router = useRouter()
-
-function goTo(path: string) {
-  router.push(path)
-}
+const auth = useAuthStore()
 
 const recipes = ref<RecipeResponse[]>([])
 const loading = ref(false)
@@ -46,7 +44,7 @@ const uiPage = computed({
 async function fetchRecipes() {
   loading.value = true
   try {
-    const result = await recipesService.getAll({
+    const result = await recipesService.getAllShared({
       page: page.value,
       size: pageSize.value,
       sortBy: sortBy.value,
@@ -79,6 +77,10 @@ watch(selectedSort, () => {
   page.value = 0
   fetchRecipes()
 })
+
+function isOwnRecipe(recipe: RecipeResponse): boolean {
+  return recipe.userId === auth.user?.id
+}
 
 const deleteTarget = ref<RecipeResponse | null>(null)
 const isDeleteModalOpen = ref(false)
@@ -128,7 +130,7 @@ onMounted(fetchRecipes)
     >
       <div>
         <h1 class="text-2xl font-semibold tracking-tight text-highlighted">
-          {{ t('recipes.titles.list') }}
+          {{ t('recipes.titles.shared') }}
         </h1>
         <p class="mt-1 text-sm text-muted">
           {{ t('recipes.list.count', totalRecords) }}
@@ -143,12 +145,6 @@ onMounted(fetchRecipes)
           class="w-full sm:w-64"
         />
         <USelect v-model="selectedSort" :items="sortOptions" class="w-full sm:w-48" />
-        <UButton
-          :label="t('recipes.actions.createNew')"
-          icon="i-lucide-plus"
-          class="justify-center"
-          @click="goTo('/recipes/new')"
-        />
       </div>
     </div>
 
@@ -183,7 +179,7 @@ onMounted(fetchRecipes)
           v-for="recipe in recipes"
           :key="recipe.id"
           class="group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-default bg-default transition-all duration-200 hover:-translate-y-0.5 hover:border-accented hover:shadow-lg"
-          @click="goTo(`/recipes/${recipe.id}/view`)"
+          @click="router.push(`/recipes/${recipe.id}/view`)"
         >
           <div class="relative h-44 shrink-0 overflow-hidden bg-elevated">
             <img
@@ -209,6 +205,7 @@ onMounted(fetchRecipes)
             </UBadge>
 
             <div
+              v-if="isOwnRecipe(recipe)"
               class="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
               @click.stop
             >
@@ -218,7 +215,11 @@ onMounted(fetchRecipes)
                 variant="solid"
                 size="sm"
                 :aria-label="t('recipes.actions.edit')"
-                @click="goTo(`/recipes/${recipe.id}/edit`)"
+                @click="
+                  () => {
+                    router.push(`/recipes/${recipe.id}/edit`)
+                  }
+                "
               />
               <UButton
                 icon="i-lucide-trash-2"
@@ -274,14 +275,18 @@ onMounted(fetchRecipes)
         class="flex flex-col items-center justify-center gap-4 py-24 text-center text-muted"
       >
         <div class="flex size-16 items-center justify-center rounded-full bg-elevated">
-          <UIcon name="i-lucide-chef-hat" class="size-7 text-dimmed" />
+          <UIcon name="i-lucide-book-open" class="size-7 text-dimmed" />
         </div>
         <p class="text-sm">{{ t('recipes.list.empty') }}</p>
         <UButton
           :label="t('recipes.actions.createFirst')"
           icon="i-lucide-plus"
           variant="outline"
-          @click="goTo('/recipes/new')"
+          @click="
+            () => {
+              router.push('/recipes/new')
+            }
+          "
         />
       </div>
     </div>

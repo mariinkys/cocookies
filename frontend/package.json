@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,15 +15,12 @@
     "format": "oxfmt src/"
   },
   "dependencies": {
-    "@primeuix/themes": "^2.0.3",
-    "@primevue/forms": "^4.5.5",
+    "@nuxt/ui": "^4.9.0",
     "@tailwindcss/vite": "^4.3.0",
     "axios": "^1.16.1",
     "pinia": "^3.0.4",
-    "primeicons": "^7.0.0",
-    "primevue": "^4.5.5",
     "tailwindcss": "^4.3.0",
-    "tailwindcss-primeui": "^0.6.1",
+    "valibot": "^1.4.1",
     "vue": "^3.5.32",
     "vue-i18n": "^11.4.4",
     "vue-router": "^5.0.4"
@@ -31,19 +28,19 @@
   "devDependencies": {
     "@intlify/eslint-plugin-vue-i18n": "^4.5.0",
     "@tsconfig/node24": "^24.0.4",
-    "@types/node": "^24.12.2",
+    "@types/node": "^26.0.1",
     "@vitejs/plugin-vue": "^6.0.6",
     "@vue/eslint-config-typescript": "^14.7.0",
     "@vue/tsconfig": "^0.9.1",
     "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-oxlint": "~1.60.0",
-    "eslint-plugin-vue": "~10.8.0",
+    "eslint-plugin-oxlint": "~1.73.0",
+    "eslint-plugin-vue": "~10.9.2",
     "jiti": "^2.6.1",
-    "npm-run-all2": "^8.0.4",
-    "oxfmt": "^0.45.0",
-    "oxlint": "~1.60.0",
-    "typescript": "~6.0.0",
+    "npm-run-all2": "^9.0.2",
+    "oxfmt": "^0.58.0",
+    "oxlint": "~1.73.0",
+    "typescript": "~7.0.2",
     "vite": "^8.0.8",
     "vite-plugin-vue-devtools": "^8.1.1",
     "vue-tsc": "^3.2.6"

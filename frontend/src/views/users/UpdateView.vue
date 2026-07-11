@@ -1,14 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Form, FormField } from '@primevue/forms'
 import { useI18n } from 'vue-i18n'
-import type { FormResolverOptions, FormSubmitEvent } from '@primevue/forms'
-import Card from 'primevue/card'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
-import Message from 'primevue/message'
-import { useToast } from 'primevue/usetoast'
+import * as v from 'valibot'
+import type { FormSubmitEvent } from '@nuxt/ui'
 import { usersService } from '@/services/users.service'
 import type { UserUpdatePayload, UpdatePasswordPayload } from '@/types/user.types'
 
@@ -18,52 +13,46 @@ const route = useRoute()
 const toast = useToast()
 
 const userId = route.params.id as string
+
 const loading = ref(false)
 const fetchLoading = ref(true)
 const passwordLoading = ref(false)
+const passwordError = ref('')
 
-const model = ref({
-  name: '',
-  email: '',
+const model = ref({ name: '', email: '' })
+
+const profileSchema = v.object({
+  name: v.pipe(
+    v.string(),
+    v.trim(),
+    v.minLength(1, t('users.fields.name.required')),
+    v.maxLength(100, t('users.fields.name.max')),
+  ),
+  email: v.pipe(
+    v.string(),
+    v.trim(),
+    v.minLength(1, t('users.fields.email.required')),
+    v.email(t('users.fields.email.invalid')),
+  ),
 })
+type ProfileSchema = v.InferOutput<typeof profileSchema>
 
-const resolver = ({ values }: FormResolverOptions) => {
-  const errors: Record<string, { message: string }[]> = {}
-
-  if (!values.name) {
-    errors.name = [{ message: t('users.fields.name.required') }]
-  } else if (String(values.name).length > 100) {
-    errors.name = [{ message: t('users.fields.name.max') }]
-  }
-
-  if (!values.email) {
-    errors.email = [{ message: t('users.fields.email.required') }]
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(values.email))) {
-    errors.email = [{ message: t('users.fields.email.invalid') }]
-  }
-
-  return { errors }
-}
-
-async function onSubmit({ valid }: FormSubmitEvent) {
-  if (!valid) return
+async function onSubmit(event: FormSubmitEvent<ProfileSchema>) {
   loading.value = true
   try {
-    const payload: UserUpdatePayload = { name: model.value.name, email: model.value.email }
+    const payload: UserUpdatePayload = { name: event.data.name, email: event.data.email }
     await usersService.update(userId, payload)
     toast.add({
-      severity: 'success',
-      summary: t('common.feedback.saved'),
-      detail: t('users.messages.updated'),
-      life: 3000,
+      color: 'success',
+      title: t('common.feedback.saved'),
+      description: t('users.messages.updated'),
     })
     router.push('/')
   } catch {
     toast.add({
-      severity: 'error',
-      summary: t('common.feedback.error'),
-      detail: t('users.messages.updateError'),
-      life: 3000,
+      color: 'error',
+      title: t('common.feedback.error'),
+      description: t('users.messages.updateError'),
     })
   } finally {
     loading.value = false
@@ -75,45 +64,43 @@ const passwordModel = ref({
   newPassword: '',
   confirmPassword: '',
 })
-const passwordError = ref('')
 
-const passwordResolver = ({ values }: FormResolverOptions) => {
-  const errors: Record<string, { message: string }[]> = {}
+const passwordSchema = v.pipe(
+  v.object({
+    currentPassword: v.pipe(
+      v.string(),
+      v.minLength(1, t('users.passwordCard.fields.currentPassword.required')),
+    ),
+    newPassword: v.pipe(v.string(), v.minLength(8, t('users.passwordCard.fields.newPassword.min'))),
+    confirmPassword: v.pipe(
+      v.string(),
+      v.minLength(1, t('users.passwordCard.fields.confirmPassword.required')),
+    ),
+  }),
+  v.forward(
+    v.partialCheck(
+      [['newPassword'], ['confirmPassword']],
+      (input) => input.newPassword === input.confirmPassword,
+      t('users.passwordCard.fields.confirmPassword.mismatch'),
+    ),
+    ['confirmPassword'],
+  ),
+)
+type PasswordSchema = v.InferOutput<typeof passwordSchema>
 
-  if (!values.currentPassword) {
-    errors.currentPassword = [{ message: t('users.passwordCard.fields.currentPassword.required') }]
-  }
-
-  if (!values.newPassword) {
-    errors.newPassword = [{ message: t('users.passwordCard.fields.newPassword.required') }]
-  } else if (String(values.newPassword).length < 8) {
-    errors.newPassword = [{ message: t('users.passwordCard.fields.newPassword.min') }]
-  }
-
-  if (!values.confirmPassword) {
-    errors.confirmPassword = [{ message: t('users.passwordCard.fields.confirmPassword.required') }]
-  } else if (values.newPassword !== values.confirmPassword) {
-    errors.confirmPassword = [{ message: t('users.passwordCard.fields.confirmPassword.mismatch') }]
-  }
-
-  return { errors }
-}
-
-async function onPasswordSubmit({ valid }: FormSubmitEvent) {
-  if (!valid) return
+async function onPasswordSubmit(event: FormSubmitEvent<PasswordSchema>) {
   passwordLoading.value = true
   passwordError.value = ''
   try {
     const payload: UpdatePasswordPayload = {
-      currentPassword: passwordModel.value.currentPassword,
-      newPassword: passwordModel.value.newPassword,
+      currentPassword: event.data.currentPassword,
+      newPassword: event.data.newPassword,
     }
     await usersService.updatePassword(userId, payload)
     toast.add({
-      severity: 'success',
-      summary: t('users.passwordCard.successTitle'),
-      detail: t('users.passwordCard.successDetail'),
-      life: 3000,
+      color: 'success',
+      title: t('users.passwordCard.successTitle'),
+      description: t('users.passwordCard.successDetail'),
     })
     passwordModel.value = { currentPassword: '', newPassword: '', confirmPassword: '' }
   } catch {
@@ -129,10 +116,9 @@ onMounted(async () => {
     model.value = { name: user.name, email: user.email }
   } catch {
     toast.add({
-      severity: 'error',
-      summary: t('common.feedback.error'),
-      detail: t('users.messages.loadError'),
-      life: 3000,
+      color: 'error',
+      title: t('common.feedback.error'),
+      description: t('users.messages.loadError'),
     })
     router.push('/')
   } finally {
@@ -142,182 +128,141 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="p-6 max-w-2xl mx-auto space-y-6">
-    <div class="flex items-center justify-between gap-3 flex-wrap">
-      <div class="flex items-center gap-3">
-        <Button
-          icon="pi pi-arrow-left"
-          severity="secondary"
-          text
-          rounded
-          :aria-label="t('common.actions.back')"
-          @click="router.push('/')"
-        />
-        <div>
-          <h1 class="text-xl font-semibold text-surface-900 dark:text-surface-0">
-            {{ t('users.titles.edit') }}
-          </h1>
-          <p class="text-sm text-surface-500 dark:text-surface-400 mt-0.5">
-            {{ t('users.descriptions.edit') }}
-          </p>
-        </div>
+  <div class="mx-auto max-w-2xl space-y-6 p-6">
+    <div class="flex items-center gap-3">
+      <UButton
+        icon="i-lucide-arrow-left"
+        color="neutral"
+        variant="ghost"
+        :aria-label="t('common.actions.back')"
+        @click="
+          () => {
+            router.push('/')
+          }
+        "
+      />
+      <div>
+        <h1 class="text-xl font-semibold text-highlighted">{{ t('users.titles.edit') }}</h1>
+        <p class="mt-0.5 text-sm text-muted">{{ t('users.descriptions.edit') }}</p>
       </div>
     </div>
 
     <div v-if="fetchLoading" class="flex items-center justify-center py-24">
-      <i class="pi pi-spinner pi-spin text-2xl text-surface-400"></i>
+      <UIcon name="i-lucide-loader-2" class="size-6 animate-spin text-dimmed" />
     </div>
 
     <template v-else>
-      <Card class="border border-surface-200 dark:border-surface-700 shadow-sm">
-        <template #content>
-          <Form
-            v-slot="$form"
-            :initialValues="model"
-            :resolver
-            :validateOnBlur="true"
-            :validateOnValueUpdate="true"
-            class="p-2 space-y-6"
-            @submit="onSubmit"
+      <UCard>
+        <UForm :schema="profileSchema" :state="model" class="space-y-6" @submit="onSubmit">
+          <UFormField :label="t('users.fields.name.label')" name="name" required>
+            <UInput
+              :model-value="model.name"
+              @update:model-value="model.name = ($event as string) ?? ''"
+              :placeholder="t('users.fields.name.placeholder')"
+              :maxlength="100"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField label="Email" name="email" required>
+            <UInput
+              :model-value="model.email"
+              @update:model-value="model.email = ($event as string) ?? ''"
+              type="email"
+              :placeholder="t('users.fields.email.placeholder')"
+              class="w-full"
+            />
+          </UFormField>
+
+          <div class="flex items-center justify-end gap-3 pt-2">
+            <UButton
+              :label="t('common.actions.cancel')"
+              color="neutral"
+              variant="outline"
+              @click="
+                () => {
+                  router.push('/')
+                }
+              "
+            />
+            <UButton
+              type="submit"
+              :label="t('common.actions.saveChanges')"
+              trailing-icon="i-lucide-check"
+              :loading="loading"
+            />
+          </div>
+        </UForm>
+      </UCard>
+
+      <UCard>
+        <UForm
+          :schema="passwordSchema"
+          :state="passwordModel"
+          class="space-y-4"
+          @submit="onPasswordSubmit"
+        >
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-lock" class="size-4 text-primary" />
+            <h2 class="text-xs font-semibold uppercase tracking-wide text-muted">
+              {{ t('users.passwordCard.title') }}
+            </h2>
+          </div>
+
+          <UFormField
+            :label="t('users.passwordCard.fields.currentPassword.label')"
+            name="currentPassword"
+            required
           >
-            <FormField v-slot="$field" name="name" class="flex flex-col gap-1.5">
-              <label class="text-sm font-medium text-surface-700 dark:text-surface-300">
-                {{ t('users.fields.name.label') }} <span class="text-red-500">*</span>
-              </label>
-              <InputText
-                v-model="model.name"
-                :placeholder="t('users.fields.name.placeholder')"
-                :invalid="$field?.invalid"
-                fluid
-              />
-              <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
-                {{ $field.error?.message }}
-              </Message>
-            </FormField>
+            <UInput
+              :model-value="passwordModel.currentPassword"
+              @update:model-value="passwordModel.currentPassword = ($event as string) ?? ''"
+              type="password"
+              :placeholder="t('users.passwordCard.fields.currentPassword.placeholder')"
+              class="w-full"
+            />
+          </UFormField>
 
-            <FormField v-slot="$field" name="email" class="flex flex-col gap-1.5">
-              <label class="text-sm font-medium text-surface-700 dark:text-surface-300">
-                Email <span class="text-red-500">*</span>
-              </label>
-              <InputText
-                v-model="model.email"
-                type="email"
-                :placeholder="t('users.fields.email.placeholder')"
-                :invalid="$field?.invalid"
-                fluid
-              />
-              <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
-                {{ $field.error?.message }}
-              </Message>
-            </FormField>
-
-            <div class="flex items-center justify-end gap-3 pt-2">
-              <Button
-                :label="t('common.actions.cancel')"
-                severity="secondary"
-                outlined
-                @click="router.push('/')"
-              />
-              <Button
-                type="submit"
-                :label="t('common.actions.saveChanges')"
-                icon="pi pi-check"
-                iconPos="right"
-                :loading="loading"
-                :disabled="!$form.valid"
-              />
-            </div>
-          </Form>
-        </template>
-      </Card>
-
-      <!-- Password card -->
-      <Card class="border border-surface-200 dark:border-surface-700 shadow-sm">
-        <template #content>
-          <Form
-            :initialValues="passwordModel"
-            :resolver="passwordResolver"
-            :validateOnBlur="true"
-            :validateOnValueUpdate="true"
-            class="p-2 space-y-4"
-            @submit="onPasswordSubmit"
+          <UFormField
+            :label="t('users.passwordCard.fields.newPassword.label')"
+            name="newPassword"
+            required
           >
-            <div class="flex items-center gap-2">
-              <i class="pi pi-lock text-primary-500 dark:text-primary-400"></i>
-              <h2
-                class="text-sm font-semibold text-surface-700 dark:text-surface-300 uppercase tracking-wide"
-              >
-                {{ t('users.passwordCard.title') }}
-              </h2>
-            </div>
+            <UInput
+              :model-value="passwordModel.newPassword"
+              @update:model-value="passwordModel.newPassword = ($event as string) ?? ''"
+              type="password"
+              :placeholder="t('users.passwordCard.fields.newPassword.placeholder')"
+              class="w-full"
+            />
+          </UFormField>
 
-            <FormField v-slot="$field" name="currentPassword" class="flex flex-col gap-1.5">
-              <label class="text-sm font-medium text-surface-700 dark:text-surface-300">
-                {{ t('users.passwordCard.fields.currentPassword.label') }}
-                <span class="text-red-500">*</span>
-              </label>
-              <InputText
-                v-model="passwordModel.currentPassword"
-                type="password"
-                :placeholder="t('users.passwordCard.fields.currentPassword.placeholder')"
-                :invalid="$field?.invalid"
-                fluid
-              />
-              <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
-                {{ $field.error?.message }}
-              </Message>
-            </FormField>
+          <UFormField
+            :label="t('users.passwordCard.fields.confirmPassword.label')"
+            name="confirmPassword"
+            required
+          >
+            <UInput
+              :model-value="passwordModel.confirmPassword"
+              @update:model-value="passwordModel.confirmPassword = ($event as string) ?? ''"
+              type="password"
+              :placeholder="t('users.passwordCard.fields.confirmPassword.placeholder')"
+              class="w-full"
+            />
+          </UFormField>
 
-            <FormField v-slot="$field" name="newPassword" class="flex flex-col gap-1.5">
-              <label class="text-sm font-medium text-surface-700 dark:text-surface-300">
-                {{ t('users.passwordCard.fields.newPassword.label') }}
-                <span class="text-red-500">*</span>
-              </label>
-              <InputText
-                v-model="passwordModel.newPassword"
-                type="password"
-                :placeholder="t('users.passwordCard.fields.newPassword.placeholder')"
-                :invalid="$field?.invalid"
-                fluid
-              />
-              <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
-                {{ $field.error?.message }}
-              </Message>
-            </FormField>
+          <p v-if="passwordError" class="text-sm text-error">{{ passwordError }}</p>
 
-            <FormField v-slot="$field" name="confirmPassword" class="flex flex-col gap-1.5">
-              <label class="text-sm font-medium text-surface-700 dark:text-surface-300">
-                {{ t('users.passwordCard.fields.confirmPassword.label') }}
-                <span class="text-red-500">*</span>
-              </label>
-              <InputText
-                v-model="passwordModel.confirmPassword"
-                type="password"
-                :placeholder="t('users.passwordCard.fields.confirmPassword.placeholder')"
-                :invalid="$field?.invalid"
-                fluid
-              />
-              <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
-                {{ $field.error?.message }}
-              </Message>
-            </FormField>
-
-            <Message v-if="passwordError" severity="error" size="small" variant="simple">
-              {{ passwordError }}
-            </Message>
-
-            <div class="flex justify-end pt-1">
-              <Button
-                type="submit"
-                :label="t('users.passwordCard.submit')"
-                icon="pi pi-lock"
-                iconPos="right"
-                :loading="passwordLoading"
-              />
-            </div>
-          </Form>
-        </template>
-      </Card>
+          <div class="flex justify-end pt-1">
+            <UButton
+              type="submit"
+              :label="t('users.passwordCard.submit')"
+              trailing-icon="i-lucide-lock"
+              :loading="passwordLoading"
+            />
+          </div>
+        </UForm>
+      </UCard>
     </template>
   </div>
 </template>

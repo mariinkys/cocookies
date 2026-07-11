@@ -17,6 +17,7 @@ export default {
       signOut: 'Cerrar sesión',
       save: 'Guardar',
       remove: 'Eliminar',
+      clear: 'Limpiar',
     },
 
     feedback: {
@@ -78,6 +79,10 @@ export default {
       passwordMinLength: 'La contraseña debe tener al menos 8 caracteres',
       max100: 'No debe superar los 100 caracteres',
       min8: 'Debe tener al menos 8 caracteres',
+      min1: 'Debe ser al menos 1',
+      exceedsChars: 'Excede el máximo de caracteres',
+      exceedsMax: 'Excede el máximo',
+      intOnly: 'Solo números enteros',
     },
 
     states: {

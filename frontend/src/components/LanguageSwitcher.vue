@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Button from 'primevue/button'
 
 const LANG_STORAGE_KEY = 'socios-peix-lang'
 const { locale } = useI18n({ useScope: 'global' })
@@ -21,13 +20,9 @@ onMounted(() => {
 
 <template>
   <div class="flex items-center">
-    <Button
+    <UButton
       :label="locale === 'es' ? 'ES' : 'EN'"
       :aria-label="locale === 'es' ? 'Cambiar a Español' : 'Switch to English'"
-      severity="secondary"
-      text
-      rounded
-      size="small"
       @click="setLanguage(locale === 'es' ? 'en' : 'es')"
     />
   </div>

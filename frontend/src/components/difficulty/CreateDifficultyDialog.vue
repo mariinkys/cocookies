@@ -1,137 +1,122 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import * as v from 'valibot'
+import type { FormSubmitEvent } from '@nuxt/ui'
 import { useI18n } from 'vue-i18n'
-import { Form, FormField } from '@primevue/forms'
-import type { FormResolverOptions, FormSubmitEvent } from '@primevue/forms'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
-import Button from 'primevue/button'
-import Message from 'primevue/message'
-import { useToast } from 'primevue/usetoast'
 import { difficultiesService } from '@/services/difficulties.service'
 import type { DifficultyRequest, DifficultyResponse } from '@/types/difficulty.types'
-
-const emit = defineEmits<{ created: [difficulty: DifficultyResponse] }>()
 
 const { t } = useI18n({ useScope: 'global' })
 const toast = useToast()
 
-const visible = ref(false)
+const props = defineProps<{ open: boolean }>()
+const emit = defineEmits<{
+  'update:open': [value: boolean]
+  created: [difficulty: DifficultyResponse]
+}>()
+
 const loading = ref(false)
 
-const model = ref<DifficultyRequest>({ name: '', description: null })
-const initialValues: DifficultyRequest = { name: '', description: null }
-
-function open() {
-  model.value = { name: '', description: null }
-  visible.value = true
+function createDefaultModel(): DifficultyRequest {
+  return { name: '', description: null }
 }
 
-defineExpose({ open })
+const model = ref<DifficultyRequest>(createDefaultModel())
 
-const resolver = ({ values }: FormResolverOptions) => {
-  const errors: Record<string, { message: string }[]> = {}
-  if (!String(values.name ?? '').trim()) {
-    errors.name = [{ message: t('common.validation.nameRequired') }]
-  }
-  return { errors }
-}
+watch(
+  () => props.open,
+  (isOpen) => {
+    if (isOpen) model.value = createDefaultModel()
+  },
+)
 
-async function onSubmit({ valid }: FormSubmitEvent) {
-  if (!valid) return
+const schema = v.object({
+  name: v.pipe(v.string(), v.trim(), v.minLength(1, t('common.validation.nameRequired'))),
+  description: v.nullable(v.string()),
+})
+type Schema = v.InferOutput<typeof schema>
+
+async function onSubmit(event: FormSubmitEvent<Schema>) {
   loading.value = true
   try {
     const payload: DifficultyRequest = {
-      name: model.value.name.trim(),
-      description: model.value.description?.trim() || null,
+      name: event.data.name,
+      description: event.data.description?.trim() || null,
     }
     const created = await difficultiesService.create(payload)
     toast.add({
-      severity: 'success',
-      summary: t('common.feedback.created'),
-      detail: t('difficulties.messages.created'),
-      life: 3000,
+      color: 'success',
+      title: t('common.feedback.created'),
+      description: t('difficulties.messages.created'),
     })
     emit('created', created)
-    visible.value = false
+    emit('update:open', false)
   } catch {
     toast.add({
-      severity: 'error',
-      summary: t('common.feedback.error'),
-      detail: t('difficulties.messages.createError'),
-      life: 3000,
+      color: 'error',
+      title: t('common.feedback.error'),
+      description: t('difficulties.messages.createError'),
     })
   } finally {
     loading.value = false
   }
 }
+
+function close() {
+  emit('update:open', false)
+}
 </script>
 
 <template>
-  <Dialog
-    v-model:visible="visible"
-    :header="t('difficulties.dialog.title')"
-    :style="{ width: '24rem' }"
-    modal
-    :draggable="false"
+  <UModal
+    :open="open"
+    @update:open="emit('update:open', $event)"
+    :title="t('difficulties.dialog.title')"
+    :dismissible="!loading"
   >
-    <Form
-      v-slot="$form"
-      :initialValues
-      :resolver
-      :validateOnBlur="true"
-      :validateOnValueUpdate="true"
-      class="flex flex-col gap-4 pt-1"
-      @submit="onSubmit"
-    >
-      <FormField v-slot="$field" name="name" class="flex flex-col gap-1.5">
-        <label class="text-sm font-medium text-surface-700 dark:text-surface-300">
-          {{ t('common.fields.name') }}
-        </label>
-        <InputText
-          v-model="model.name"
-          :placeholder="t('difficulties.dialog.namePlaceholder')"
-          :invalid="$field?.invalid"
-          autofocus
-          fluid
-        />
-        <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
-          {{ $field.error?.message }}
-        </Message>
-      </FormField>
+    <template #body>
+      <UForm :schema="schema" :state="model" class="space-y-4" @submit="onSubmit">
+        <UFormField :label="t('common.fields.name')" name="name" required>
+          <UInput
+            :model-value="model.name"
+            @update:model-value="model.name = ($event as string) ?? ''"
+            :placeholder="t('difficulties.dialog.namePlaceholder')"
+            autofocus
+            class="w-full"
+          />
+        </UFormField>
 
-      <FormField name="description" class="flex flex-col gap-1.5">
-        <label class="text-sm font-medium text-surface-700 dark:text-surface-300">
-          {{ t('common.fields.description') }}
-          <span class="text-surface-400 dark:text-surface-500 font-normal ml-1">
-            {{ t('common.fields.optional') }}
-          </span>
-        </label>
-        <Textarea
-          v-model="model.description"
-          :placeholder="t('difficulties.dialog.descriptionPlaceholder')"
-          rows="3"
-          fluid
-          auto-resize
-        />
-      </FormField>
+        <UFormField
+          :label="t('common.fields.description')"
+          name="description"
+          :hint="t('common.fields.optional')"
+        >
+          <UTextarea
+            :model-value="model.description ?? undefined"
+            @update:model-value="model.description = ($event as string) || null"
+            :placeholder="t('difficulties.dialog.descriptionPlaceholder')"
+            :rows="3"
+            autoresize
+            class="w-full"
+          />
+        </UFormField>
 
-      <div class="flex justify-end gap-2 pt-1">
-        <Button
-          :label="t('common.actions.cancel')"
-          severity="secondary"
-          outlined
-          @click="visible = false"
-        />
-        <Button
-          type="submit"
-          :label="t('common.actions.create')"
-          icon="pi pi-plus"
-          :loading="loading"
-          :disabled="!!$form.invalid"
-        />
-      </div>
-    </Form>
-  </Dialog>
+        <div class="flex justify-end gap-2 pt-1">
+          <UButton
+            :label="t('common.actions.cancel')"
+            color="neutral"
+            variant="outline"
+            :disabled="loading"
+            @click="close"
+          />
+          <UButton
+            type="submit"
+            :label="t('common.actions.create')"
+            trailing-icon="i-lucide-plus"
+            :loading="loading"
+          />
+        </div>
+      </UForm>
+    </template>
+  </UModal>
 </template>

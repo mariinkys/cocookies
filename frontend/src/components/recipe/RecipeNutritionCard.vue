@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Card from 'primevue/card'
 import type { RecipeNutritionResponse } from '@/types/recipe.types'
 
 const props = defineProps<{
@@ -90,114 +89,96 @@ const rows = computed(() =>
 )
 
 const accentClasses: Record<string, string> = {
-  blue: 'bg-blue-100   dark:bg-blue-900/30   text-blue-700   dark:text-blue-300',
+  blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
   yellow: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300',
   orange: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
-  red: 'bg-red-100    dark:bg-red-900/30    text-red-700    dark:text-red-300',
-  green: 'bg-green-100  dark:bg-green-900/30  text-green-700  dark:text-green-300',
+  red: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
+  green: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
   purple: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
 }
 </script>
 
 <template>
-  <Card class="border border-surface-200 dark:border-surface-700 shadow-sm">
-    <template #content>
-      <div class="p-2 space-y-4">
-        <h2
-          class="text-sm font-semibold text-surface-700 dark:text-surface-300 uppercase tracking-wide"
-        >
-          {{ t('recipes.fields.nutrition.title') }}
-        </h2>
-
-        <!-- Calories hero row -->
-        <div
-          v-if="nutrition.calories != null"
-          class="rounded-xl bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800 p-4 flex items-center justify-between"
-        >
-          <div>
-            <p
-              class="text-xs text-primary-500 dark:text-primary-400 font-medium uppercase tracking-wide"
-            >
-              {{ t('recipes.fields.nutrition.calories') }}
-            </p>
-            <p
-              class="text-3xl font-bold text-primary-700 dark:text-primary-300 tabular-nums leading-none mt-1"
-            >
-              {{ nutrition.calories }}
-              <span class="text-sm font-normal ml-1">kcal</span>
-            </p>
-            <p class="text-xs text-primary-400 dark:text-primary-500 mt-1">
-              {{
-                t('recipes.fields.nutrition.perServing', {
-                  value: nutrition.servingSizeValue,
-                  unit: nutrition.servingSizeUnit,
-                })
-              }}
-            </p>
-          </div>
-          <div class="text-right">
-            <p
-              class="text-xs text-primary-400 dark:text-primary-500 font-medium uppercase tracking-wide"
-            >
-              {{ t('recipes.fields.nutrition.total') }}
-            </p>
-            <p
-              class="text-xl font-bold text-primary-600 dark:text-primary-400 tabular-nums leading-none mt-1"
-            >
-              {{ total.calories }}
-              <span class="text-xs font-normal ml-0.5">kcal</span>
-            </p>
-            <p class="text-xs text-primary-400 dark:text-primary-500 mt-1">
-              {{ t('recipes.fields.nutrition.forServings', { count: servings }) }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Nutrient rows -->
-        <div
-          v-if="rows.length"
-          class="space-y-0 divide-y divide-surface-100 dark:divide-surface-800"
-        >
-          <div
-            v-for="row in rows"
-            :key="row.key"
-            class="flex items-center justify-between py-2.5 first:pt-0 last:pb-0 gap-3"
-          >
-            <div class="flex items-center gap-2">
-              <span
-                class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
-                :class="accentClasses[row.accent]"
-              >
-                {{ row.unit }}
-              </span>
-              <span class="text-sm text-surface-700 dark:text-surface-300">
-                {{ t(row.labelKey) }}
-              </span>
-            </div>
-            <div class="text-right shrink-0">
-              <span class="text-sm font-semibold text-surface-900 dark:text-surface-0 tabular-nums">
-                {{ row.per }}{{ row.unit }}
-              </span>
-              <span class="text-xs text-surface-400 dark:text-surface-500 tabular-nums ml-2">
-                / {{ row.tot }}{{ row.unit }} {{ t('recipes.fields.nutrition.totalShort') }}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Serving size footnote -->
-        <p
-          class="text-[10px] text-surface-400 dark:text-surface-500 border-t border-surface-100 dark:border-surface-800 pt-2"
-        >
-          {{
-            t('recipes.fields.nutrition.footnote', {
-              value: nutrition.servingSizeValue,
-              unit: nutrition.servingSizeUnit,
-              servings,
-            })
-          }}
-        </p>
-      </div>
+  <UCard>
+    <template #header>
+      <h2 class="text-sm font-semibold uppercase tracking-wide text-muted">
+        {{ t('recipes.fields.nutrition.title') }}
+      </h2>
     </template>
-  </Card>
+
+    <div class="space-y-4">
+      <div
+        v-if="nutrition.calories != null"
+        class="flex items-center justify-between rounded-xl border border-primary/15 bg-primary/5 p-4"
+      >
+        <div>
+          <p class="text-xs font-medium uppercase tracking-wide text-primary">
+            {{ t('recipes.fields.nutrition.calories') }}
+          </p>
+          <p class="mt-1 text-3xl font-bold leading-none tabular-nums text-primary">
+            {{ nutrition.calories }}
+            <span class="ml-1 text-sm font-normal">kcal</span>
+          </p>
+          <p class="mt-1 text-xs text-primary/70">
+            {{
+              t('recipes.fields.nutrition.perServing', {
+                value: nutrition.servingSizeValue,
+                unit: nutrition.servingSizeUnit,
+              })
+            }}
+          </p>
+        </div>
+        <div class="text-right">
+          <p class="text-xs font-medium uppercase tracking-wide text-primary/70">
+            {{ t('recipes.fields.nutrition.total') }}
+          </p>
+          <p class="mt-1 text-xl font-bold leading-none tabular-nums text-primary/90">
+            {{ total.calories }}
+            <span class="ml-0.5 text-xs font-normal">kcal</span>
+          </p>
+          <p class="mt-1 text-xs text-primary/70">
+            {{ t('recipes.fields.nutrition.forServings', { count: servings }) }}
+          </p>
+        </div>
+      </div>
+
+      <div v-if="rows.length" class="divide-y divide-default">
+        <div
+          v-for="row in rows"
+          :key="row.key"
+          class="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0"
+        >
+          <div class="flex items-center gap-2">
+            <span
+              class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+              :class="accentClasses[row.accent]"
+            >
+              {{ row.unit }}
+            </span>
+            <span class="text-sm text-toned">
+              {{ t(row.labelKey) }}
+            </span>
+          </div>
+          <div class="shrink-0 text-right">
+            <span class="text-sm font-semibold tabular-nums text-highlighted">
+              {{ row.per }}{{ row.unit }}
+            </span>
+            <span class="ml-2 text-xs tabular-nums text-dimmed">
+              / {{ row.tot }}{{ row.unit }} {{ t('recipes.fields.nutrition.totalShort') }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <p class="border-t border-default pt-2 text-[10px] text-dimmed">
+        {{
+          t('recipes.fields.nutrition.footnote', {
+            value: nutrition.servingSizeValue,
+            unit: nutrition.servingSizeUnit,
+            servings,
+          })
+        }}
+      </p>
+    </div>
+  </UCard>
 </template>

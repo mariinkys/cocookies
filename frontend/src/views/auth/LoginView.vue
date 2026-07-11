@@ -1,52 +1,40 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-import { Form, FormField } from '@primevue/forms'
-import type { FormResolverOptions, FormSubmitEvent } from '@primevue/forms'
-import Card from 'primevue/card'
-import InputText from 'primevue/inputtext'
-import Password from 'primevue/password'
-import Button from 'primevue/button'
-import Message from 'primevue/message'
 import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import * as v from 'valibot'
+import type { FormSubmitEvent } from '@nuxt/ui'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
+import { useRoute, useRouter } from 'vue-router'
 import type { LoginPayload } from '@/types/auth.types'
 import type { AxiosError } from 'axios'
-import { useToast } from 'primevue/usetoast'
 
 const { t } = useI18n({ useScope: 'global' })
 const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
 const toast = useToast()
+
 const loading = ref(false)
+const showPassword = ref(false)
 
-const model = ref<LoginPayload>({ email: '', password: '' })
+const schema = v.object({
+  email: v.pipe(
+    v.string(),
+    v.minLength(1, t('common.validation.emailRequired')),
+    v.email(t('common.validation.invalidEmail')),
+  ),
+  password: v.pipe(v.string(), v.minLength(1, t('common.validation.passwordRequired'))),
+})
+type Schema = v.InferOutput<typeof schema>
 
-const initialValues = { email: '', password: '' }
+const model = ref<LoginPayload>({
+  email: '',
+  password: '',
+})
 
-const resolver = ({ values }: FormResolverOptions) => {
-  const errors: Record<string, { message: string }[]> = {}
-  const email = values.email as string
-  const password = values.password as string
-
-  if (!email) {
-    errors.email = [{ message: t('common.validation.emailRequired') }]
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errors.email = [{ message: t('common.validation.invalidEmail') }]
-  }
-
-  if (!password) {
-    errors.password = [{ message: t('common.validation.passwordRequired') }]
-  }
-
-  return { errors }
-}
-
-async function onSubmit({ valid }: FormSubmitEvent) {
-  if (!valid) return
-
+async function onSubmit(event: FormSubmitEvent<Schema>) {
   loading.value = true
+  model.value = event.data
   try {
     await auth.login(model.value)
     const redirect = (route.query.redirect as string) ?? '/'
@@ -54,10 +42,9 @@ async function onSubmit({ valid }: FormSubmitEvent) {
   } catch (e) {
     const err = e as AxiosError<{ message: string }>
     toast.add({
-      severity: 'error',
-      summary: t('common.feedback.error'),
-      detail: err.response?.data?.message ?? t('auth.login.errors.loginFailed'),
-      life: 3000,
+      color: 'error',
+      title: t('common.feedback.error'),
+      description: err.response?.data?.message ?? t('auth.login.errors.loginFailed'),
     })
   } finally {
     loading.value = false
@@ -66,85 +53,113 @@ async function onSubmit({ valid }: FormSubmitEvent) {
 </script>
 
 <template>
-  <div
-    class="flex h-full items-center justify-center bg-surface-50 dark:bg-surface-950 px-6 transition-colors duration-200"
-  >
-    <Card class="w-full max-w-md border border-surface-200 dark:border-surface-700 shadow-lg">
-      <template #content>
-        <div class="space-y-8 p-2">
-          <div class="text-center space-y-1">
-            <h1 class="text-xl font-semibold text-surface-900 dark:text-surface-0">
+  <div class="relative flex h-full items-center justify-center overflow-hidden px-6 py-12">
+    <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+      <div
+        class="absolute left-1/2 top-0 size-144 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl"
+      />
+    </div>
+
+    <div class="w-full max-w-md">
+      <div class="overflow-hidden rounded-xl border border-default bg-default shadow-sm">
+        <div
+          class="relative flex h-28 items-center justify-center overflow-hidden border-b border-default bg-elevated"
+        >
+          <div
+            class="absolute inset-0 flex items-center justify-around text-dimmed/40"
+            aria-hidden="true"
+          >
+            <UIcon name="i-lucide-carrot" class="size-6 -rotate-12" />
+            <UIcon name="i-lucide-cooking-pot" class="size-7 rotate-6" />
+            <UIcon name="i-lucide-utensils" class="size-6 -rotate-6" />
+            <UIcon name="i-lucide-croissant" class="size-7 rotate-12" />
+          </div>
+
+          <div
+            class="relative flex size-14 items-center justify-center rounded-full bg-default shadow-sm ring-1 ring-default"
+          >
+            <UIcon name="i-lucide-chef-hat" class="size-7 text-primary" />
+          </div>
+        </div>
+
+        <div class="space-y-6 p-6 sm:p-8">
+          <div class="space-y-1 text-center">
+            <h1 class="text-xl font-semibold tracking-tight text-highlighted">
               {{ t('auth.login.title') }}
             </h1>
-            <p class="text-sm text-surface-500 dark:text-surface-400">
+            <p class="text-sm text-muted">
               {{ t('auth.login.description') }}
             </p>
           </div>
 
-          <Form
-            v-slot="$form"
-            :initialValues
-            :resolver
-            :validateOnBlur="true"
-            :validateOnValueUpdate="true"
-            class="space-y-5"
-            @submit="onSubmit"
-          >
-            <FormField v-slot="$field" name="email" class="flex flex-col gap-1.5">
-              <label class="text-sm font-medium text-surface-700 dark:text-surface-300">
-                {{ t('common.fields.email') }}
-              </label>
-              <InputText
+          <UForm :schema="schema" :state="model" class="space-y-5" @submit="onSubmit">
+            <UFormField :label="t('common.fields.email')" name="email">
+              <UInput
                 v-model="model.email"
                 type="email"
+                icon="i-lucide-mail"
                 :placeholder="t('common.placeholders.enterYourEmail')"
                 autocomplete="email"
-                :invalid="$field?.invalid"
-                fluid
+                size="lg"
+                class="w-full"
               />
-              <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
-                {{ $field.error?.message }}
-              </Message>
-            </FormField>
+            </UFormField>
 
-            <FormField v-slot="$field" name="password" class="flex flex-col gap-1.5">
-              <label class="text-sm font-medium text-surface-700 dark:text-surface-300">
-                {{ t('common.fields.password') }}
-              </label>
-              <Password
+            <UFormField :label="t('common.fields.password')" name="password">
+              <UInput
                 v-model="model.password"
+                :type="showPassword ? 'text' : 'password'"
+                icon="i-lucide-lock"
                 :placeholder="t('common.placeholders.enterPassword')"
-                :feedback="false"
-                :invalid="$field?.invalid"
-                toggleMask
-                fluid
-              />
-              <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
-                {{ $field.error?.message }}
-              </Message>
-            </FormField>
+                autocomplete="current-password"
+                size="lg"
+                class="w-full"
+                :ui="{ trailing: 'pe-1' }"
+              >
+                <template #trailing>
+                  <UButton
+                    color="neutral"
+                    variant="link"
+                    size="sm"
+                    :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                    :aria-label="showPassword ? 'Hide Password' : 'Show Password'"
+                    :aria-pressed="showPassword"
+                    @click="
+                      () => {
+                        showPassword = !showPassword
+                      }
+                    "
+                  />
+                </template>
+              </UInput>
+            </UFormField>
 
-            <Button
+            <UButton
               type="submit"
               :label="t('auth.login.submit')"
-              icon="pi pi-sign-in"
-              icon-pos="right"
-              class="w-full"
               :loading="loading"
-              :disabled="!!$form.invalid"
+              trailing-icon="i-lucide-log-in"
+              size="lg"
+              block
             />
+          </UForm>
 
-            <p class="text-center text-sm text-surface-500 dark:text-surface-400">
-              <RouterLink
-                to="/register"
-                class="font-medium text-primary-600 dark:text-primary-400 hover:underline"
-              >
-                {{ t('navigation.items.newAccount') }}
-              </RouterLink>
-            </p>
-          </Form>
+          <USeparator :label="t('auth.login.noAccount')" :ui="{ label: 'text-dimmed text-xs' }" />
+
+          <UButton
+            :label="t('navigation.items.newAccount')"
+            icon="i-lucide-user-plus"
+            color="neutral"
+            variant="outline"
+            block
+            @click="
+              () => {
+                router.push('/register')
+              }
+            "
+          />
         </div>
-      </template>
-    </Card>
+      </div>
+    </div>
   </div>
 </template>

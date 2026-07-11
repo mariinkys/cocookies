@@ -1,16 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { Form } from '@primevue/forms'
-import Card from 'primevue/card'
-import Button from 'primevue/button'
-import ConfirmDialog from 'primevue/confirmdialog'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 
-import { useRecipeForm } from '@/composables/useRecipeForm'
-import { useRecipeSteps } from '@/composables/useRecipeSteps'
-import { useRecipeIngredients } from '@/composables/useRecipeIngredients'
-import { useRecipeNutrition } from '@/composables/useRecipeNutrition'
+import { useRecipeForm } from '@/composables/recipe/useRecipeForm'
+import { useRecipeSteps } from '@/composables/recipe/useRecipeSteps'
+import { useRecipeIngredients } from '@/composables/recipe/useRecipeIngredients'
+import { useRecipeNutrition } from '@/composables/recipe/useRecipeNutrition'
 import { useLlmDialog } from '@/composables/useLlmDialog'
 
 import StepDialog from '@/components/recipe/upsert/StepDialog.vue'
@@ -32,180 +28,198 @@ const recipeId = computed(() => route.params.id as string | undefined)
 
 const {
   model,
+  schema,
   isEdit,
   isOwnRecipe,
   loading,
   fetchLoading,
   deleteLoading,
-  hasListErrors,
+  isDeleteModalOpen,
   fetchRecipe,
-  resolver,
   onSubmit,
-  confirmDelete,
+  openDeleteModal,
+  closeDeleteModal,
+  confirmDeleteRecipe,
 } = useRecipeForm(recipeId)
 
 const steps = useRecipeSteps(model)
 const ingredients = useRecipeIngredients(model)
 const nutrition = useRecipeNutrition(model)
-const { llmDialogVisible, formKey, applyLlmImport } = useLlmDialog(model)
+const { llmDialogVisible, applyLlmImport } = useLlmDialog(model)
+
+const readOnly = computed(() => isEdit.value && !isOwnRecipe.value)
 
 onMounted(fetchRecipe)
 </script>
 
 <template>
-  <div class="px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6">
+  <div class="mx-auto max-w-7xl space-y-6 p-6">
     <div v-if="fetchLoading" class="flex items-center justify-center py-24">
-      <i class="pi pi-spinner pi-spin text-2xl text-surface-400"></i>
+      <UIcon name="i-lucide-loader-2" class="size-6 animate-spin text-dimmed" />
     </div>
 
-    <Form
-      v-else
-      :key="formKey"
-      v-slot="$form"
-      :initialValues="model"
-      :resolver
-      :validateOnBlur="true"
-      :validateOnValueUpdate="true"
-      class="space-y-4 sm:space-y-6"
-      @submit="onSubmit"
-    >
-      <ConfirmDialog />
-
-      <StepDialog
-        :visible="steps.visible.value"
-        @update:visible="steps.visible.value = $event"
-        :instructions="steps.instructions.value"
-        @update:instructions="steps.instructions.value = $event"
-        :duration="steps.duration.value"
-        @update:duration="steps.duration.value = $event"
-        :title="steps.dialogTitle.value"
-        :isAdding="steps.isAdding.value"
-        :error="steps.error.value"
-        @save="steps.save"
-        @saveAndClose="steps.saveAndClose"
-        @close="steps.close"
-      />
-
-      <IngredientDialog
-        :visible="ingredients.visible.value"
-        @update:visible="ingredients.visible.value = $event"
-        :name="ingredients.name.value"
-        @update:name="ingredients.name.value = $event"
-        :quantity="ingredients.quantity.value"
-        @update:quantity="ingredients.quantity.value = $event"
-        :unit="ingredients.unit.value"
-        @update:unit="ingredients.unit.value = $event"
-        :notes="ingredients.notes.value"
-        @update:notes="ingredients.notes.value = $event"
-        :title="ingredients.dialogTitle.value"
-        :isAdding="ingredients.isAdding.value"
-        :error="ingredients.error.value"
-        @save="ingredients.save"
-        @saveAndClose="ingredients.saveAndClose"
-        @close="ingredients.close"
-      />
-
-      <AskLlmDialog v-model:visible="llmDialogVisible" @import="applyLlmImport" />
-
-      <!-- Page header -->
-      <div class="flex items-center justify-between gap-3 flex-wrap">
+    <UForm v-else :schema="schema" :state="model" class="space-y-4 sm:space-y-6" @submit="onSubmit">
+      <div
+        class="flex flex-col gap-4 border-b border-default px-6 py-6 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div class="flex items-center gap-3">
-          <Button
-            icon="pi pi-arrow-left"
-            severity="secondary"
-            text
-            rounded
+          <UButton
+            icon="i-lucide-arrow-left"
+            color="neutral"
+            variant="ghost"
             :aria-label="t('common.actions.back')"
-            @click="router.push('/')"
+            @click="
+              () => {
+                router.push('/')
+              }
+            "
           />
           <div>
-            <h1 class="text-xl font-semibold text-surface-900 dark:text-surface-0">
+            <h1 class="text-2xl font-semibold tracking-tight text-highlighted">
               {{ isEdit ? t('recipes.titles.edit') : t('recipes.titles.create') }}
             </h1>
-            <p class="text-sm text-surface-500 dark:text-surface-400 mt-0.5">
+            <p class="mt-1 text-sm text-muted">
               {{ isEdit ? t('recipes.descriptions.edit') : t('recipes.descriptions.create') }}
             </p>
           </div>
         </div>
-        <div v-if="isOwnRecipe" class="flex items-center gap-2 shrink-0">
-          <Button
-            :label="t('common.actions.cancel')"
-            severity="secondary"
-            outlined
-            @click="router.push('/')"
-          />
-          <Button
-            type="submit"
-            :label="isEdit ? t('common.actions.saveChanges') : t('recipes.actions.create')"
-            :icon="isEdit ? 'pi pi-check' : 'pi pi-plus'"
-            icon-pos="right"
-            :loading="loading"
-            :disabled="!$form.valid || hasListErrors"
-          />
-          <Button
+
+        <div v-if="!readOnly" class="flex flex-wrap items-center gap-2">
+          <UButton
             v-if="!isEdit"
             :label="t('recipes.import.trigger')"
-            icon="pi pi-sparkles"
-            severity="secondary"
-            outlined
-            @click="llmDialogVisible = true"
+            icon="i-lucide-sparkles"
+            color="neutral"
+            variant="outline"
+            @click="
+              () => {
+                llmDialogVisible = true
+              }
+            "
           />
-          <Button
+          <UButton
             v-if="isEdit"
-            icon="pi pi-trash"
-            severity="danger"
-            outlined
+            icon="i-lucide-trash-2"
+            color="error"
+            variant="outline"
             :loading="deleteLoading"
             :aria-label="t('recipes.actions.delete')"
-            @click="confirmDelete"
+            @click="openDeleteModal"
+          />
+          <UButton
+            :label="t('common.actions.cancel')"
+            color="neutral"
+            variant="outline"
+            @click="
+              () => {
+                router.push('/')
+              }
+            "
+          />
+          <UButton
+            type="submit"
+            :label="isEdit ? t('common.actions.saveChanges') : t('recipes.actions.create')"
+            :trailing-icon="isEdit ? 'i-lucide-check' : 'i-lucide-plus'"
+            :loading="loading"
           />
         </div>
       </div>
 
-      <!-- Body grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
-        <div class="lg:col-span-2 space-y-4 sm:space-y-6">
-          <RecipeBasicInfo v-model="model" />
+      <div class="grid grid-cols-1 gap-4 px-6 sm:gap-6 lg:grid-cols-3">
+        <div class="space-y-4 lg:col-span-2 sm:space-y-6">
+          <RecipeBasicInfo v-model="model" :disabled="readOnly" />
 
-          <Card class="border border-surface-200 dark:border-surface-700 shadow-sm">
-            <template #content>
+          <UCard>
+            <UFormField name="ingredients">
               <IngredientList
                 :ingredients="model.ingredients"
-                :formError="($form.errors as Record<string, any>)?.['ingredients']?.[0]?.message"
+                :disabled="readOnly"
                 @add="ingredients.openAdd"
                 @edit="ingredients.openEdit"
                 @remove="ingredients.remove"
               />
-            </template>
-          </Card>
+            </UFormField>
+          </UCard>
 
-          <Card class="border border-surface-200 dark:border-surface-700 shadow-sm">
-            <template #content>
+          <UCard>
+            <UFormField name="steps">
               <StepList
                 :steps="model.steps"
-                :formError="($form.errors as Record<string, any>)?.['steps']?.[0]?.message"
+                :disabled="readOnly"
                 @add="steps.openAdd"
                 @edit="steps.openEdit"
                 @remove="steps.remove"
                 @move="steps.move"
                 @reorder="steps.reorder"
               />
-            </template>
-          </Card>
+            </UFormField>
+          </UCard>
         </div>
 
-        <!-- Right Side Col -->
-        <div class="lg:col-span-1 space-y-4 sm:space-y-6">
-          <RecipeOrganisation v-model="model" />
-          <RecipeTiming v-model="model" />
+        <div class="space-y-4 lg:col-span-1 sm:space-y-6">
+          <RecipeOrganisation v-model="model" :disabled="readOnly" />
+          <RecipeTiming v-model="model" :disabled="readOnly" />
           <RecipeNutrition
             v-model="model"
+            :disabled="readOnly"
             @enable="nutrition.enable"
             @disable="nutrition.disable"
           />
-          <RecipeVisibility v-model="model" />
+          <RecipeVisibility v-model="model" :disabled="readOnly" />
         </div>
       </div>
-    </Form>
+    </UForm>
+
+    <StepDialog
+      v-model:open="steps.visible"
+      v-model:instructions="steps.instructions"
+      v-model:duration="steps.duration"
+      :title="steps.dialogTitle"
+      :is-adding="steps.isAdding"
+      :error="steps.error"
+      @save="steps.save"
+      @save-and-close="steps.saveAndClose"
+      @close="steps.close"
+    />
+
+    <IngredientDialog
+      v-model:open="ingredients.visible"
+      v-model:name="ingredients.name"
+      v-model:quantity="ingredients.quantity"
+      v-model:unit="ingredients.unit"
+      v-model:notes="ingredients.notes"
+      :title="ingredients.dialogTitle"
+      :is-adding="ingredients.isAdding"
+      :error="ingredients.error"
+      @save="ingredients.save"
+      @save-and-close="ingredients.saveAndClose"
+      @close="ingredients.close"
+    />
+
+    <AskLlmDialog v-model:open="llmDialogVisible" @import="applyLlmImport" />
+
+    <UModal
+      v-model:open="isDeleteModalOpen"
+      :title="t('recipes.deleteDialog.title')"
+      :description="t('recipes.deleteDialog.message', { name: model.title })"
+      :dismissible="!deleteLoading"
+      :ui="{ footer: 'justify-end' }"
+    >
+      <template #footer>
+        <UButton
+          :label="t('common.actions.cancel')"
+          color="neutral"
+          variant="outline"
+          :disabled="deleteLoading"
+          @click="closeDeleteModal"
+        />
+        <UButton
+          :label="t('common.actions.delete')"
+          color="error"
+          :loading="deleteLoading"
+          @click="confirmDeleteRecipe"
+        />
+      </template>
+    </UModal>
   </div>
 </template>
