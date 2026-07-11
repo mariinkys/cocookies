@@ -104,7 +104,11 @@ const navLinks = computed(() => [
           variant="ghost"
           size="sm"
           square
-          @click="mobileOpen = !mobileOpen"
+          @click="
+            () => {
+              mobileOpen = !mobileOpen
+            }
+          "
         />
       </div>
     </div>
