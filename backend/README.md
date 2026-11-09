@@ -3,8 +3,6 @@
 Rust + [axum](https://github.com/tokio-rs/axum) + SQLite ([sqlx](https://github.com/launchbadge/sqlx)),
 with native PDF generation through [krilla](https://github.com/LaurenzV/krilla).
 
-A single ~12 MB binary that idles at roughly 15 MB of RAM.
-
 ## Running
 
 ```sh
@@ -12,10 +10,6 @@ cargo run                      # http://localhost:8080, database in ./cocookies.
 cargo test                     # unit + end-to-end API tests
 cargo clippy --all-targets -- -D warnings
 ```
-
-Migrations in `migrations/` are embedded in the binary and applied on start-up. The first
-migration is idempotent, so a database created by the previous (Java) backend is upgraded in
-place: just point `DB_URL` at it.
 
 ## Configuration
 
@@ -94,23 +88,6 @@ it in `infra/setup.rs` and `AppState`.
 
 **Testing:** use cases are unit-tested against the in-memory fakes in `use_cases/fakes.rs`;
 adapters have focused unit tests; `tests/api.rs` drives the real router on a real SQLite file.
-
-## API
-
-Same routes and JSON shapes as before, with these differences:
-
-* **Guests**: `GET /api/recipes/shared`, `GET /api/recipes/{id}` and
-  `GET /api/recipes/{id}/pdf/{template}` work without signing in for shared recipes
-  (when `GUEST_ACCESS=true`). `GET /api/system/config` tells the client whether that is enabled.
-* **List endpoints** (`/api/recipes`, `/api/recipes/shared`) return lightweight recipe *cards*
-  (no steps / ingredients / nutrition; category and difficulty as `{id, name}`).
-* Only the **owner** can modify or delete a recipe, even a shared one; recipes can only reference
-  the owner's own categories/difficulties.
-* Proper status codes for not found (404), duplicates (409) and bad references (400) instead of
-  generic 500s. `GET /api/users` (list every user) was removed.
-* Sessions are bound to the user id, so changing your e-mail no longer logs you out. Refresh
-  tokens are stored hashed, rotated on use, and reuse revokes all of the user's sessions.
-* `GET /api/system/health` for container health checks.
 
 ## Fonts
 
