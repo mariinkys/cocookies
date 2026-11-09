@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -40,7 +40,7 @@
     "npm-run-all2": "^9.0.4",
     "oxfmt": "^0.77.0",
     "oxlint": "~1.92.0",
-    "typescript": "~7.0.2",
+    "typescript": "~6.0.2",
     "vite": "^8.3.6",
     "vite-plugin-vue-devtools": "^8.2.1",
     "vue-tsc": "^3.3.14"
