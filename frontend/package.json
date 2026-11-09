@@ -15,35 +15,35 @@
     "format": "oxfmt src/"
   },
   "dependencies": {
-    "@nuxt/ui": "^4.9.0",
-    "@tailwindcss/vite": "^4.3.2",
-    "axios": "^1.18.1",
+    "@nuxt/ui": "^4.12.0",
+    "@tailwindcss/vite": "^4.3.5",
+    "axios": "^1.21.0",
     "pinia": "^4.1.0",
-    "tailwindcss": "^4.3.2",
-    "valibot": "^1.4.2",
-    "vue": "^3.5.39",
-    "vue-i18n": "^11.4.6",
-    "vue-router": "^5.1.0"
+    "tailwindcss": "^4.3.5",
+    "valibot": "^1.5.0",
+    "vue": "^3.5.45",
+    "vue-i18n": "^11.4.18",
+    "vue-router": "^5.4.0"
   },
   "devDependencies": {
     "@intlify/eslint-plugin-vue-i18n": "^4.5.1",
-    "@tsconfig/node24": "^24.0.4",
-    "@types/node": "^26.1.1",
-    "@vitejs/plugin-vue": "^6.0.7",
+    "@tsconfig/node24": "^24.0.5",
+    "@types/node": "^26.6.6",
+    "@vitejs/plugin-vue": "^6.0.10",
     "@vue/eslint-config-typescript": "^14.9.0",
     "@vue/tsconfig": "^0.9.1",
-    "eslint": "^10.6.0",
+    "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-oxlint": "~1.92.0",
     "eslint-plugin-vue": "~10.12.0",
     "jiti": "^2.7.0",
-    "npm-run-all2": "^9.0.2",
+    "npm-run-all2": "^9.0.4",
     "oxfmt": "^0.77.0",
     "oxlint": "~1.92.0",
     "typescript": "~7.0.2",
-    "vite": "^8.1.4",
-    "vite-plugin-vue-devtools": "^8.1.5",
-    "vue-tsc": "^3.3.7"
+    "vite": "^8.3.6",
+    "vite-plugin-vue-devtools": "^8.2.1",
+    "vue-tsc": "^3.3.14"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
