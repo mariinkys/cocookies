@@ -1,15 +1,22 @@
 import api from '@/api/axios'
 import type { PageResponse, PaginatedParams } from '@/types/common.types'
-import type { RecipeRequest, RecipeResponse, RecipeTemplate } from '@/types/recipe.types'
+import type {
+  RecipeRequest,
+  RecipeResponse,
+  RecipeSummaryResponse,
+  RecipeTemplate,
+} from '@/types/recipe.types'
 
 class RecipesService {
-  async getAll(params?: PaginatedParams): Promise<PageResponse<RecipeResponse>> {
-    const { data } = await api.get<PageResponse<RecipeResponse>>('/api/recipes', { params })
+  async getAll(params?: PaginatedParams): Promise<PageResponse<RecipeSummaryResponse>> {
+    const { data } = await api.get<PageResponse<RecipeSummaryResponse>>('/api/recipes', { params })
     return data
   }
 
-  async getAllShared(params?: PaginatedParams): Promise<PageResponse<RecipeResponse>> {
-    const { data } = await api.get<PageResponse<RecipeResponse>>('/api/recipes/shared', { params })
+  async getAllShared(params?: PaginatedParams): Promise<PageResponse<RecipeSummaryResponse>> {
+    const { data } = await api.get<PageResponse<RecipeSummaryResponse>>('/api/recipes/shared', {
+      params,
+    })
     return data
   }
 

@@ -12,11 +12,24 @@
 ## Features
 
 - Multiple Users (can share recipes)
+- Guest access: browse shared recipes read-only, no account needed
 - Recipe Nutrition Info
 - PDF Generation
 - AI Import of recipes (from images, PDFs...)
 
 And more
+
+## Self-hosting
+
+Copy `.env.example` to `.env`, set at least `JWT_SECRET`, and run `docker compose up -d`.
+The app is served on port 8080. Configuration options are documented in
+[backend/README.md](./backend/README.md#configuration). Databases from previous versions are
+migrated automatically on start-up.
+
+## Development
+
+- Backend (Rust): `cd backend && cargo run` — see [backend/README.md](./backend/README.md)
+- Frontend (Vue): `cd frontend && pnpm install && pnpm dev`
 
 ## About me
 

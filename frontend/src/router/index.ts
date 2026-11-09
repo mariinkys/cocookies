@@ -12,7 +12,7 @@ const routes = [
     path: '/sharedrecipes',
     name: 'Shared Recipes',
     component: () => import('@/views/recipes/SharedView.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, allowGuest: true },
   },
   {
     path: '/login',
@@ -48,7 +48,7 @@ const routes = [
     path: '/recipes/:id/view',
     name: 'View Recipe',
     component: () => import('@/views/recipes/DetailsView.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, allowGuest: true },
   },
 ]
 
@@ -62,6 +62,10 @@ router.beforeEach(async (to) => {
   await auth.init()
 
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
+    // Guests may browse shared recipes (read only); everything else needs an account.
+    if (auth.isGuest) {
+      return to.meta.allowGuest ? true : { name: 'Shared Recipes' }
+    }
     return { name: 'Login', query: { redirect: to.fullPath } }
   }
 

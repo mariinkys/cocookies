@@ -14,12 +14,12 @@ services:
     environment:
       - COOKIE_SECURE=false
       - CORS_ALLOWED_ORIGIN=http://SERVERIP:8080
-      - DB_URL=jdbc:sqlite:/app/data/cocookies.db
+      - DB_URL=/app/data/cocookies.db
+      - GUEST_ACCESS=true
       - JWT_SECRET=EnterYourOwn
       - OLLAMA_MODEL=gemma3:4b
       - OLLAMA_URL=http://SERVERIP:11434
-      - SPRING_PROFILES_ACTIVE=prod
-      - TRUST_PROXY=false
+      - TRUST_PROXY=true
     image: ghcr.io/mariinkys/cocookies-backend:latest
     labels:
       icon: https://raw.githubusercontent.com/mariinkys/cocookies/refs/heads/main/frontend/src/assets/icon.png

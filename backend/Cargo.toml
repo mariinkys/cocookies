@@ -1,0 +1,63 @@
+[package]
+name = "cocookies"
+version = "0.3.0"
+edition = "2024"
+rust-version = "1.90"
+description = "A self-hostable recipe manager (backend)"
+license = "GPL-3.0-only"
+repository = "https://github.com/mariinkys/cocookies"
+authors = ["Alex Marín"]
+publish = false
+
+[dependencies]
+# HTTP
+axum = { version = "0.8.9", default-features = false, features = ["http1", "json", "query", "tokio", "multipart", "macros"] }
+tower = { version = "0.5.3", default-features = false }
+tower-http = { version = "0.7.1", features = ["cors", "trace", "set-header", "limit"] }
+tokio = { version = "1.54.1", features = ["rt-multi-thread", "macros", "net", "signal", "time", "sync"] }
+
+# Persistence
+sqlx = { version = "0.9.0", default-features = false, features = ["runtime-tokio", "sqlite-bundled", "migrate", "macros"] }
+
+# Serialization
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+
+# Security
+jsonwebtoken = { version = "11.1.0", default-features = false, features = ["rust_crypto"] }
+bcrypt = "0.19.3"
+sha2 = "0.11.1"
+getrandom = "0.4.3"
+uuid = { version = "1.29.1", features = ["v4", "serde"] }
+
+# Outbound HTTP (Ollama + recipe page/image fetching)
+reqwest = { version = "0.13.5", default-features = false, features = ["rustls-no-provider", "json"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+
+# PDF generation / reading
+krilla = { version = "0.8.2", default-features = false, features = ["raster-images"] }
+skrifa = "0.42.1" # same version krilla uses, for text measurement
+lopdf = { version = "0.47.0", default-features = false }
+base64 = "0.22.1" # same version krilla uses
+
+# Observability & errors
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", default-features = false, features = ["fmt", "env-filter", "ansi"] }
+thiserror = "2.0.21"
+async-trait = "0.1.92"
+anyhow = "1.0.104"
+
+[target.'cfg(target_env = "musl")'.dependencies]
+# musl's allocator is slow; mimalloc keeps both latency and RSS low.
+mimalloc = { version = "0.1.52", default-features = false }
+
+[dev-dependencies]
+tower = { version = "0.5.3", features = ["util"] }
+http-body-util = "0.1"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true

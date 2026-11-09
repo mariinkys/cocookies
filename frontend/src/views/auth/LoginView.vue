@@ -32,6 +32,14 @@ const model = ref<LoginPayload>({
   password: '',
 })
 
+function continueAsGuest() {
+  auth.enterAsGuest()
+  const redirect = route.query.redirect as string | undefined
+  // Only follow the redirect if guests are allowed there (e.g. a shared recipe link).
+  const target = redirect && router.resolve(redirect).meta.allowGuest ? redirect : '/sharedrecipes'
+  router.push(target)
+}
+
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   loading.value = true
   model.value = event.data
@@ -158,6 +166,22 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
               }
             "
           />
+
+          <template v-if="auth.guestAccessEnabled">
+            <USeparator :label="t('auth.guest.or')" :ui="{ label: 'text-dimmed text-xs' }" />
+
+            <div class="space-y-1.5">
+              <UButton
+                :label="t('auth.guest.continue')"
+                icon="i-lucide-eye"
+                color="neutral"
+                variant="ghost"
+                block
+                @click="continueAsGuest"
+              />
+              <p class="text-center text-xs text-dimmed">{{ t('auth.guest.hint') }}</p>
+            </div>
+          </template>
         </div>
       </div>
     </div>
