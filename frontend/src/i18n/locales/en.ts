@@ -122,6 +122,13 @@ export default {
         loginFailed: 'Login failed',
       },
     },
+    guest: {
+      or: 'or',
+      continue: 'Continue as guest',
+      hint: 'Browse shared recipes without an account (read only)',
+      badge: 'Guest',
+      signIn: 'Sign in',
+    },
     register: {
       title: 'Create an account',
       description: 'Fill in the details below to get started',

@@ -19,6 +19,15 @@ const logout = async () => {
   router.push('/login')
 }
 
+const signIn = () => {
+  mobileOpen.value = false
+  auth.leaveGuest()
+  router.push('/login')
+}
+
+/** Signed-in users and guests both get the navigation links. */
+const canBrowse = computed(() => auth.isAuthenticated || auth.isGuest)
+
 const isActive = (path: string) => route.path === path
 
 const navLinks = computed(() => [
@@ -35,7 +44,10 @@ const navLinks = computed(() => [
   >
     <div class="flex items-center justify-between px-6 h-14">
       <div class="flex items-center gap-4">
-        <RouterLink to="/" class="flex items-center gap-2 shrink-0 select-none">
+        <RouterLink
+          :to="auth.isGuest ? '/sharedrecipes' : '/'"
+          class="flex items-center gap-2 shrink-0 select-none"
+        >
           <img
             src="@/assets/icon.png"
             alt="Cocookies"
@@ -46,7 +58,7 @@ const navLinks = computed(() => [
           <span class="text-sm font-semibold text-highlighted tracking-tight"> Cocookies </span>
         </RouterLink>
 
-        <template v-if="auth.isAuthenticated">
+        <template v-if="canBrowse">
           <div class="hidden md:block w-px h-5 bg-border" />
 
           <nav class="hidden md:flex items-center gap-1">
@@ -78,6 +90,25 @@ const navLinks = computed(() => [
           {{ auth.user?.email }}
         </RouterLink>
 
+        <template v-if="auth.isGuest">
+          <UBadge
+            class="hidden md:inline-flex mr-1"
+            color="neutral"
+            variant="subtle"
+            icon="i-lucide-eye"
+            :label="t('auth.guest.badge')"
+          />
+          <UButton
+            class="hidden md:flex"
+            :label="t('auth.guest.signIn')"
+            icon="i-lucide-log-in"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            @click="signIn"
+          />
+        </template>
+
         <UButton
           v-if="auth.isAuthenticated"
           class="hidden md:flex"
@@ -96,7 +127,7 @@ const navLinks = computed(() => [
 
         <!-- Hamburger (mobile) -->
         <UButton
-          v-if="auth.isAuthenticated"
+          v-if="canBrowse"
           class="md:hidden"
           :icon="mobileOpen ? 'i-lucide-x' : 'i-lucide-menu'"
           :aria-label="t('common.theme.toggleMenu')"
@@ -123,7 +154,7 @@ const navLinks = computed(() => [
       leave-to-class="opacity-0 -translate-y-1"
     >
       <div
-        v-if="mobileOpen && auth.isAuthenticated"
+        v-if="mobileOpen && canBrowse"
         class="md:hidden border-t border-default bg-default px-4 py-3 space-y-1"
       >
         <RouterLink
@@ -142,7 +173,30 @@ const navLinks = computed(() => [
           {{ link.label }}
         </RouterLink>
 
-        <div class="pt-2 mt-2 border-t border-muted flex items-center justify-between">
+        <div
+          v-if="auth.isGuest"
+          class="pt-2 mt-2 border-t border-muted flex items-center justify-between"
+        >
+          <UBadge
+            color="neutral"
+            variant="subtle"
+            icon="i-lucide-eye"
+            :label="t('auth.guest.badge')"
+          />
+          <UButton
+            :label="t('auth.guest.signIn')"
+            icon="i-lucide-log-in"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            @click="signIn"
+          />
+        </div>
+
+        <div
+          v-if="auth.isAuthenticated"
+          class="pt-2 mt-2 border-t border-muted flex items-center justify-between"
+        >
           <RouterLink
             :to="`/users/${auth.user?.id}/edit`"
             class="text-xs text-muted truncate max-w-50 hover:text-default transition-colors"

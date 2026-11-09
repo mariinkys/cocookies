@@ -122,6 +122,13 @@ export default {
         loginFailed: 'Error al iniciar sesión',
       },
     },
+    guest: {
+      or: 'o',
+      continue: 'Continuar como invitado',
+      hint: 'Explora las recetas compartidas sin cuenta (solo lectura)',
+      badge: 'Invitado',
+      signIn: 'Iniciar sesión',
+    },
     register: {
       title: 'Crear una cuenta',
       description: 'Rellena los datos para empezar',

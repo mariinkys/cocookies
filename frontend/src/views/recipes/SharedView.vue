@@ -4,14 +4,14 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { recipesService } from '@/services/recipes.service'
 import { useAuthStore } from '@/stores/auth'
-import type { RecipeResponse } from '@/types/recipe.types'
+import type { RecipeSummaryResponse } from '@/types/recipe.types'
 
 const { t } = useI18n({ useScope: 'global' })
 const toast = useToast()
 const router = useRouter()
 const auth = useAuthStore()
 
-const recipes = ref<RecipeResponse[]>([])
+const recipes = ref<RecipeSummaryResponse[]>([])
 const loading = ref(false)
 const search = ref('')
 const totalRecords = ref(0)
@@ -78,15 +78,15 @@ watch(selectedSort, () => {
   fetchRecipes()
 })
 
-function isOwnRecipe(recipe: RecipeResponse): boolean {
+function isOwnRecipe(recipe: RecipeSummaryResponse): boolean {
   return recipe.userId === auth.user?.id
 }
 
-const deleteTarget = ref<RecipeResponse | null>(null)
+const deleteTarget = ref<RecipeSummaryResponse | null>(null)
 const isDeleteModalOpen = ref(false)
 const deleting = ref(false)
 
-function askDelete(event: Event, recipe: RecipeResponse) {
+function askDelete(event: Event, recipe: RecipeSummaryResponse) {
   event.stopPropagation()
   deleteTarget.value = recipe
   isDeleteModalOpen.value = true
@@ -279,6 +279,7 @@ onMounted(fetchRecipes)
         </div>
         <p class="text-sm">{{ t('recipes.list.empty') }}</p>
         <UButton
+          v-if="auth.isAuthenticated"
           :label="t('recipes.actions.createFirst')"
           icon="i-lucide-plus"
           variant="outline"

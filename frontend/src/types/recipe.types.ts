@@ -35,6 +35,29 @@ export interface RecipeResponse {
   updatedAt: string
 }
 
+/** `{id, name}` reference used on recipe cards. */
+export interface NamedRef {
+  id: string
+  name: string
+}
+
+/** Lightweight card returned by the list endpoints (no steps/ingredients/nutrition). */
+export interface RecipeSummaryResponse {
+  id: string
+  userId: string
+  category: NamedRef | null
+  difficulty: NamedRef | null
+  title: string
+  description: string | null
+  prepTime: number | null
+  cookTime: number | null
+  servings: number
+  imageUrl: string | null
+  shared: boolean
+  createdAt: string
+  updatedAt: string
+}
+
 export interface RecipeStepRequest {
   stepNumber: number
   instructions: string

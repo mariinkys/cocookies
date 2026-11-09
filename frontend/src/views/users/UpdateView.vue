@@ -5,12 +5,14 @@ import { useI18n } from 'vue-i18n'
 import * as v from 'valibot'
 import type { FormSubmitEvent } from '@nuxt/ui'
 import { usersService } from '@/services/users.service'
+import { useAuthStore } from '@/stores/auth'
 import type { UserUpdatePayload, UpdatePasswordPayload } from '@/types/user.types'
 
 const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
 const route = useRoute()
 const toast = useToast()
+const auth = useAuthStore()
 
 const userId = route.params.id as string
 
@@ -42,6 +44,7 @@ async function onSubmit(event: FormSubmitEvent<ProfileSchema>) {
   try {
     const payload: UserUpdatePayload = { name: event.data.name, email: event.data.email }
     await usersService.update(userId, payload)
+    await auth.fetchCurrentUser()
     toast.add({
       color: 'success',
       title: t('common.feedback.saved'),

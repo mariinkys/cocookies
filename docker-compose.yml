@@ -2,12 +2,12 @@ services:
   backend:
     image: ghcr.io/${GITHUB_REPOSITORY}-backend:latest
     environment:
-      SPRING_PROFILES_ACTIVE: prod
-      DB_URL: jdbc:sqlite:/app/data/cocookies.db
+      DB_URL: /app/data/cocookies.db
       JWT_SECRET: ${JWT_SECRET}
       CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN}
       COOKIE_SECURE: ${COOKIE_SECURE}
-      TRUST_PROXY: ${TRUST_PROXY}
+      TRUST_PROXY: ${TRUST_PROXY:-true}
+      GUEST_ACCESS: ${GUEST_ACCESS:-true}
       OLLAMA_URL: ${OLLAMA_URL}
       OLLAMA_MODEL: ${OLLAMA_MODEL}
     volumes:

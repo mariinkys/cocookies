@@ -1,14 +1,8 @@
 import api from '@/api/axios'
 import type { RegisterPayload } from '@/types/auth.types'
-import type { PageResponse, PaginatedParams } from '@/types/common.types'
 import type { UpdatePasswordPayload, UserResponse, UserUpdatePayload } from '@/types/user.types'
 
 class UsersService {
-  async getAll(params?: PaginatedParams): Promise<PageResponse<UserResponse>> {
-    const { data } = await api.get<PageResponse<UserResponse>>('/api/users', { params })
-    return data
-  }
-
   async getById(id: string): Promise<UserResponse> {
     const { data } = await api.get<UserResponse>(`/api/users/${id}`)
     return data
